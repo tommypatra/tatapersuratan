@@ -10,7 +10,10 @@
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^8.75",
         "laravel/sanctum": "^2.11",
-        "laravel/tinker": "^2.5"
+        "laravel/tinker": "^2.5",
+        "setasign/fpdf": "^1.8",
+        "setasign/fpdi": "^2.6",
+        "simplesoftwareio/simple-qrcode": "^4.2"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
@@ -25,7 +28,10 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/Helpers/WebApp.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
