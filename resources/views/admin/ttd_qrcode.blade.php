@@ -150,7 +150,7 @@
             <div id="idttd" data-id=""></div>
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modal-label">Form</h5>
+                    <h5 class="modal-title" id="modal-label" >Form</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body ">
@@ -344,11 +344,7 @@
         $('#user_ttd_id').val("").trigger("change");
 
         CrudModule.resetForm(fieldInit);
-        let myModalForm = new bootstrap.Modal(document.getElementById('modal-form'), {
-            backdrop: 'static',
-            keyboard: false,
-        });
-        myModalForm.toggle();
+        showHideModal('modal-form');
     }
 
     // tambah data
@@ -434,11 +430,7 @@
         $('#is_diterima').val("").trigger("change");
         
         CrudModule.resetForm(fieldInit);
-        let myModalForm = new bootstrap.Modal(document.getElementById('modal-verifikasi'), {
-            backdrop: 'static',
-            keyboard: false,
-        });
-        myModalForm.toggle();
+        showHideModal('modal-verifikasi');
 
         // extractPdf(pdfUrl).then(function(resultArray) {
         //     $('#datapdf').data('pdf','');
@@ -479,6 +471,7 @@
             data:dataForm,
             success: function (response){
                 if (response.success) {
+                    showHideModal('modal-verifikasi',false);
                     refresh();
                 } 
                 appShowNotification(response.success,[response.message]);

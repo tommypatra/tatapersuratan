@@ -124,3 +124,17 @@ function isUserInDisposisi(tujuanArray, userId) {
     }
     return false;
 }    
+
+function showHideModal(el,status=true){
+    if(status){
+        let myModalForm = new bootstrap.Modal(document.getElementById(el), {
+            backdrop: 'static',
+            keyboard: false,
+        });
+        myModalForm.toggle();
+    }else{
+        const cmodal = document.querySelector('#'+el);
+        const modal = bootstrap.Modal.getInstance(cmodal);    
+        modal.hide();      
+    }
+}

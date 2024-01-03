@@ -20,7 +20,7 @@ use App\Http\Resources\DistribusiResource;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 
-function uploadFile(Request $request)
+function uploadFile($request)
 {
     $uploadedFile = $request->file('file');
     $originalFileName = $uploadedFile->getClientOriginalName();
