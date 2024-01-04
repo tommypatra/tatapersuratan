@@ -108,8 +108,7 @@
 				}
 			});
 
-			$("#email").val('admin@thisapp.com');
-			$("#password").val('00000000');
+
 
 			function setSession(param){
 				let postData={
