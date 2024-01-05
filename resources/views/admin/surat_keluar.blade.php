@@ -187,6 +187,7 @@
             <div class="modal-body">
                 <div class="row mb-3" style="align:center">
                     <div class="col-lg-8">
+                        <button id="switch-camera" class="btn btn-primary">Switch Camera</button>
                         <video id="camera" autoplay width="100%"></video>
                     </div>                
                     <div class="col-lg-4">
@@ -718,23 +719,21 @@
             });    
         });
 
-    }    
+    }   
 
     $(document).ready(function() {
-
         CrudModule.setApi(vApi);
         // Load data default
         loadData();
-
-
-
         // Ambil referensi elemen
         const cameraElement = document.getElementById("camera");
         const takePhotoButton = document.getElementById("take-photo");
+        const switchCameraButton = document.getElementById("switch-camera"); // Tambahkan ini
+
         let isUploading = false;
+        let stream; // Tambahkan ini untuk menyimpan referensi stream kamera
 
         function stopCamera() {
-            const stream = cameraElement.srcObject;
             if (stream) {
                 const tracks = stream.getTracks();
                 tracks.forEach(function(track) {
@@ -744,16 +743,40 @@
             }
         }
 
-        $('#modal-upload').on('shown.bs.modal', function () {
-            navigator.mediaDevices.getUserMedia({ video: true })
-            .then(function (stream) {
-                cameraElement.srcObject = stream;
-            })
-            .catch(function (error) {
-                console.error("Error accessing camera:", error);
-            });
+        // Tambahkan fungsi untuk switch kamera
+        function switchCamera() {
+            stopCamera();
 
-            takePhotoButton.addEventListener("click", function () {
+            const videoConstraints = {
+                video: {
+                    facingMode: (stream.getVideoTracks()[0].getSettings().facingMode === 'user') ? 'environment' : 'user'
+                }
+            };
+
+            navigator.mediaDevices.getUserMedia(videoConstraints)
+                .then(function(newStream) {
+                    stream = newStream;
+                    cameraElement.srcObject = newStream;
+                })
+                .catch(function(error) {
+                    console.error("Error switching camera:", error);
+                });
+        }
+
+        $('#modal-upload').on('shown.bs.modal', function() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(initialStream) {
+                    stream = initialStream; // Simpan referensi stream
+                    cameraElement.srcObject = initialStream;
+                })
+                .catch(function(error) {
+                    console.error("Error accessing camera:", error);
+                });
+
+            // Tambahkan event listener untuk switch camera
+            switchCameraButton.addEventListener("click", switchCamera);
+
+            takePhotoButton.addEventListener("click", function() {
                 if (!isUploading) {
                     isUploading = true;
                     takePhotoButton.disabled = true;
@@ -778,22 +801,21 @@
                         canvas.width,
                         canvas.height
                     );
-                    canvas.toBlob(function (blob) {
+                    canvas.toBlob(function(blob) {
                         if (blob) {
-                            uploadFile(vsurat_keluar_id, vUserId, blob, 'capture.jpg');
+                            const user_id = "{{ auth()->user()->id }}";
+                            uploadFile(vsurat_masuk_id, user_id, blob, 'capture.jpg');
                         }
                         isUploading = false;
                         takePhotoButton.disabled = false;
                     }, "image/jpeg", 1);
                 }
             });
-
         });
 
-        $('#modal-upload').on('hidden.bs.modal', function () {
+        $('#modal-upload').on('hidden.bs.modal', function() {
             stopCamera();
         });
-
     });    
 
 </script>
