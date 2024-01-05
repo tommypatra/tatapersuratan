@@ -736,98 +736,99 @@ function displayPagination(response) {
     // });
 
     $(document).ready(function() {
-    // Ambil referensi elemen
-    const cameraElement = document.getElementById("camera");
-    const takePhotoButton = document.getElementById("take-photo");
-    const switchCameraButton = document.getElementById("switch-camera"); // Tambahkan ini
+        refreshData()
+        // Ambil referensi elemen
+        const cameraElement = document.getElementById("camera");
+        const takePhotoButton = document.getElementById("take-photo");
+        const switchCameraButton = document.getElementById("switch-camera"); // Tambahkan ini
 
-    let isUploading = false;
-    let stream; // Tambahkan ini untuk menyimpan referensi stream kamera
+        let isUploading = false;
+        let stream; // Tambahkan ini untuk menyimpan referensi stream kamera
 
-    function stopCamera() {
-        if (stream) {
-            const tracks = stream.getTracks();
-            tracks.forEach(function(track) {
-                track.stop();
-            });
-            cameraElement.srcObject = null;
+        function stopCamera() {
+            if (stream) {
+                const tracks = stream.getTracks();
+                tracks.forEach(function(track) {
+                    track.stop();
+                });
+                cameraElement.srcObject = null;
+            }
         }
-    }
 
-    // Tambahkan fungsi untuk switch kamera
-    function switchCamera() {
-        stopCamera();
+        // Tambahkan fungsi untuk switch kamera
+        function switchCamera() {
+            stopCamera();
 
-        const videoConstraints = {
-            video: {
-                facingMode: (stream.getVideoTracks()[0].getSettings().facingMode === 'user') ? 'environment' : 'user'
-            }
-        };
+            const videoConstraints = {
+                video: {
+                    facingMode: (stream.getVideoTracks()[0].getSettings().facingMode === 'user') ? 'environment' : 'user'
+                }
+            };
 
-        navigator.mediaDevices.getUserMedia(videoConstraints)
-            .then(function(newStream) {
-                stream = newStream;
-                cameraElement.srcObject = newStream;
-            })
-            .catch(function(error) {
-                console.error("Error switching camera:", error);
+            navigator.mediaDevices.getUserMedia(videoConstraints)
+                .then(function(newStream) {
+                    stream = newStream;
+                    cameraElement.srcObject = newStream;
+                })
+                .catch(function(error) {
+                    console.error("Error switching camera:", error);
+                });
+        }
+
+        $('#modal-upload').on('shown.bs.modal', function() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(initialStream) {
+                    stream = initialStream; // Simpan referensi stream
+                    cameraElement.srcObject = initialStream;
+                })
+                .catch(function(error) {
+                    console.error("Error accessing camera:", error);
+                });
+
+            // Tambahkan event listener untuk switch camera
+            switchCameraButton.addEventListener("click", switchCamera);
+
+            takePhotoButton.addEventListener("click", function() {
+                if (!isUploading) {
+                    isUploading = true;
+                    takePhotoButton.disabled = true;
+
+                    const canvas = document.createElement("canvas");
+                    const scaleFactor = 1.5;
+                    const targetWidth = cameraElement.videoWidth * scaleFactor;
+                    const targetHeight = cameraElement.videoHeight * scaleFactor;
+
+                    canvas.width = targetWidth;
+                    canvas.height = targetHeight;
+
+                    const context = canvas.getContext("2d");
+                    context.drawImage(
+                        cameraElement,
+                        (cameraElement.videoWidth - targetWidth) / 2,
+                        (cameraElement.videoHeight - targetHeight) / 2,
+                        targetWidth,
+                        targetHeight,
+                        0,
+                        0,
+                        canvas.width,
+                        canvas.height
+                    );
+                    canvas.toBlob(function(blob) {
+                        if (blob) {
+                            const user_id = "{{ auth()->user()->id }}";
+                            uploadFile(vsurat_masuk_id, user_id, blob, 'capture.jpg');
+                        }
+                        isUploading = false;
+                        takePhotoButton.disabled = false;
+                    }, "image/jpeg", 1);
+                }
             });
-    }
+        });
 
-    $('#modal-upload').on('shown.bs.modal', function() {
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(function(initialStream) {
-                stream = initialStream; // Simpan referensi stream
-                cameraElement.srcObject = initialStream;
-            })
-            .catch(function(error) {
-                console.error("Error accessing camera:", error);
-            });
-
-        // Tambahkan event listener untuk switch camera
-        switchCameraButton.addEventListener("click", switchCamera);
-
-        takePhotoButton.addEventListener("click", function() {
-            if (!isUploading) {
-                isUploading = true;
-                takePhotoButton.disabled = true;
-
-                const canvas = document.createElement("canvas");
-                const scaleFactor = 1.5;
-                const targetWidth = cameraElement.videoWidth * scaleFactor;
-                const targetHeight = cameraElement.videoHeight * scaleFactor;
-
-                canvas.width = targetWidth;
-                canvas.height = targetHeight;
-
-                const context = canvas.getContext("2d");
-                context.drawImage(
-                    cameraElement,
-                    (cameraElement.videoWidth - targetWidth) / 2,
-                    (cameraElement.videoHeight - targetHeight) / 2,
-                    targetWidth,
-                    targetHeight,
-                    0,
-                    0,
-                    canvas.width,
-                    canvas.height
-                );
-                canvas.toBlob(function(blob) {
-                    if (blob) {
-                        const user_id = "{{ auth()->user()->id }}";
-                        uploadFile(vsurat_masuk_id, user_id, blob, 'capture.jpg');
-                    }
-                    isUploading = false;
-                    takePhotoButton.disabled = false;
-                }, "image/jpeg", 1);
-            }
+        $('#modal-upload').on('hidden.bs.modal', function() {
+            stopCamera();
         });
     });
-
-    $('#modal-upload').on('hidden.bs.modal', function() {
-        stopCamera();
-    });
-});
 
 </script>
 @endsection
