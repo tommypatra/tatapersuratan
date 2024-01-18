@@ -24,8 +24,8 @@
                                 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                                     <li><a href="javascript:;" id="btnRefresh" onclick="refresh()" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="refresh-cw"></i> Refresh</a></li>
                                     <li><a href="javascript:;" id="btnTambah" onclick="tambah()" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="plus-circle"></i> Tambah</a></li>
-                                    <li><a href="#" id="btnCoba" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="filter"></i> Filter</a></li>
-                                </ul>                        
+                                    <li><a href="#" class="nav-link px-2 link-dark" onclick="setfilter()"><i class="align-middle" data-feather="filter"></i> Filter</a></li>
+                                </ul>        
                                 <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
                                     <input type="search" id="search-data" class="form-control" placeholder="Search..." aria-label="Search">
                                 </form>                        
@@ -34,7 +34,23 @@
                     </header>
 
                 </div>
-                <div class="card-body">                    
+                <div class="card-body">              
+                    
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:;" id="tabKonsep" onclick="setActiveTab('tabKonsep')">Konsep</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="javascript:;" id="tabAjukan" onclick="setActiveTab('tabAjukan')">Diajukan</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="javascript:;" id="tabTerima" onclick="setActiveTab('tabTerima')">Diterima</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="javascript:;" id="tabTolak" onclick="setActiveTab('tabTolak')">Ditolak</a>
+                        </li>
+                    </ul>
+                    
                     <div class="table-responsive">
                         <table class="table mt-3">
                             <thead>
@@ -43,7 +59,7 @@
                                     <th style="width:15%">Jenis/ Pejabat Spesimen</th>
                                     <th style="width:40%">Tanggal/ Nomor/ Perihal/ Asal</th>
                                     <th style="width:15%">Tujuan/ Ringkasan</th>
-                                    <th style="width:20%">Lampiran</th>
+                                    <th style="text-align: center; width:20%">Lampiran</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -215,6 +231,7 @@
     var vApi='/api/surat-keluar';
     var vJudul='Penomoran Surat Keluar';
     var vsurat_keluar_id;
+    var tahunFilter = '{{ date("Y") }}';
     // console.log(hakAkses);
     var hakAkses = {!! session()->get('akses') !!};
     // if(hakAkses>1)
@@ -241,7 +258,45 @@
         time: false,
     });
 
+    
+    function setfilter(){
+        tahunFilter = prompt('Masukkan tahun:');
+        if (!isValidTahun(tahunFilter)) {
+            appShowNotification(false,['Tahun yang dimasukkan tidak valid. Mohon masukkan tahun yang benar.']);
+        }else{
+            loadData();
+        }
+    }
 
+    function isValidTahun(input) {
+        const regex = /^\d{4}$/;
+        return regex.test(input);
+    }   
+
+    // Fungsi untuk mengatur kelas active
+    function setActiveTab(tabId) {
+        $('.nav-link').removeClass('active'); 
+        $('#' + tabId).addClass('active');
+        console.log(tabId);
+        switch (tabId) {
+            case 'tabKonsep':
+                loadDataKonsep();
+                break;
+            case 'tabAjukan':
+                loadDataMasuk();
+                break;
+            case 'tabTerima':
+                loadDataDiterima();
+                break;
+            case 'tabTolak':
+                loadDataDitolak();
+                break;
+            default:
+                loadDataMasuk();
+                break;
+        }    
+    }
+    
     //refresh
     function refresh(){
         CrudModule.refresh(displayData);
@@ -272,6 +327,23 @@
             $.each(data, function(index, dt) {
 
                 var lampiran=`<span class="badge bg-danger">Belum terupload</span>`;
+                var labelApp=labelSetupVerifikasi(dt.is_diajukan,dt.is_diterima,dt.catatan,dt.verifikator);
+                var menu_edit=``;
+
+                if(dt.user_id==vUserId){
+                    menu_edit=` <li><a class="dropdown-item" href="javascript:;" onclick="ajukan(${dt.id})"><i class="fa-regular fa-share-from-square"></i> Ajukan</a></li>
+                                <li><a class="dropdown-item" href="javascript:;" onclick="ganti(${dt.id})"><i class="fa-solid fa-pen-to-square"></i> Ganti</a></li>
+                                <li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>`;
+                }
+                
+                if(dt.is_diajukan){
+                    menu_edit=``;
+                    if(dt.is_diterima==null && hakAkses==1){
+                        menu_edit=` <li><a class="dropdown-item" href="javascript:;" onclick="validasi(1,${dt.id})"><i class="fa-solid fa-envelope-circle-check"></i> Terima</a></li>
+                                    <li><a class="dropdown-item" href="javascript:;" onclick="validasi(0,${dt.id})"><i class="fa-solid fa-rectangle-xmark"></i> Tolak</a></li>`;
+                    }
+                }
+
                 var menu_detail=``;
                 if(dt.jumlah_lampiran>0){
                     lampiran =`<ul style="list-style: none;margin: 0;padding: 0; font-size:11px;" class="fa-ul images">`;
@@ -282,8 +354,8 @@
                             lampiran +=`<li><span class="fa-li"><i class="fa-solid fa-arrow-up-right-from-square"></i></span><a href="${ds.upload.path}" target="_blank">${ds.upload.name}</a> <a href="javascript:;" onclick="hapusLampiranSuratKeluar(${ds.id},${ds.upload.id})"><i class="fa-regular fa-trash-can"></i></a></li>`;
                     });
                     lampiran +=`</ul>`;
-                    menu_detail=`   <li><a class="dropdown-item" href="{{ asset('surat-keluar-detail/${dt.id}') }}" ><i class="fa-solid fa-newspaper"></i> Selengkapnya</a></li>
-                                    <li><a class="dropdown-item" href="javascript:;" onclick="prosesdistribusi(${dt.id})"><i class="fa-regular fa-paper-plane"></i> Distribusi</a></li>`;
+
+                    menu_detail=`<li><a class="dropdown-item" href="javascript:;" onclick="prosesdistribusi(${dt.id})"><i class="fa-regular fa-paper-plane"></i> Ajukan</a></li>`;
                 }
                 
                 var lblaktif=(!dt.is_aktif)?`<span class="badge bg-danger">Tidak Aktif</span>`:`<span class="badge bg-success">Aktif</span>`;
@@ -303,10 +375,12 @@
                                 <figcaption class="blockquote-footer mb-0">
                                     ${dt.user.name} (${dt.asal}) 
                                 </figcaption>                                   
-                            </div>                               
+                            </div>  
+                            <div>${labelApp.catatan}</div>                             
                         </td>
                         <td>${dt.tujuan}<div style="font-style:italic;font-size:12px;">${ringkasan}</div></td>
-                        <td>
+                        <td style="text-align: center">
+                            <div>${labelApp.label}</div>
                             <i class="fa-solid fa-users"></i> ${dt.jumlah_distribusi}
                             <div class="btn-group-sm">
                                 <a href="javascript:;" class="btn btn-primary uploadLampiran" data-surat_keluar_id="${dt.id}"><i class="fa-solid fa-upload"></i></a>
@@ -319,8 +393,8 @@
                                 <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
                                 <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
                                     ${menu_detail}
-                                    <li><a class="dropdown-item" href="javascript:;" onclick="ganti(${dt.id})"><i class="fa-solid fa-pen-to-square"></i> Ganti</a></li>
-                                    <li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>
+                                    ${menu_edit}
+                                    <li><a class="dropdown-item" href="{{ asset('surat-keluar-detail/${dt.id}') }}" target="_blank"><i class="fa-solid fa-newspaper"></i> Selengkapnya</a></li>
                                 </ul>
                             </div>                    
                         </td>
@@ -453,7 +527,8 @@
         $("#el-klasifikasi").hide();
         //load pola
         let thn = new Date($("#tanggal").val()).getFullYear();        
-        let dataCari = {tahun:thn,user_id:vUserId};
+        // let dataCari = {tahun:thn,user_id:vUserId};
+        let dataCari = {tahun:thn};
         let keywordString = encodeURIComponent(JSON.stringify(dataCari));
 
         $.ajax({
@@ -495,6 +570,39 @@
             $("#el-klasifikasi").hide();
         }
     });
+
+    function validasi(is_diterima,id){
+        var label='tolak';
+        var catatan='';
+        if(is_diterima){
+            label='terima';
+        }
+
+        if(confirm('apakah anda yakin '+label+' usulan ini?')){
+            if(!is_diterima)
+                catatan = prompt("Tuliskan alasan mengapa usulan ini ditolak?");
+
+            $.ajax({
+                url: "/api/proses-ajuan-surat-keluar",
+                type: "POST",
+                data: {
+                    'id':id,
+                    'is_diterima':is_diterima,
+                    'catatan':catatan,
+                },
+                dataType: 'json',
+                success: function (response) {
+                    if(response.success){
+                        appShowNotification(true, [response.message]);
+                        refresh();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    appShowNotification(false, ["Something went wrong. Please try again later."]);
+                }
+            });                
+        }
+    }
 
     // function initSpesimen(){
     //     //load spesimen
@@ -630,7 +738,26 @@
                 uploadFile(surat_keluar_id, vUserId, selectedFile);
             }
         });
-    });    
+    });  
+    
+    function ajukan(id){
+        if(confirm("apakah anda yakin?")){
+            $.ajax({
+                url: "/api/ajukan-surat-keluar",
+                type: "POST",
+                data: {'id':id},
+                dataType: 'json',
+                success: function (response) {
+                    if(response.success)
+                        refresh();
+                    appShowNotification(response.success, response.msg);
+                },
+                error: function (xhr, status, error) {
+                    appShowNotification(false, ["Something went wrong. Please try again later."]);
+                }
+            });
+        }
+    }
 
     function uploadFile(surat_keluar_id, user_id, file, fileName) {
         const formData = new FormData();
@@ -721,10 +848,41 @@
 
     }   
 
+    function salinText() {
+        var textToCopy = $('#salinText').text().trim();
+        var textarea = $('<textarea>').val(textToCopy);
+        $('body').append(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        textarea.remove();
+        alert("Teks berhasil disalin ke clipboard!");
+    }    
+
+    function loadDataKonsep(page = 1) {
+        CrudModule.setFilter('{"kategori":"konsep","tahun":'+tahunFilter+'}');
+        CrudModule.fRead(page, displayData);
+    }
+
+    function loadDataMasuk(page = 1) {
+        CrudModule.setFilter('{"kategori":"diajukan","tahun":'+tahunFilter+'}');
+        CrudModule.fRead(page, displayData);
+    }
+
+    function loadDataDiterima(page = 1) {
+        CrudModule.setFilter('{"kategori":"diterima","tahun":'+tahunFilter+'}');
+        CrudModule.fRead(page, displayData);
+    }
+
+    function loadDataDitolak(page = 1) {
+        CrudModule.setFilter('{"kategori":"ditolak","tahun":'+tahunFilter+'}');
+        CrudModule.fRead(page, displayData);
+    }
+        
     $(document).ready(function() {
         CrudModule.setApi(vApi);
         // Load data default
-        loadData();
+        loadDataKonsep();
+
         // Ambil referensi elemen
         const cameraElement = document.getElementById("camera");
         const takePhotoButton = document.getElementById("take-photo");

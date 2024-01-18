@@ -138,3 +138,35 @@ function showHideModal(el,status=true){
         modal.hide();      
     }
 }
+
+function labelSetupVerifikasi(is_diajukan=null,is_diterima=null,catatan=null,verifikator=null){
+    var clrtmp='info';
+    // var label_disetujui=`<span class="badge bg-info">Menunggu</span>`;
+    var catatan_verifikasi='';
+    var label_disetujui=`<span class="badge bg-warning">Belum Diajukan</span>`;
+
+    if(is_diajukan){
+        label_disetujui=`<span class="badge bg-info">Menunggu Validasi</span>`;
+        if(is_diterima!==null && is_diterima!==''){
+            clrtmp=(is_diterima)?'success':'danger';
+            label_disetujui=(is_diterima)?`<span class="badge bg-${clrtmp}">Diterima</span>`:`<span class="badge bg-danger">Ditolak</span>`;
+        }        
+    }
+
+    if(verifikator!==null && verifikator!==''){
+        catatan_verifikasi=`<div style="font-size:12px">verifikator : ${verifikator}</div>`;
+    }
+
+
+    if(catatan!==null && catatan!==''){
+        catatan_verifikasi+=`
+            <div class="alert alert-${clrtmp} alert-dismissible fade show" role="alert">
+                <h4 class="alert-heading">Catatan Validasi</h4>
+                <p>${catatan}</p>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>                    
+        `;
+    }
+
+    return {'label':'<div>'+label_disetujui+'</div>','catatan':catatan_verifikasi}
+}

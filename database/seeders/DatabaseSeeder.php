@@ -107,6 +107,16 @@ class DatabaseSeeder extends Seeder
 
         //untuk surat masuk
         for ($i = 1; $i <= 10; $i++) {
+            $diajukan = rand(0, 1);
+            $diterima = null;
+            $catatan = null;
+            $verifikator = null;
+            if ($diajukan) {
+                $diterima = rand(0, 1);
+                $catatan = (!$diterima) ? "ada yang kurang ini " . $i : null;
+                $verifikator = ($diterima >= 0) ? "Administrator" : null;
+            }
+
             SuratMasuk::create([
                 'user_id' => rand(1, 2),
                 'no_agenda' => $i,
@@ -116,6 +126,10 @@ class DatabaseSeeder extends Seeder
                 'asal' => 'asal surat ' . $i,
                 'tempat' => 'tempat surat ' . $i,
                 'perihal' => 'Surat Tentang Data ' . $i, // password default login admin
+                "is_diajukan" => $diajukan,
+                "is_diterima" => $diterima,
+                "catatan" => $catatan,
+                "verifikator" => $verifikator,
             ]);
         }
 
@@ -200,17 +214,52 @@ class DatabaseSeeder extends Seeder
         //nilai default surat keluar
         $dtdef = [
             [
-                "no_surat" => "001/In.23/HM.00/I/2023",
+                "no_surat" => null,
+                "no_indeks" => null,
+                "asal" => "AKMA",
+                "pola" => null,
+                "tujuan" => "Para Dekan",
+                "perihal" => "Data Kuota Maba",
+                "ringkasan" => "",
+                "tanggal" => date("Y-m-d"),
+                "klasifikasi_surat_id" => "1",
+                "akses_pola_id" => "2",
+                "user_id" => 2,
+                "catatan" => null,
+                "is_diajukan" => 0,
+                "is_diterima" => null,
+            ],
+            [
+                "no_surat" => "001/In.23/HM.00/I/" . date("Y"),
                 "no_indeks" => "1",
                 "asal" => "AKMA",
-                "pola" => "001/In.23/HM.00/I/2023",
+                "pola" => "001/In.23/HM.00/I/" . date("Y"),
                 "tujuan" => "Para Dekan",
                 "perihal" => "Permintaan data mahasiswa terbaik",
                 "ringkasan" => "",
-                "tanggal" => "2023-01-01",
+                "tanggal" => date("Y-m-d"),
                 "klasifikasi_surat_id" => "1",
                 "akses_pola_id" => "2",
-                "user_id" => 1
+                "user_id" => 1,
+                "is_diajukan" => 1,
+                "is_diterima" => 1,
+                "catatan" => null,
+            ],
+            [
+                "no_surat" => null,
+                "no_indeks" => null,
+                "asal" => "AKMA",
+                "pola" => "002/In.23/HM.00/I/" . date("Y"),
+                "tujuan" => "Para Dekan",
+                "perihal" => "Data Beasiswa",
+                "ringkasan" => "",
+                "tanggal" => date("Y-m-d"),
+                "klasifikasi_surat_id" => "1",
+                "akses_pola_id" => "2",
+                "user_id" => 1,
+                "is_diajukan" => 1,
+                "is_diterima" => 0,
+                "catatan" => null,
             ],
         ];
 
@@ -227,6 +276,9 @@ class DatabaseSeeder extends Seeder
                 "klasifikasi_surat_id" => $dt["klasifikasi_surat_id"],
                 "akses_pola_id" => $dt["akses_pola_id"],
                 "user_id" => $dt["user_id"],
+                "is_diterima" => $dt["is_diterima"],
+                "is_diajukan" => $dt["is_diajukan"],
+                "catatan" => $dt["catatan"],
             ]);
         }
 

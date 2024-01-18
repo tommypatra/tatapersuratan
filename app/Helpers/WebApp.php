@@ -41,6 +41,41 @@ function uploadFile($request)
     return $path;
 }
 
+function getAksesPola($user_id, $tahun)
+{
+    $query = AksesPola::with(
+        [
+            'polaSurat',
+            'spesimenJabatan' => function ($query) {
+                $query->orderBy('id', 'ASC');
+            },
+            'user' => function ($query) {
+                $query->select('id', 'name', 'email');
+            }
+        ]
+    )
+        ->where('tahun', $tahun)
+        ->where('user_id', $user_id)
+        ->orderBy('tahun', 'desc')
+        ->orderBy('user_id', 'asc')
+        ->orderBy('pola_surat_id', 'asc')
+        ->orderBy('spesimen_jabatan_id', 'asc')
+        ->get();
+
+    $aksesPolaId = [];
+    foreach ($query as $i => $dp) {
+        $aksesPolaId[] = $dp['id'];
+    }
+
+
+    $retval = [
+        "success" => true,
+        "message" => "data ditemukan",
+        "data" => $aksesPolaId,
+    ];
+    return $retval;
+}
+
 function generateNomorKeluar($tanggal = null, $akses_pola_id = null, $klasifikasi_surat_id = null, $no_indeks = null, $no_sub_indeks = null, $id = null)
 {
     $retval = [
@@ -49,6 +84,7 @@ function generateNomorKeluar($tanggal = null, $akses_pola_id = null, $klasifikas
         'no_sub_indeks' => '',
         'pola' => '',
     ];
+    // dd($tanggal, $akses_pola_id);
     if (!$tanggal || !$akses_pola_id) {
         return $retval;
     }
@@ -69,6 +105,7 @@ function generateNomorKeluar($tanggal = null, $akses_pola_id = null, $klasifikas
     $dt_spesimen_jabatan = $persuratan->spesimenJabatan;
     $dt_klasifikasi_surat = KlasifikasiSurat::find($klasifikasi_surat_id);
 
+    // dd($dt_klasifikasi_surat);
     // Lakukan pengecekan ketersediaan klasifikasi surat jika diperlukan
     if ($dt_pola->needs_klasifikasi && !$dt_klasifikasi_surat) {
         return $retval;
@@ -227,11 +264,6 @@ function generateUniqueFileName($originalFileName)
     return $uniqueFileName;
 }
 
-function formatNotNull($check = null)
-{
-    return ($check) ? $check : "";
-}
-
 function waktuFormat($dateTime, $format = 'Y-m-d H:i:s')
 {
     return Carbon::parse($dateTime)->format($format);
@@ -370,4 +402,22 @@ function bulanAngkaToRomawi($bulan = 1)
         12 => 'XII'
     ];
     return isset($romawi[$bulan]) ? $romawi[$bulan] : 'I';
+}
+
+function cekPort($host = '127.0.0.1', $ports = ['6001'])
+{
+    foreach ($ports as $port) {
+        $connection = @fsockopen($host, $port);
+        $return = 0;
+        if (is_resource($connection)) {
+            $return = 1;
+            fclose($connection);
+        }
+        return $return;
+    }
+}
+
+function formatNotNull($check = null)
+{
+    return ($check) ? $check : "";
 }

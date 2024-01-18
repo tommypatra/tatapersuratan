@@ -43,13 +43,45 @@ class SuratMasukController extends Controller
         $filter = $request->input('filter');
         if ($filter) {
             $filterArray = json_decode($filter, true);
-            if ($filterArray) {
+            if (is_array($filterArray)) {
                 foreach ($filterArray as $i => $dp) {
-                    $query->where($i, $dp);
+                    if ($i == 'kategori')
+                        switch ($dp) {
+                            case "konsep":
+                                $query->where('is_diajukan', '!=', 1);
+                                break;
+                            case "diajukan":
+                                $query->where('is_diajukan', 1)->whereNull('is_diterima');
+                                break;
+                            case "diterima":
+                                $query->where('is_diajukan', 1)->where('is_diterima', 1);
+                                break;
+                            case "ditolak":
+                                $query->where('is_diajukan', 1)->where('is_diterima', 0);
+                                break;
+                        }
+                    elseif ($i == 'tahun') {
+                        $tahun_sekarang = $dp;
+                        // $aksespola = getAksesPola($user_id, $tahun_sekarang);
+                        // dd($aksespola['data']);
+
+                        $query->whereYear('tanggal', $tahun_sekarang);
+                        // if (!empty($aksespola['data'])) {
+                        //     $idAkses = $aksespola['data'];
+
+                        //     $query->where(function ($query) use ($user_id, $idAkses) {
+                        //         $query->orWhere('user_id', $user_id)
+                        //             ->orWhere(function ($query) use ($idAkses) {
+                        //                 $query->whereIn('akses_pola_id', $idAkses);
+                        //             });
+                        //     });
+                        // }
+                    } else
+                        $query->where($i, $dp);
                 }
             }
         }
-
+        $sql = $query->toSql();
         //untuk pencarian
         $keyword = $request->input('keyword');
         if ($keyword) {
@@ -167,6 +199,72 @@ class SuratMasukController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function ajukan(Request $request)
+    {
+        try {
+            $data = $this->findId($request->input('id'));
+            if ($data->is_diajukan)
+                return response()->json([
+                    'success' => false,
+                    'message' => 'pengajuan gagal',
+                    'error' => 'sudah diajukan',
+                ], 500);
+
+            $data->update(['is_diajukan' => 1]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'pengajuan successfully',
+                'data' => new SuratMasukResource($data),
+            ], 200);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function prosesAjuan(Request $request)
+    {
+        try {
+            $dataSave = [
+                'is_diterima' => $request->input('is_diterima'),
+                'catatan' => $request->input('catatan'),
+                'verifikator' => auth()->user()->name,
+            ];
+
+            $data = $this->findId($request->input('id'));
+
+            $data->update($dataSave);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Update data sukses dilakukan',
+                'data' => $dataSave,
+            ], 200);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update',
                 'error' => $e->getMessage(),
             ], 500);
         }

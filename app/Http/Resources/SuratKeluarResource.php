@@ -18,11 +18,17 @@ class SuratKeluarResource extends JsonResource
         return [
             'id' => $this->id,
             'tanggal' => $this->tanggal,
-            'no_indeks' => $this->no_indeks,
-            'no_sub_indeks' => $this->no_sub_indeks,
-            'no_surat' => $this->no_surat,
+            'no_indeks' => formatNotNull($this->no_indeks),
+            'no_sub_indeks' => formatNotNull($this->no_sub_indeks),
+            'no_surat' => formatNotNull($this->no_surat),
             'perihal' => $this->perihal,
             'asal' => $this->asal,
+
+            'is_diterima' => $this->is_diterima,
+            'is_diajukan' => $this->is_diajukan,
+            'catatan' => $this->catatan,
+            'verifikator' => $this->verifikator,
+
             'tujuan' => $this->tujuan,
             'pola' => $this->pola,
             'ringkasan' => $this->ringkasan,

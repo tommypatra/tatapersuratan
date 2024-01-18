@@ -77,6 +77,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('encode/{id}', [UtilityController::class, 'encode']);
     Route::get('encode/{id}', [UtilityController::class, 'encode']);
 
+    Route::post('ajukan-surat-masuk', [SuratMasukController::class, 'ajukan']);
+    Route::post('proses-ajuan-surat-masuk', [SuratMasukController::class, 'prosesAjuan']);
+
+    Route::post('ajukan-surat-keluar', [SuratKeluarController::class, 'ajukan']);
+    Route::post('proses-ajuan-surat-keluar', [SuratKeluarController::class, 'prosesAjuan']);
+
     Route::post('get-surat-masuk', [UtilityController::class, 'getSuratMasuk']);
     Route::get('get-akses-pola', [UtilityController::class, 'getAksesPola']);
     Route::get('get-kategori-surat-masuk', [UtilityController::class, 'getKategoriSuratMasuk']);

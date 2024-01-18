@@ -189,7 +189,7 @@
 
 <script type="text/javascript">
     var vApi='/api/ttd-elektronik';
-    var vJudul='Penomoran Surat Keluar';
+    var vJudul='Tanda Tangan Elektronik';
     var vsurat_keluar_id;
     // console.log(hakAkses);
     var hakAkses = {!! session()->get('akses') !!};

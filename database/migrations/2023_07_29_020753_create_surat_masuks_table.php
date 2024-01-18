@@ -23,6 +23,12 @@ class CreateSuratMasuksTable extends Migration
             $table->string('ringkasan')->nullable();
             $table->date('tanggal');
             $table->timestamps();
+
+            $table->boolean('is_diajukan')->default(false);
+            $table->boolean('is_diterima')->nullable();
+            $table->string('verifikator')->nullable();
+            $table->text('catatan')->nullable();
+
             $table->foreignId('user_id');
             $table->foreign('user_id')->references('id')->on('users')->restrictOnDelete();
 

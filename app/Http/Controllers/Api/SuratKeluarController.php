@@ -15,6 +15,8 @@ class SuratKeluarController extends Controller
     //OKE
     public function index(Request $request)
     {
+
+        $user_id = auth()->user()->id;
         $query = SuratKeluar::orderBy('tanggal', 'desc')
             ->orderBy('no_indeks', 'desc')
             ->orderBy('no_sub_indeks', 'desc')
@@ -26,22 +28,59 @@ class SuratKeluarController extends Controller
                 },
             ]);
 
-        $rolesAkun = $request->input('roles_akun');
-        if (!in_array('Admin', $rolesAkun)) {
-            $query->where('user_id', auth()->user()->id);
-        }
+        // $rolesAkun = $request->input('roles_akun');
+        // if (!in_array('Admin', $rolesAkun)) {
+        //     $query->where('user_id', auth()->user()->id);
+        // }
 
-
-        //untuk filter lebih dari 1 kolom
         $filter = $request->input('filter');
         if ($filter) {
             $filterArray = json_decode($filter, true);
             if (is_array($filterArray)) {
                 foreach ($filterArray as $i => $dp) {
-                    $query->where($i, $dp);
+                    if ($i == 'kategori')
+                        switch ($dp) {
+                            case "konsep":
+                                $query->where('is_diajukan', '!=', 1);
+                                break;
+                            case "diajukan":
+                                $query->where('is_diajukan', 1)->whereNull('is_diterima');
+                                break;
+                            case "diterima":
+                                $query->where('is_diajukan', 1)->where('is_diterima', 1);
+                                break;
+                            case "ditolak":
+                                $query->where('is_diajukan', 1)->where('is_diterima', 0);
+                                break;
+                        }
+                    elseif ($i == 'tahun') {
+                        $tahun_sekarang = $dp;
+                        $aksespola = getAksesPola($user_id, $tahun_sekarang);
+                        // dd($aksespola['data']);
+
+                        $query->whereYear('tanggal', $tahun_sekarang);
+                        if (!empty($aksespola['data'])) {
+                            $idAkses = $aksespola['data'];
+                            $query->where(function ($query) use ($user_id, $idAkses) {
+                                $query->orWhere('user_id', $user_id)
+                                    ->orWhere(function ($query) use ($idAkses) {
+                                        $query->whereIn('akses_pola_id', $idAkses);
+                                    });
+                            });
+                        } else {
+                            $rolesAkun = $request->input('roles_akun');
+                            if (!in_array('Admin', $rolesAkun)) {
+                                $query->where('user_id', auth()->user()->id);
+                            }
+                        }
+                    } else
+                        $query->where($i, $dp);
                 }
             }
         }
+        $sql = $query->toSql();
+        // $bindings = $query->getBindings();
+        // dd($sql);
 
         //untuk pencarian
         $keyword = $request->input('keyword');
@@ -53,11 +92,14 @@ class SuratKeluarController extends Controller
         }
 
         $perPage = $request->input('per_page', env('DATA_PER_PAGE', 10));
+
+
         if ($perPage === 'all') {
             $data = $query->get();
         } else {
             $data = $query->paginate($perPage);
         }
+
         return SuratKeluarResource::collection($data);
     }
 
@@ -93,10 +135,31 @@ class SuratKeluarController extends Controller
             // dd($validatedData);
             $data = SuratKeluar::create($validatedData);
 
+            $akses_pola_id = $data->akses_pola_id;
+            $daftarAksesPola = getAksesPola(auth()->user()->id, substr($data->tanggal, 0, 4));
+
+            // jika ada akses maka generatekan nomor suratnya
+            $pesan = 'pengajuan pengambilan surat berhasil dibuat';
+            if (in_array($akses_pola_id, $daftarAksesPola['data'])) {
+                $generateValue = $this->updateNoSurat($data->id, $data);
+                $dataSave = [
+                    'is_diterima' => 1,
+                    'catatan' => null,
+                    'verifikator' => auth()->user()->name,
+                    'no_surat' => $generateValue['no_surat'],
+                    'no_indeks' => $generateValue['no_indeks'],
+                    'no_sub_indeks' => $generateValue['no_sub_indeks'],
+                    'pola' => $generateValue['pola'],
+                ];
+                $pesan = '  Pengambilan nomor surat perihal <i>' . $data->perihal . '</i> tanggal <i>' . $data->tanggal . '
+                            </i> berhasil, dengan nomor <b>' . $generateValue['no_surat'] . '</b>';
+                $data->update($dataSave);
+            }
+
             // $data['tanggal']
             return response()->json([
                 'success' => true,
-                'message' => 'created successfully',
+                'message' => $pesan,
                 'data' => new SuratKeluarResource($data),
             ], 201);
         } catch (ValidationException $e) {
@@ -158,6 +221,112 @@ class SuratKeluarController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function ajukan(Request $request)
+    {
+        try {
+            $data = $this->findId($request->input('id'));
+            if ($data->is_diajukan)
+                return response()->json([
+                    'success' => false,
+                    'message' => 'pengajuan gagal',
+                    'error' => 'sudah diajukan',
+                ], 500);
+
+            $data->update(['is_diajukan' => 1]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'pengajuan successfully',
+                'data' => new SuratKeluarResource($data),
+            ], 200);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function updateNoSurat($id = null, $data = null)
+    {
+        if (!$data) {
+            $data = $this->findId($id);
+        }
+
+        $id = $data->id;
+        $perihal = $data->perihal;
+        $tanggal = $data->tanggal;
+        $no_indeks = $data->no_indeks;
+        $no_sub_indeks = $data->no_sub_indeks;
+        $klasifikasi_surat_id = $data->klasifikasi_surat_id;
+        $akses_pola_id = $data->akses_pola_id;
+
+        $daftarAksesPola = getAksesPola(auth()->user()->id, substr($data->tanggal, 0, 4));
+        // jika tidak ada akses
+        if (!in_array($akses_pola_id, $daftarAksesPola['data'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal dilakukan',
+                'error' => ['tidak ada akses'],
+            ], 500);
+        }
+        $generateValue = generateNomorKeluar($tanggal, $akses_pola_id, $klasifikasi_surat_id, $no_indeks, $no_sub_indeks, null);
+        return $generateValue;
+    }
+
+    public function prosesAjuan(Request $request)
+    {
+        try {
+            $dataSave = [
+                'is_diterima' => $request->input('is_diterima'),
+                'catatan' => $request->input('catatan'),
+                'verifikator' => auth()->user()->name,
+            ];
+
+            $data = $this->findId($request->input('id'));
+
+            $pesan = 'Pengajuan surat perihal <i>' . $data->perihal . '</i> tanggal <i>' . $data->tanggal;
+            if ($request->input('is_diterima')) {
+                $generateValue = $this->updateNoSurat($data->id, $data);
+                $dataSave += [
+                    'no_surat' => $generateValue['no_surat'],
+                    'no_indeks' => $generateValue['no_indeks'],
+                    'no_sub_indeks' => $generateValue['no_sub_indeks'],
+                    'pola' => $generateValue['pola'],
+                ];
+                $pesan .=  '</i> berhasil, dengan nomor <b>' . $generateValue['no_surat'] . '</b>';
+            } else {
+                $pesan = ($request->input('catatan')) ? $pesan . ' tidak diterima karena ' . $request->input('catatan') : 'tidak diterima';
+            }
+            $data->update($dataSave);
+
+            return response()->json([
+                'success' => true,
+                'message' => '<div id="salinText" onclick="salinText()">' . $pesan . '</div>',
+                'data' => $dataSave,
+            ], 200);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update',
                 'error' => $e->getMessage(),
             ], 500);
         }

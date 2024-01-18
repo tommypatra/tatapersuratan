@@ -15,8 +15,8 @@ class CreateSuratKeluarsTable extends Migration
     {
         Schema::create('surat_keluars', function (Blueprint $table) {
             $table->id();
-            $table->string('no_surat');
-            $table->integer('no_indeks');
+            $table->string('no_surat')->nullable();
+            $table->integer('no_indeks')->nullable();
             $table->integer('no_sub_indeks')->nullable();
             $table->string('perihal');
             $table->string('asal');
@@ -26,14 +26,13 @@ class CreateSuratKeluarsTable extends Migration
             $table->date('tanggal');
             $table->timestamps();
 
-            // $table->foreignId('spesimen_jabatan_id');
-            // $table->foreign('spesimen_jabatan_id')->references('id')->on('spesimen_jabatans')->restrictOnDelete();
+            $table->boolean('is_diajukan')->default(false);
+            $table->boolean('is_diterima')->nullable();
+            $table->string('verifikator')->nullable();
+            $table->text('catatan')->nullable();
 
             $table->foreignId('klasifikasi_surat_id')->nullable();
             $table->foreign('klasifikasi_surat_id')->references('id')->on('klasifikasi_surats')->restrictOnDelete();
-
-            // $table->foreignId('pola_surat_id');
-            // $table->foreign('pola_surat_id')->references('id')->on('pola_surats')->restrictOnDelete();
 
             $table->foreignId('akses_pola_id');
             $table->foreign('akses_pola_id')->references('id')->on('akses_polas')->restrictOnDelete();
