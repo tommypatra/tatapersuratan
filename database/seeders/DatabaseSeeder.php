@@ -9,9 +9,10 @@ use App\Models\PolaSurat;
 use App\Models\TtdQrcode;
 use App\Models\SuratMasuk;
 use App\Models\SuratKeluar;
+use App\Models\PolaSpesimen;
 use App\Models\SpesimenJabatan;
-use Illuminate\Database\Seeder;
 
+use Illuminate\Database\Seeder;
 use App\Models\KlasifikasiSurat;
 use App\Models\KategoriSuratMasuk;
 use Illuminate\Support\Facades\Hash;
@@ -190,99 +191,47 @@ class DatabaseSeeder extends Seeder
 
         //nilai default akses pola
         $dtdef = [
-            ["tahun" => date('Y'), "pola_surat_id" => 1, "user_id" => 1, "spesimen_jabatan_id" => 1],
-            ["tahun" => date('Y'), "pola_surat_id" => 2, "user_id" => 1, "spesimen_jabatan_id" => 1],
-            ["tahun" => date('Y'), "pola_surat_id" => 2, "user_id" => 1, "spesimen_jabatan_id" => 2],
-            ["tahun" => date('Y'), "pola_surat_id" => 2, "user_id" => 1, "spesimen_jabatan_id" => 3],
-            ["tahun" => date('Y'), "pola_surat_id" => 2, "user_id" => 1, "spesimen_jabatan_id" => 4],
-            ["tahun" => date('Y'), "pola_surat_id" => 2, "user_id" => 1, "spesimen_jabatan_id" => 5],
-            ["tahun" => date('Y'), "pola_surat_id" => 2, "user_id" => 2, "spesimen_jabatan_id" => 2],
-            ["tahun" => date('Y'), "pola_surat_id" => 2, "user_id" => 2, "spesimen_jabatan_id" => 3],
-            ["tahun" => date('Y'), "pola_surat_id" => 2, "user_id" => 2, "spesimen_jabatan_id" => 4],
-            ["tahun" => date('Y'), "pola_surat_id" => 2, "user_id" => 2, "spesimen_jabatan_id" => 5],
+            ["pola_surat_id" => 1, "user_id" => 1, "spesimen_jabatan_id" => 1],
+            ["pola_surat_id" => 2, "user_id" => 1, "spesimen_jabatan_id" => 1],
+            ["pola_surat_id" => 2, "user_id" => 1, "spesimen_jabatan_id" => 2],
+            ["pola_surat_id" => 2, "user_id" => 1, "spesimen_jabatan_id" => 3],
+            ["pola_surat_id" => 2, "user_id" => 1, "spesimen_jabatan_id" => 4],
+            ["pola_surat_id" => 2, "user_id" => 1, "spesimen_jabatan_id" => 5],
+        ];
+
+        foreach ($dtdef as $dt) {
+            PolaSpesimen::create([
+                'pola_surat_id' => $dt['pola_surat_id'],
+                'spesimen_jabatan_id' => $dt['spesimen_jabatan_id'],
+                'user_id' => $dt['user_id'],
+            ]);
+        }
+
+        //nilai default akses pola
+        $dtdef = [
+            ["tahun" => date('Y'), "pola_spesimen_id" => 1, "user_id" => 1],
+            ["tahun" => date('Y'), "pola_spesimen_id" => 2, "user_id" => 1],
+            ["tahun" => date('Y'), "pola_spesimen_id" => 3, "user_id" => 1],
+            ["tahun" => date('Y'), "pola_spesimen_id" => 4, "user_id" => 1],
+            ["tahun" => date('Y'), "pola_spesimen_id" => 5, "user_id" => 1],
+            ["tahun" => date('Y'), "pola_spesimen_id" => 6, "user_id" => 1],
+            ["tahun" => date('Y'), "pola_spesimen_id" => 3, "user_id" => 2],
+            ["tahun" => date('Y'), "pola_spesimen_id" => 4, "user_id" => 2],
+            ["tahun" => date('Y'), "pola_spesimen_id" => 5, "user_id" => 2],
+            ["tahun" => date('Y'), "pola_spesimen_id" => 3, "user_id" => 3],
         ];
 
         foreach ($dtdef as $dt) {
             AksesPola::create([
                 'tahun' => $dt['tahun'],
-                'pola_surat_id' => $dt['pola_surat_id'],
+                'pola_spesimen_id' => $dt['pola_spesimen_id'],
                 'user_id' => $dt['user_id'],
-                'spesimen_jabatan_id' => $dt['spesimen_jabatan_id'],
             ]);
         }
 
-        //nilai default surat keluar
-        $dtdef = [
-            [
-                "no_surat" => null,
-                "no_indeks" => null,
-                "asal" => "AKMA",
-                "pola" => null,
-                "tujuan" => "Para Dekan",
-                "perihal" => "Data Kuota Maba",
-                "ringkasan" => "",
-                "tanggal" => date("Y-m-d"),
-                "klasifikasi_surat_id" => "1",
-                "akses_pola_id" => "2",
-                "user_id" => 2,
-                "catatan" => null,
-                "is_diajukan" => 0,
-                "is_diterima" => null,
-            ],
-            [
-                "no_surat" => "001/In.23/HM.00/I/" . date("Y"),
-                "no_indeks" => "1",
-                "asal" => "AKMA",
-                "pola" => "001/In.23/HM.00/I/" . date("Y"),
-                "tujuan" => "Para Dekan",
-                "perihal" => "Permintaan data mahasiswa terbaik",
-                "ringkasan" => "",
-                "tanggal" => date("Y-m-d"),
-                "klasifikasi_surat_id" => "1",
-                "akses_pola_id" => "2",
-                "user_id" => 1,
-                "is_diajukan" => 1,
-                "is_diterima" => 1,
-                "catatan" => null,
-            ],
-            [
-                "no_surat" => null,
-                "no_indeks" => null,
-                "asal" => "AKMA",
-                "pola" => "002/In.23/HM.00/I/" . date("Y"),
-                "tujuan" => "Para Dekan",
-                "perihal" => "Data Beasiswa",
-                "ringkasan" => "",
-                "tanggal" => date("Y-m-d"),
-                "klasifikasi_surat_id" => "1",
-                "akses_pola_id" => "2",
-                "user_id" => 1,
-                "is_diajukan" => 1,
-                "is_diterima" => 0,
-                "catatan" => null,
-            ],
-        ];
 
-        foreach ($dtdef as $dt) {
-            SuratKeluar::create([
-                "no_surat" => $dt["no_surat"],
-                "no_indeks" => $dt["no_indeks"],
-                "asal" => $dt["asal"],
-                "pola" => $dt["pola"],
-                "perihal" => $dt["perihal"],
-                "tujuan" => $dt["tujuan"],
-                "ringkasan" => $dt["ringkasan"],
-                "tanggal" => $dt["tanggal"],
-                "klasifikasi_surat_id" => $dt["klasifikasi_surat_id"],
-                "akses_pola_id" => $dt["akses_pola_id"],
-                "user_id" => $dt["user_id"],
-                "is_diterima" => $dt["is_diterima"],
-                "is_diajukan" => $dt["is_diajukan"],
-                "catatan" => $dt["catatan"],
-            ]);
-        }
 
-        //nilai default surat keluar
+        //nilai default qrcode
         $dtdef = [
             [
                 "no_surat" => "002/In.23/HM.00/I/2023",
@@ -335,6 +284,78 @@ class DatabaseSeeder extends Seeder
                 "user_ttd_id" => $dt["user_ttd_id"],
                 "user_id" => $dt["user_id"],
                 "qrcode" => null,
+            ]);
+        }
+
+
+        //nilai default surat keluar
+        $dtdef = [
+            [
+                "no_surat" => null,
+                "no_indeks" => null,
+                "asal" => "AKMA",
+                "pola" => null,
+                "tujuan" => "Para Dekan",
+                "perihal" => "Data Kuota Maba",
+                "ringkasan" => "",
+                "tanggal" => date("Y-m-d"),
+                "klasifikasi_surat_id" => "1",
+                "pola_spesimen_id" => "2",
+                "user_id" => 2,
+                "catatan" => null,
+                "is_diajukan" => 0,
+                "is_diterima" => null,
+            ],
+            [
+                "no_surat" => "001/In.23/HM.00/I/" . date("Y"),
+                "no_indeks" => "1",
+                "asal" => "AKMA",
+                "pola" => "001/In.23/HM.00/I/" . date("Y"),
+                "tujuan" => "Para Dekan",
+                "perihal" => "Permintaan data mahasiswa terbaik",
+                "ringkasan" => "",
+                "tanggal" => date("Y-m-d"),
+                "klasifikasi_surat_id" => "1",
+                "pola_spesimen_id" => "2",
+                "user_id" => 1,
+                "is_diajukan" => 1,
+                "is_diterima" => 1,
+                "catatan" => null,
+            ],
+            [
+                "no_surat" => null,
+                "no_indeks" => null,
+                "asal" => "AKMA",
+                "pola" => "002/In.23/HM.00/I/" . date("Y"),
+                "tujuan" => "Para Dekan",
+                "perihal" => "Data Beasiswa",
+                "ringkasan" => "",
+                "tanggal" => date("Y-m-d"),
+                "klasifikasi_surat_id" => "1",
+                "pola_spesimen_id" => "2",
+                "user_id" => 1,
+                "is_diajukan" => 1,
+                "is_diterima" => 0,
+                "catatan" => null,
+            ],
+        ];
+
+        foreach ($dtdef as $dt) {
+            SuratKeluar::create([
+                "no_surat" => $dt["no_surat"],
+                "no_indeks" => $dt["no_indeks"],
+                "asal" => $dt["asal"],
+                "pola" => $dt["pola"],
+                "perihal" => $dt["perihal"],
+                "tujuan" => $dt["tujuan"],
+                "ringkasan" => $dt["ringkasan"],
+                "tanggal" => $dt["tanggal"],
+                "klasifikasi_surat_id" => $dt["klasifikasi_surat_id"],
+                "pola_spesimen_id" => $dt["pola_spesimen_id"],
+                "user_id" => $dt["user_id"],
+                "is_diterima" => $dt["is_diterima"],
+                "is_diajukan" => $dt["is_diajukan"],
+                "catatan" => $dt["catatan"],
             ]);
         }
     }

@@ -33,14 +33,14 @@ class SuratKeluarResource extends JsonResource
             'pola' => $this->pola,
             'ringkasan' => $this->ringkasan,
             'klasifikasi_surat_id' => $this->klasifikasi_surat_id,
-            'pola_surat' => $this->aksesPola->polaSurat,
             'user_id' => $this->user_id,
-            'akses_pola_id' => $this->akses_pola_id,
+            'pola_spesimen_id' => $this->pola_spesimen_id,
+            'pola_surat' => $this->polaSpesimen->polaSurat,
+            'spesimen_jabatan' => $this->polaSpesimen->spesimenJabatan,
 
             'user' => new UserAppResource($this->user),
             'distribusi' => DistribusiResource::collection($this->distribusi),
             'jumlah_distribusi' => count($this->distribusi),
-            'spesimen_jabatan' => $this->aksesPola->spesimenJabatan,
             'klasifikasi_surat' => $this->klasifikasiSurat,
             'lampiran_surat_keluar' => $this->lampiranSuratKeluar,
 

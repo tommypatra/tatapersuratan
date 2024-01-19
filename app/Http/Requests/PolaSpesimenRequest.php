@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class AksesPolaRequest extends FormRequest
+class PolaSpesimenRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,18 +24,16 @@ class AksesPolaRequest extends FormRequest
     public function rules()
     {
         return [
-            'tahun' => 'required',
-            'pola_spesimen_id' => 'required',
-            'user_id' => 'required',
+            'pola_surat_id' => 'required',
+            'spesimen_jabatan_id' => 'required',
         ];
     }
 
     public function attributes()
     {
         return [
-            'tahun' => 'tahun',
-            'pola_spesimen_id' => 'pola spesimen',
-            'user_id' => 'pengguna',
+            'pola_surat_id' => 'pola surat',
+            'spesimen_jabatan_id' => 'spesiman jabatan',
         ];
     }
 }

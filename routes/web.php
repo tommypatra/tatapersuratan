@@ -35,6 +35,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/grup', [WebController::class, 'grup'])->name('grup');
     Route::get('/spesimen-jabatan', [WebController::class, 'spesimenJabatan'])->name('spesimen-jabatan');
     Route::get('/akses-pola', [WebController::class, 'aksesPola'])->name('akses-pola');
+    Route::get('/pola-spesimen', [WebController::class, 'polaSpesimen'])->name('pola-spesimen');
     Route::get('/profil', [WebController::class, 'profil'])->name('profil');
     Route::get('/disposisi', [WebController::class, 'disposisi'])->name('disposisi');
     Route::get('/distribusi', [WebController::class, 'distribusi'])->name('distribusi');

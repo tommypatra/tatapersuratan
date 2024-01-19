@@ -115,7 +115,7 @@
                         </div>
 						<div class="col-lg-8 mb-3">
                             <label class="form-label">Jenis Surat</label>
-                            <select name="akses_pola_id" id="akses_pola_id" type="text" class="form-control " required></select>
+                            <select name="pola_spesimen_id" id="pola_spesimen_id" type="text" class="form-control " required></select>
                         </div>
 						{{-- <div class="col-lg-4 mb-3">
                             <label class="form-label">Spesimen Jabatan</label>
@@ -248,7 +248,7 @@
         'asal': { action: 'val' },
         'tujuan': { action: 'val' },
         'ringkasan': { action: 'val' },
-        'akses_pola_id': { action: 'select2' },
+        'pola_spesimen_id': { action: 'select2' },
         'klasifikasi_surat_id': { action: 'select2' },
     };
 
@@ -509,7 +509,7 @@
     // $('#spesimen_jabatan_id').select2({
     //     placeholder: "-pilih-"
     // });
-    $('#akses_pola_id').select2({
+    $('#pola_spesimen_id').select2({
         placeholder: "-pilih-"
     });
     sel2_cariKlasifikasi(3,'#klasifikasi_surat_id','#myForm .modal-content')
@@ -522,7 +522,7 @@
     initPola();
     function initPola(){
         //set empty dan hide dulu
-        $('#akses_pola_id').empty();
+        $('#pola_spesimen_id').empty();
         $('#spesimen_jabatan_id').val("");
         $("#el-klasifikasi").hide();
         //load pola
@@ -532,7 +532,7 @@
         let keywordString = encodeURIComponent(JSON.stringify(dataCari));
 
         $.ajax({
-            url: '/api/get-akses-pola?filter='+keywordString,
+            url: '/api/get-pola-spesimen?page=all',
             method: 'GET',
             dataType: 'json',
             success: function (response){
@@ -550,7 +550,7 @@
                     });
                 }
 
-                sel2_datalokal('#akses_pola_id',vdata,false,'#myForm .modal-content');
+                sel2_datalokal('#pola_spesimen_id',vdata,false,'#myForm .modal-content');
 
             },
             error: function(xhr, status, error) {
@@ -560,7 +560,7 @@
     }
 
     $("#el-klasifikasi").hide();
-    $('#akses_pola_id').on('change', function() {
+    $('#pola_spesimen_id').on('change', function() {
         // initSpesimen();
         let needs_klasifikasi=$(this).select2('data')[0].needs_klasifikasi;
 
@@ -609,7 +609,7 @@
     //     $('#spesimen_jabatan_id').empty();
     //     let id=$("#pola_surat_id").val();
     //     if(id){
-    //         let dataCari = {akses_pola_id:id};
+    //         let dataCari = {pola_spesimen_id:id};
     //         let keywordString = encodeURIComponent(JSON.stringify(dataCari));
     //         $.ajax({
     //             url: '/api/akses-spesimen?keyword='+keywordString,

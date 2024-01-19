@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAksesPolasTable extends Migration
+class CreatePolaSpesimensTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,8 @@ class CreateAksesPolasTable extends Migration
      */
     public function up()
     {
-        Schema::create('akses_polas', function (Blueprint $table) {
+        Schema::create('pola_spesimens', function (Blueprint $table) {
             $table->id();
-            $table->year('tahun');
             $table->timestamps();
             $table->foreignId('pola_surat_id');
             $table->foreign('pola_surat_id')->references('id')->on('pola_surats')->restrictOnDelete();
@@ -23,8 +22,7 @@ class CreateAksesPolasTable extends Migration
             $table->foreign('user_id')->references('id')->on('users')->restrictOnDelete();
             $table->foreignId('spesimen_jabatan_id');
             $table->foreign('spesimen_jabatan_id')->references('id')->on('spesimen_jabatans')->restrictOnDelete();
-            $table->index('tahun');
-            $table->unique(['tahun', 'pola_surat_id', 'user_id', 'spesimen_jabatan_id'], "akses_pola_unik");
+            $table->unique(['pola_surat_id', 'spesimen_jabatan_id'], "pola_spesimen_unik");
         });
     }
 
@@ -35,6 +33,6 @@ class CreateAksesPolasTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('akses_polas');
+        Schema::dropIfExists('pola_spesimens');
     }
 }

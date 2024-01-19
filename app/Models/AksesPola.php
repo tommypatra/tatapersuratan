@@ -8,14 +8,9 @@ class AksesPola extends Model
 {
     protected $guarded = ['id'];
 
-    public function polaSurat()
+    public function polaSpesimen()
     {
-        return $this->belongsTo(PolaSurat::class);
-    }
-
-    public function spesimenJabatan()
-    {
-        return $this->belongsTo(SpesimenJabatan::class);
+        return $this->belongsTo(PolaSpesimen::class);
     }
 
     public function suratKeluar()

@@ -33,9 +33,9 @@ class SuratKeluar extends Model
         return $this->belongsTo(SpesimenJabatan::class);
     }
 
-    public function aksesPola()
+    public function polaSpesimen()
     {
-        return $this->belongsTo(AksesPola::class);
+        return $this->belongsTo(PolaSpesimen::class);
     }
 
 

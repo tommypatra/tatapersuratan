@@ -34,12 +34,12 @@ class CreateSuratKeluarsTable extends Migration
             $table->foreignId('klasifikasi_surat_id')->nullable();
             $table->foreign('klasifikasi_surat_id')->references('id')->on('klasifikasi_surats')->restrictOnDelete();
 
-            $table->foreignId('akses_pola_id');
-            $table->foreign('akses_pola_id')->references('id')->on('akses_polas')->restrictOnDelete();
+            $table->foreignId('pola_spesimen_id');
+            $table->foreign('pola_spesimen_id')->references('id')->on('pola_spesimens')->restrictOnDelete();
 
             $table->foreignId('user_id');
             $table->foreign('user_id')->references('id')->on('users')->restrictOnDelete();
-            $table->unique(['no_indeks', 'no_sub_indeks', 'akses_pola_id'], 'surat_keluar_unique');
+            $table->unique(['no_indeks', 'no_sub_indeks', 'pola_spesimen_id'], 'surat_keluar_unique');
         });
     }
 

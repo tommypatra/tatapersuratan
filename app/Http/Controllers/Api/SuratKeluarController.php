@@ -23,7 +23,7 @@ class SuratKeluarController extends Controller
             ->orderBy('perihal', 'asc')
             ->with([
                 'klasifikasiSurat', 'user', 'lampiranSuratKeluar.upload',
-                'aksesPola.polaSurat', 'aksesPola.spesimenJabatan', 'distribusi.user' => function ($query) {
+                'polaSpesimen.polaSurat', 'polaSpesimen.spesimenJabatan', 'distribusi.user' => function ($query) {
                     $query->select('id', 'name', 'email');
                 },
             ]);
@@ -64,7 +64,7 @@ class SuratKeluarController extends Controller
                             $query->where(function ($query) use ($user_id, $idAkses) {
                                 $query->orWhere('user_id', $user_id)
                                     ->orWhere(function ($query) use ($idAkses) {
-                                        $query->whereIn('akses_pola_id', $idAkses);
+                                        $query->whereIn('pola_spesimen_id', $idAkses);
                                     });
                             });
                         } else {
@@ -142,8 +142,10 @@ class SuratKeluarController extends Controller
             $pesan = 'pengajuan pengambilan surat berhasil dibuat';
             if (in_array($akses_pola_id, $daftarAksesPola['data'])) {
                 $generateValue = $this->updateNoSurat($data->id, $data);
+                // dd($generateValue);
                 $dataSave = [
                     'is_diterima' => 1,
+                    'is_diajukan' => 1,
                     'catatan' => null,
                     'verifikator' => auth()->user()->name,
                     'no_surat' => $generateValue['no_surat'],
@@ -265,24 +267,27 @@ class SuratKeluarController extends Controller
             $data = $this->findId($id);
         }
 
+        // dd($data);
         $id = $data->id;
         $perihal = $data->perihal;
         $tanggal = $data->tanggal;
         $no_indeks = $data->no_indeks;
         $no_sub_indeks = $data->no_sub_indeks;
         $klasifikasi_surat_id = $data->klasifikasi_surat_id;
-        $akses_pola_id = $data->akses_pola_id;
+        $pola_spesimen_id = $data->pola_spesimen_id;
 
         $daftarAksesPola = getAksesPola(auth()->user()->id, substr($data->tanggal, 0, 4));
+        // dd($pola_spesimen_id, $daftarAksesPola);
+
         // jika tidak ada akses
-        if (!in_array($akses_pola_id, $daftarAksesPola['data'])) {
+        if (!in_array($pola_spesimen_id, $daftarAksesPola['data'])) {
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal dilakukan',
                 'error' => ['tidak ada akses'],
             ], 500);
         }
-        $generateValue = generateNomorKeluar($tanggal, $akses_pola_id, $klasifikasi_surat_id, $no_indeks, $no_sub_indeks, null);
+        $generateValue = generateNomorKeluar($tanggal, $pola_spesimen_id, $klasifikasi_surat_id, $no_indeks, $no_sub_indeks, null);
         return $generateValue;
     }
 
@@ -294,7 +299,6 @@ class SuratKeluarController extends Controller
                 'catatan' => $request->input('catatan'),
                 'verifikator' => auth()->user()->name,
             ];
-
             $data = $this->findId($request->input('id'));
 
             $pesan = 'Pengajuan surat perihal <i>' . $data->perihal . '</i> tanggal <i>' . $data->tanggal;

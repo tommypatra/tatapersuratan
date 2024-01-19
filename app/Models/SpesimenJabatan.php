@@ -2,20 +2,23 @@
 
 namespace App\Models;
 
+use App\Models\AksesPola;
+use App\Models\SuratKeluar;
+use App\Models\PolaSpesimen;
 use Illuminate\Database\Eloquent\Model;
 
 class SpesimenJabatan extends Model
 {
     protected $guarded = ['id'];
 
+    public function polaSpesimen()
+    {
+        return $this->hasMany(PolaSpesimen::class);
+    }
+
     public function suratKeluar()
     {
         return $this->hasMany(SuratKeluar::class);
-    }
-
-    public function aksesPola()
-    {
-        return $this->hasMany(AksesPola::class);
     }
 
     public function pejabat()

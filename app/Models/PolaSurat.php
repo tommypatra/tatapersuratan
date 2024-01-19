@@ -8,9 +8,9 @@ class PolaSurat extends Model
 {
     protected $guarded = ['id'];
 
-    public function aksesPola()
+    public function polaSpesimen()
     {
-        return $this->hasMany(AksesPola::class);
+        return $this->hasMany(PolaSpesimen::class);
     }
 
     public function suratKeluar()

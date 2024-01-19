@@ -103,7 +103,7 @@ function sel2_cariKlasifikasi($vLength=3,$vElement='#klasifikasi_surat_id',vdrop
       placeholder: 'Cari klasifikasi',
       dropdownParent:vdropdownParent,
       ajax: {
-          url: '/api/klasifikasi-surat-keluar',
+          url: '/api/get-klasifikasi-surat-keluar',
           type: 'GET',
           dataType: 'json',
           delay: 250,

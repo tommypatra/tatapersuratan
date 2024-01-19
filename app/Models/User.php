@@ -2,16 +2,35 @@
 
 namespace App\Models;
 
+use App\Models\Profil;
+use App\Models\Tujuan;
+use App\Models\Upload;
+use App\Models\GrupUser;
+use App\Models\AksesPola;
+use App\Models\Disposisi;
+use App\Models\TtdQrcode;
+use App\Models\Distribusi;
+use App\Models\SuratKeluar;
+use App\Models\PolaSpesimen;
+use App\Models\SpesimenJabatan;
+use App\Models\DisposisiSelesai;
+use App\Models\KlasifikasiSurat;
+use Laravel\Sanctum\HasApiTokens;
+use App\Models\KategoriSuratMasuk;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     use HasApiTokens, Notifiable;
 
     protected $guarded = ['id'];
+
+    public function polaSpesimen()
+    {
+        return $this->hasMany(PolaSpesimen::class);
+    }
 
     public function aksesPola()
     {

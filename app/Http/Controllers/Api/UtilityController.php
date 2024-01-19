@@ -8,15 +8,19 @@ use App\Helpers\WebApp;
 use App\Models\AksesPola;
 use App\Models\TtdQrcode;
 use App\Models\SuratMasuk;
+use App\Models\PolaSpesimen;
 use Illuminate\Http\Request;
-use App\Models\KategoriSuratMasuk;
 
+use App\Models\KlasifikasiSurat;
+use App\Models\KategoriSuratMasuk;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
 use App\Http\Resources\UserAppResource;
 use App\Http\Resources\AksesPolaResource;
 use App\Http\Resources\TtdQrcodeResource;
 use App\Http\Resources\SuratMasukResource;
+use App\Http\Resources\PolaSpesimenResource;
+use App\Http\Resources\KlasifikasiSuratResource;
 use App\Http\Resources\KategoriSuratMasukResource;
 
 class UtilityController extends Controller
@@ -55,10 +59,8 @@ class UtilityController extends Controller
     {
         $query = AksesPola::with(
             [
-                'polaSurat',
-                'spesimenJabatan' => function ($query) {
-                    $query->orderBy('id', 'ASC');
-                },
+                'polaSpesimen.polaSurat',
+                'polaSpesimen.spesimenJabatan.pejabat',
                 'user' => function ($query) {
                     $query->select('id', 'name', 'email');
                 }
@@ -66,8 +68,7 @@ class UtilityController extends Controller
         )
             ->orderBy('tahun', 'desc')
             ->orderBy('user_id', 'asc')
-            ->orderBy('pola_surat_id', 'asc')
-            ->orderBy('spesimen_jabatan_id', 'asc');
+            ->orderBy('pola_spesimen_id', 'asc');
 
         //untuk filter lebih dari 1 kolom
         $filter = $request->input('filter');
@@ -276,5 +277,89 @@ class UtilityController extends Controller
             'message' => 'data ditemukan',
             'data' => $data,
         ], 200);
+    }
+
+    public function getKlasifikasiSuratKeluar(Request $request)
+    {
+        $query = KlasifikasiSurat::orderBy('kode', 'asc')
+            ->with(['user' => function ($query) {
+                $query->select('id', 'name', 'email');
+            },]);
+
+        $filter = $request->input('filter');
+        if ($filter) {
+            $filterArray = json_decode($filter, true);
+            if ($filterArray) {
+                foreach ($filterArray as $i => $dp) {
+                    $query->where($i, $dp);
+                }
+            }
+        }
+
+        $keyword = $request->input('keyword');
+        if ($keyword) {
+            $query->where('kode', 'LIKE', "%$keyword%");
+            $query->orWhere('klasifikasi', 'LIKE', "%$keyword%");
+            $query->orWhere('keterangan', 'LIKE', "%$keyword%");
+        }
+
+        $data = $query->get();
+
+        return KlasifikasiSuratResource::collection($data);
+    }
+
+    public function getPolaSpesimen(Request $request)
+    {
+        $query = PolaSpesimen::with(
+            [
+                'PolaSurat' => function ($query) {
+                    $query->orderBy('id', 'ASC');
+                },
+                'spesimenJabatan' => function ($query) {
+                    $query->orderBy('id', 'ASC');
+                },
+                'user' => function ($query) {
+                    $query->select('id', 'name', 'email');
+                }
+            ]
+        )
+            ->orderBy('user_id', 'asc')
+            ->orderBy('pola_surat_id', 'asc')
+            ->orderBy('spesimen_jabatan_id', 'asc');
+
+
+        //untuk filter lebih dari 1 kolom
+        $filter = $request->input('filter');
+        if ($filter) {
+            $filterArray = json_decode($filter, true);
+            if (is_array($filterArray)) {
+                foreach ($filterArray as $i => $dp) {
+                    $query->where($i, $dp);
+                }
+            } else {
+                // $query->whereHas('tujuan', function ($query) use ($filter) {
+                //     $query->where('user_id', $filter);
+                // });
+            }
+        }
+
+        //untuk pencarian
+        $keyword = $request->input('keyword');
+        if ($keyword) {
+            $query->whereHas('user', function ($query) use ($keyword) {
+                $query->where('name', 'LIKE', "%" . $keyword . "%")
+                    ->orWhere('email', 'LIKE', "%" . $keyword . "%");
+            });
+        }
+
+        // echo $query->toSql();
+        $perPage = $request->input('per_page', env('DATA_PER_PAGE', 10));
+        if ($perPage === 'all') {
+            $data = $query->get();
+        } else {
+            $data = $query->paginate($perPage);
+        }
+
+        return PolaSpesimenResource::collection($data);
     }
 }

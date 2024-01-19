@@ -38,10 +38,8 @@
                             <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th width="10%">Tahun</th>
-                                    <th width="25%">Pengguna</th>
-                                    <th width="25%">Akses</th>
-                                    <th>Pengelola</th>
+                                    <th width="40%">Akses</th>
+                                    <th width="40%">Pejabat Spesimen</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -78,17 +76,13 @@
                 </div>
                 <div class="modal-body ">
                     <div class="row">
-						<div class="col-lg-3 mb-3">
-                            <label class="form-label">Tahun</label>
-                            <select name="tahun" id="tahun" class="form-control" required></select>
+						<div class="col-lg-4 mb-3">
+                            <label class="form-label">Jenis Surat</label>
+                            <select name="pola_surat_id" id="pola_surat_id" class="form-control" required></select>
                         </div>
 						<div class="col-lg-8 mb-3">
-                            <label class="form-label">User</label>
-                            <select name="user_id" id="user_id" class="form-control" required multiple></select>
-                        </div>
-						<div class="col-lg-4 mb-3">
-                            <label class="form-label">Akses Surat</label>
-                            <select name="pola_spesimen_id" id="pola_spesimen_id" class="form-control" required></select>
+                            <label class="form-label">Akses Spesimen Jabatan</label>
+                            <select name="spesimen_jabatan_id" id="spesimen_jabatan_id" class="form-control" required multiple></select>
                         </div>
                     </div>
                 </div>
@@ -111,13 +105,11 @@
 <script src="{{ asset('js/select2lib.js') }}"></script>
 <script src="{{ asset('js/crud.js') }}"></script>
 <script type="text/javascript">
-    var vApi='/api/akses-pola';
-    var vJudul='Akses Pola';
+    var vApi='/api/pola-spesimen';
+    var vJudul='Pola Spesimen';
     var fieldInit={
         'id': { action: 'val' },
-        'tahun': { action: 'select2' },
         'pola_surat_id': { action: 'pola_surat_id' },
-        'user_id': { action: 'select2' },
         'spesimen_jabatan_id': { action: 'select2' },
     };
 
@@ -146,10 +138,8 @@
                 var row = `
                     <tr>
                         <td>${nomor++}</td>
-                        <td>${dt.tahun}</td>
-                        <td>${dt.user.name} <p style="font-style:italic;">${dt.user.email}</i></p></td>
-                        <td>${dt.pola_spesimen.pola_surat.kategori} ${dt.pola_spesimen.spesimen_jabatan.jabatan}</td>
-                        <td><div style="text-align:left;font-size:10px;">${dt.created_at}</div></td>
+                        <td>${dt.pola_surat.kategori}</td>
+                        <td>${dt.spesimen_jabatan.jabatan}</td>
                         <td>
                             <div class="btn-group" role="group">
                                 <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
@@ -240,21 +230,22 @@
     //simpan baru atau simpan perubahan
     function simpan(setup_ajax,form) {
         let id=$('#id').val();
-        let tahun=$('#tahun').val();
-        let user_id=$('#user_id').val();
-        let pola_spesimen_id=$('#pola_spesimen_id').val();
-        $.each(user_id, function(index, usrDt) {
+        let pola_surat_id=$('#pola_surat_id').val();
+        let spesimen_jabatan_id=$('#spesimen_jabatan_id').val();
+        $.each(spesimen_jabatan_id, function(index, spsDt) {
             let dataForm={
-                tahun:tahun,
-                user_id:usrDt,
-                pola_spesimen_id:pola_spesimen_id,
+                spesimen_jabatan_id:spsDt,
+                pola_surat_id:pola_surat_id,
             }
             CrudModule.fSave(setup_ajax, dataForm, function(response) {
-                //console.log(response);
+                console.log(response);
+                if(response.success)
+                    refresh();
+                appShowNotification(response.success, [response.message]);
             });
         });
         $('#modal-form').modal('hide');
-        refresh();
+        
     }		    
 
     // hapus
@@ -293,24 +284,41 @@
 
         //load pola
         $.ajax({
-            url: '/api/pola-spesimen?page=all',
+            url: '/api/pola-surat-keluar?page=all',
             method: 'GET',
             dataType: 'json',
             success: function (response){
                 let vdata=[];
                 if(response.data.length>0){
-                    console.log(response.data);
                     $.each(response.data, function(index, dt) {
-                        vdata.push({id:dt.id,text:dt.pola_surat.kategori+' '+dt.spesimen_jabatan.jabatan});
+                        vdata.push({id:dt.id,text:dt.kategori});
                     });
                 }
-                sel2_datalokal('#pola_spesimen_id',vdata,false,'#myForm .modal-content');
+                sel2_datalokal('#pola_surat_id',vdata,false,'#myForm .modal-content');
             },
             error: function(xhr, status, error) {
                 console.error(error);
             }
         });
 
+        //load jabatan
+        $.ajax({
+            url: '/api/spesimen-jabatan?page=all',
+            method: 'GET',
+            dataType: 'json',
+            success: function (response){
+                let vdata=[];
+                if(response.data.length>0){
+                    $.each(response.data, function(index, dt) {
+                        vdata.push({id:dt.id,text:dt.jabatan});
+                    });
+                }
+                sel2_datalokal('#spesimen_jabatan_id',vdata,false,'#myForm .modal-content');
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+            }
+        });        
     }
 
     $(document).ready(function() {

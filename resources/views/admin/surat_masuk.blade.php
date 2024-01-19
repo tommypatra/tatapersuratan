@@ -353,7 +353,7 @@
 
     function refreshData(){
         $('#search-data').val("");
-        loadData(vPage);
+        CrudModule.refresh(displayData);
     }
 
     $('#btnRefresh').on('click', function() {

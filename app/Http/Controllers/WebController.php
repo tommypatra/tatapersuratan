@@ -165,6 +165,11 @@ class WebController extends Controller
         return view('admin.ttd_qrcode');
     }
 
+    public function polaSpesimen()
+    {
+        return view('admin.pola_spesimen');
+    }
+
     public function detailTte($kode = null)
     {
         return view('tte', ['kode' => $kode]);

@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\TtdQrcodeController;
 use App\Http\Controllers\Api\DistribusiController;
 use App\Http\Controllers\Api\SuratMasukController;
 use App\Http\Controllers\Api\SuratKeluarController;
+use App\Http\Controllers\Api\PolaSpesimenController;
 use App\Http\Controllers\Api\SpesimenJabatanController;
 use App\Http\Controllers\Api\KlasifikasiSuratController;
 use App\Http\Controllers\Api\KategoriSuratMasukController;
@@ -52,6 +53,7 @@ Route::middleware(['auth:sanctum', 'ability:Admin'])->group(function () {
     Route::resource('kategori-surat-masuk', KategoriSuratMasukController::class);
     Route::resource('spesimen-jabatan', SpesimenJabatanController::class);
     Route::resource('pola-surat-keluar', PolaSuratController::class);
+    Route::resource('pola-spesimen', PolaSpesimenController::class);
     Route::resource('klasifikasi-surat-keluar', KlasifikasiSuratController::class);
 });
 
@@ -84,9 +86,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('proses-ajuan-surat-keluar', [SuratKeluarController::class, 'prosesAjuan']);
 
     Route::post('get-surat-masuk', [UtilityController::class, 'getSuratMasuk']);
+    Route::get('get-pola-spesimen', [UtilityController::class, 'getPolaSpesimen']);
     Route::get('get-akses-pola', [UtilityController::class, 'getAksesPola']);
     Route::get('get-kategori-surat-masuk', [UtilityController::class, 'getKategoriSuratMasuk']);
     Route::get('get-users', [UtilityController::class, 'getUsers']);
+    Route::get('get-klasifikasi-surat-keluar', [UtilityController::class, 'getKlasifikasiSuratKeluar']);
+
     Route::post('ganti-foto-profil', [UtilityController::class, 'gantiFotoProfil']);
     Route::put('ttd-elektronik-verifikasi/{id}', [TtdQrcodeController::class, 'verifikasi']);
 });

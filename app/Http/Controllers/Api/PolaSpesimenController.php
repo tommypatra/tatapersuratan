@@ -2,32 +2,33 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Models\PolaSpesimen;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
-use App\Http\Requests\AksesPolaRequest;
-use App\Http\Resources\AksesPolaResource;
-use App\Models\AksesPola;
-use App\Models\User;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\PolaSpesimenRequest;
+use App\Http\Resources\PolaSpesimenResource;
 
-class AksesPolaController extends Controller
+class PolaSpesimenController extends Controller
 {
     //OKE
     public function index(Request $request)
     {
-        $query = AksesPola::with(
+        $query = PolaSpesimen::with(
             [
-                'polaSpesimen.polaSurat',
-                'polaSpesimen.spesimenJabatan.pejabat',
+                'PolaSurat' => function ($query) {
+                    $query->orderBy('id', 'ASC');
+                },
+                'spesimenJabatan' => function ($query) {
+                    $query->orderBy('id', 'ASC');
+                },
                 'user' => function ($query) {
                     $query->select('id', 'name', 'email');
                 }
             ]
         )
-            ->orderBy('tahun', 'desc')
             ->orderBy('user_id', 'asc')
-            ->orderBy('pola_spesimen_id', 'asc');
+            ->orderBy('pola_surat_id', 'asc')
+            ->orderBy('spesimen_jabatan_id', 'asc');
 
 
         //untuk filter lebih dari 1 kolom
@@ -62,13 +63,13 @@ class AksesPolaController extends Controller
             $data = $query->paginate($perPage);
         }
 
-        return AksesPolaResource::collection($data);
+        return PolaSpesimenResource::collection($data);
     }
 
     //OKE 
     public function findID($id)
     {
-        $data = AksesPola::findOrFail($id);
+        $data = PolaSpesimen::findOrFail($id);
         if (!$data) {
             return response()->json([
                 'success' => false,
@@ -89,17 +90,17 @@ class AksesPolaController extends Controller
     }
 
     //OKE PUT application/x-www-form-urlencoded
-    public function store(AksesPolaRequest $request)
+    public function store(PolaSpesimenRequest $request)
     {
         try {
             $validatedData = $request->validated();
-
-            $data = AksesPola::create($validatedData);
+            $validatedData['user_id'] = auth()->user()->id;
+            $data = PolaSpesimen::create($validatedData);
 
             return response()->json([
                 'success' => true,
                 'message' => 'created successfully',
-                'data' => new AksesPolaResource($data),
+                'data' => new PolaSpesimenResource($data),
             ], 201);
         } catch (ValidationException $e) {
             return response()->json([
@@ -117,7 +118,7 @@ class AksesPolaController extends Controller
     }
 
     //OKE PUT application/x-www-form-urlencoded
-    public function update(AksesPolaRequest $request, $id)
+    public function update(PolaSpesimenRequest $request, $id)
     {
 
         try {
@@ -128,7 +129,7 @@ class AksesPolaController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'updated successfully',
-                'data' => new AksesPolaResource($data),
+                'data' => new PolaSpesimenResource($data),
             ], 200);
         } catch (ValidationException $e) {
             return response()->json([
