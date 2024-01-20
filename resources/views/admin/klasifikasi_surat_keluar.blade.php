@@ -256,10 +256,7 @@
     // hapus
     function hapus(id) {
         CrudModule.fDelete(id, function(response) {
-            appShowNotification(response.success, [response.message]);
-            if (response.success) {
-                refresh();
-            }
+            refresh();
         });
     }
 

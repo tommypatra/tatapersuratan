@@ -24,6 +24,8 @@ class CreateTtdQrcodesTable extends Migration
             $table->string('file');
             $table->string('qrcode')->nullable();
             // $table->text('file_detail');
+
+            $table->boolean('is_diajukan')->default(false);
             $table->boolean('is_diterima')->nullable();
             $table->text('catatan')->nullable();
 

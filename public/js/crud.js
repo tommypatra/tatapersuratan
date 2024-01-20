@@ -54,8 +54,8 @@ var CrudModule = (function() {
                 method: 'DELETE',
                 dataType: 'json',
                 success: function(response) {
-                    appShowNotification(response.success, [response.message]);
-                    if (response.success)
+                    // appShowNotification(response.success, [response.message]);
+                    // if (response.success)
                         callback(response);
                 },
                 error: function(xhr, status, error) {

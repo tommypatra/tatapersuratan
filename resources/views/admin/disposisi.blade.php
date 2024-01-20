@@ -21,7 +21,6 @@
                         
                                 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                                     <li><a href="javascript:;" id="btnRefresh" onclick="refresh()" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="refresh-cw"></i> Refresh</a></li>
-                                    <li><a href="javascript:;" id="btnTambah" onclick="tambah()" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="plus-circle"></i> Tambah</a></li>
                                     <li><a href="javascript:;" id="btnFilter" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="filter"></i> Filter</a></li>
                                 </ul>                        
                                 <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
@@ -216,10 +215,7 @@
     // hapus
     function hapus(id) {
         CrudModule.fDelete(id, function(response) {
-            appShowNotification(response.success, [response.message]);
-            if (response.success) {
-                refresh();
-            }
+            refresh();
         });
     }
 

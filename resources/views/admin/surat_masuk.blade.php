@@ -211,9 +211,9 @@
     var vJudul='Surat Masuk';
     var vPage = 1;
     var vsurat_masuk_id;
-    var tahunFilter = '{{ date("Y") }}';
 
     var hakAkses = {!! session()->get('akses') !!};
+    var tahunFilter = '{{ date("Y") }}';
 
     function setfilter(){
         tahunFilter = prompt('Masukkan tahun:');
@@ -553,9 +553,8 @@ function displayPagination(response) {
                 method: 'DELETE',
                 dataType: 'json',
                 success: function(response) {
-                    appShowNotification(response.success,[response.message]);
-                    if(response.success)
-                        refreshData();
+                    refresh();
+                    updateNotifWeb();
                 },
                 error: function(xhr, status, error) {
                     appShowNotification(false,[error]);
@@ -620,6 +619,7 @@ function displayPagination(response) {
             success: function (response) {
                 if(response.success){
                     refresh();
+                    updateNotifWeb();
                     $('#modal-disposisi').modal('hide');
                 }   
                 appShowNotification(response.success,[response.message]);
@@ -660,6 +660,7 @@ function displayPagination(response) {
             success: function(response) {
                 if (response.success) {
                     refreshData();
+                    updateNotifWeb();
                     $('#modal-form').modal('hide');
                 } 
                 appShowNotification(response.success,[response.message]);
@@ -678,6 +679,7 @@ function displayPagination(response) {
             success: function(response) {
                 if (response.success) {
                     showModalForm();
+                    updateNotifWeb();
                     populateEditForm(response.data);
                 }else 
                     appShowNotification(response.success,[response.message]);
@@ -729,14 +731,7 @@ function displayPagination(response) {
                 url: "/api/lampiran-surat-masuk/"+id,
                 dataType: 'json',
                 success: function (response) {
-                    if (response.success) {
-                        refresh();
-                        if(confirm("Tautan berhasil dihapus, apakah anda juga ingin menghapus secara permanen file tersebut?")){
-                            hapusFileUpload(upload_id);
-                        }
-                    } else {
-                        appShowNotification(false, ["Failed to upload attachment."]);
-                    }
+                    refresh();
                 },
                 error: function (xhr, status, error) {
                     appShowNotification(false, ["Something went wrong. Please try again later."]);
@@ -745,26 +740,7 @@ function displayPagination(response) {
         }
     }
 
-    function hapusFileUpload(id){
-        $.ajax({
-            type: "DELETE",
-            url: "/api/upload/"+id,
-            dataType: 'json',
-            success: function (response) {
-                if (response.success) {
-                    appShowNotification(response.success, [response.message]);
-                } else {
-                    appShowNotification(false, ["Failed to upload attachment."]);
-                }
-            },
-            error: function (xhr, status, error) {
-                appShowNotification(false, ["Something went wrong. Please try again later."]);
-            },
-        });
-    }
-
-
-    
+   
 
     $(document).on("click", ".uploadLampiran", function () {
         var surat_masuk_id = $(this).data("surat_masuk_id");
@@ -814,8 +790,10 @@ function displayPagination(response) {
                 data: {'id':id},
                 dataType: 'json',
                 success: function (response) {
-                    if(response.success)
+                    if(response.success){
                         refresh();
+                        updateNotifWeb();
+                    }
                     appShowNotification(response.success, response.msg);
                 },
                 error: function (xhr, status, error) {
@@ -849,6 +827,7 @@ function displayPagination(response) {
                     if(response.success){
                         appShowNotification(true, [response.message]);
                         refresh();
+                        updateNotifWeb();
                     }
                 },
                 error: function (xhr, status, error) {

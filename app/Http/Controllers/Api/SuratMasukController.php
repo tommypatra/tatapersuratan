@@ -62,20 +62,7 @@ class SuratMasukController extends Controller
                         }
                     elseif ($i == 'tahun') {
                         $tahun_sekarang = $dp;
-                        // $aksespola = getAksesPola($user_id, $tahun_sekarang);
-                        // dd($aksespola['data']);
-
                         $query->whereYear('tanggal', $tahun_sekarang);
-                        // if (!empty($aksespola['data'])) {
-                        //     $idAkses = $aksespola['data'];
-
-                        //     $query->where(function ($query) use ($user_id, $idAkses) {
-                        //         $query->orWhere('user_id', $user_id)
-                        //             ->orWhere(function ($query) use ($idAkses) {
-                        //                 $query->whereIn('akses_pola_id', $idAkses);
-                        //             });
-                        //     });
-                        // }
                     } else
                         $query->where($i, $dp);
                 }
@@ -123,7 +110,7 @@ class SuratMasukController extends Controller
             'success' => true,
             'message' => 'ditemukan',
             'data' => $data,
-        ], 201);
+        ], 200);
     }
 
     //OKE PUT application/x-www-form-urlencoded
@@ -131,6 +118,14 @@ class SuratMasukController extends Controller
     {
         try {
             $validatedData = $request->validated();
+
+            $rolesAkun = $request->input('roles_akun');
+            if (in_array('Admin', $rolesAkun)) {
+                $validatedData['is_diajukan'] = 1;
+                $validatedData['is_diterima'] = 1;
+                $validatedData['verifikator'] = auth()->user()->name;
+            }
+
             $validatedData['waktu_buat'] = date("Y-m-d H:i:s");
             $data = SuratMasuk::create($validatedData);
 
@@ -194,7 +189,7 @@ class SuratMasukController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'deleted successfully',
-            ], 200);
+            ], 204);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

@@ -20,51 +20,57 @@ class TtdQrcodeController extends Controller
     //OKE
     public function index(Request $request)
     {
-        $query = TtdQrcode::orderBy('is_diterima', 'asc')
+        $query = TtdQrcode::orderBy('is_diajukan', 'asc')
+            ->orderBy('is_diterima', 'asc')
             ->orderBy('tanggal', 'asc')
             ->orderBy('perihal', 'asc')
+            ->where(function ($query) {
+                $userId = auth()->user()->id;
+                $query->where('user_id', $userId)
+                    ->orWhere('user_ttd_id', $userId);
+            })
             ->with([
                 'user', 'ttd'
             ]);
-        $rolesAkun = $request->input('roles_akun');
 
+
+        $filter = $request->input('filter');
+
+        //untuk filter lebih dari 1 kolom
         $filter = $request->input('filter');
         if ($filter) {
             $filterArray = json_decode($filter, true);
             if (is_array($filterArray)) {
                 foreach ($filterArray as $i => $dp) {
-                    $query->where($i, $dp);
-                }
-            } else {
-                if ($filter == 'masuk') {
-                    $query->where(function ($query) {
-                        $query->where('user_id', auth()->user()->id)
-                            ->orWhere('user_ttd_id', auth()->user()->id);
-                    })
-                        ->whereNull('is_diterima');
-                } elseif ($filter == 'diterima') {
-                    $query->where(function ($query) {
-                        $query->where('user_id', auth()->user()->id)
-                            ->orWhere('user_ttd_id', auth()->user()->id);
-                    })
-                        ->where('is_diterima', 1);
-                } elseif ($filter == 'ditolak') {
-                    $query->where(function ($query) {
-                        $query->where('user_id', auth()->user()->id)
-                            ->orWhere('user_ttd_id', auth()->user()->id);
-                    })
-                        ->where('is_diterima', 0);
+                    if ($i == 'kategori')
+                        switch ($dp) {
+                            case "konsep":
+                                $query->where('is_diajukan', '!=', 1);
+                                break;
+                            case "diajukan":
+                                $query->where('is_diajukan', 1)->whereNull('is_diterima');
+                                break;
+                            case "diterima":
+                                $query->where('is_diajukan', 1)->where('is_diterima', 1);
+                                break;
+                            case "ditolak":
+                                $query->where('is_diajukan', 1)->where('is_diterima', 0);
+                                break;
+                        }
+                    elseif ($i == 'tahun') {
+                        $tahun_sekarang = $dp;
+                        $query->whereYear('tanggal', $tahun_sekarang);
+                    } else
+                        $query->where($i, $dp);
                 }
             }
         }
-
         //untuk pencarian
         $keyword = $request->input('keyword');
         if ($keyword) {
             $query->where('perihal', 'LIKE', "%$keyword%")
                 ->orWhere('no_surat', 'LIKE', "%$keyword%")
                 ->orWhere('tanggal', 'LIKE', "%$keyword%");
-            // ->orWhere('asal', 'LIKE', "%$keyword%");
         }
 
         $perPage = $request->input('per_page', env('DATA_PER_PAGE', 10));
@@ -98,7 +104,7 @@ class TtdQrcodeController extends Controller
             'success' => true,
             'message' => 'ditemukan',
             'data' => $data,
-        ], 201);
+        ], 200);
     }
 
 
@@ -191,7 +197,7 @@ class TtdQrcodeController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'deleted successfully',
-            ], 200);
+            ], 204);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -201,28 +207,63 @@ class TtdQrcodeController extends Controller
         }
     }
 
-    public function verifikasi(Request $request, $id)
+    public function ajukan(Request $request)
+    {
+        try {
+            $data = $this->findId($request->input('id'));
+            if ($data->is_diajukan)
+                return response()->json([
+                    'success' => false,
+                    'message' => 'pengajuan gagal',
+                    'error' => 'sudah diajukan',
+                ], 500);
+
+            $data->update(['is_diajukan' => 1]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'pengajuan successfully',
+                'data' => new TtdQrcodeResource($data),
+            ], 200);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function verifikasi(Request $request)
     {
         try {
             // $pdfInfo = json_decode($request->input('pdf'), true);
             $request->validate([
+                'id' => 'required',
                 'is_diterima' => 'required',
                 'catatan' => 'nullable',
             ]);
+            $id = $request->input('id');
 
             $data = $this->findId($id);
             if (!$data) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Data Tidak Ditemukan',
-                    'errors' => 'data dengan id terseubt tidak ditemukan',
+                    'errors' => 'data dengan id tersebut tidak ditemukan',
                 ], 200);
             } elseif ($data->user_ttd_id != auth()->user()->id) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Akses Ditolak',
                     'errors' => 'anda tidak diperbolehkan mengakses layanan ini',
-                ], 200);
+                ], 403);
             }
 
             $dataUpdate = [

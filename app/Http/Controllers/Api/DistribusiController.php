@@ -73,7 +73,7 @@ class DistribusiController extends Controller
             'success' => true,
             'message' => 'ditemukan',
             'data' => $data,
-        ], 201);
+        ], 200);
     }
 
     //OKE PUT application/x-www-form-urlencoded

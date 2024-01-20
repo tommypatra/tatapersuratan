@@ -46,7 +46,7 @@
 										</figcaption>                                   
 									</div>
 								</div>
-								<div class="mb-3">
+								<div class="mb-3" id="keterangan">
 									Telah sah dan ditandatangani secara elektronik oleh <span id="pejabat"><i>pejabat</i></span> sebagai <span class="jabatan"><i>jabatan</i></span> IAIN Kendari.  
 								</div>								
 								<hr>
@@ -94,6 +94,18 @@
 						$('.jabatan').html(response.data.jabatan);
 						$('#pejabat').html(response.data.pejabat);
 						$('#file').attr("href", vBaseUrl+'/'+response.data.file);
+						if(!response.data.is_diterima){
+							var ket='tidak sah dan tidak ditanda tangani secara elektronik';
+							if(response.data.catatan)
+								ket+=' karena '+response.data.catatan;
+							$('#keterangan').html(ket.toUpperCase());
+							$('#file').attr("href", "javascript:;");
+							setTimeout(
+								function () {
+									window.location.href = '{{ route("akun-masuk") }}';
+								}, 5000
+							);						
+						}
 					}
 				},
 				error: function(xhr, status, error) {

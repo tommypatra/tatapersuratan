@@ -301,10 +301,7 @@
 
         CrudModule.fDelete(id, function(response) {
             CrudModule.setApi(vApi);
-            appShowNotification(response.success, [response.message]);
-            if (response.success) {
-                refresh();
-            }
+            refresh();
         });
     }
 

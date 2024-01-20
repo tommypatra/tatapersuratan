@@ -22,6 +22,7 @@ use App\Http\Resources\SuratMasukResource;
 use App\Http\Resources\PolaSpesimenResource;
 use App\Http\Resources\KlasifikasiSuratResource;
 use App\Http\Resources\KategoriSuratMasukResource;
+use App\Models\SuratKeluar;
 
 class UtilityController extends Controller
 {
@@ -230,7 +231,7 @@ class UtilityController extends Controller
                 'success' => true,
                 'message' => 'foto profil berhasil terupdate',
                 'data' => $user,
-            ], 201);
+            ], 200);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
@@ -361,5 +362,77 @@ class UtilityController extends Controller
         }
 
         return PolaSpesimenResource::collection($data);
+    }
+    public function infoGeneral()
+    {
+        try {
+            $user_id = auth()->user()->id;
+            $rolesAkun = cekAkses($user_id);
+            $tahun_sekarang = date('Y');
+
+            //untuk info surat masuk
+            $suratMasuk = SuratMasuk::selectRaw("
+                COUNT(CASE WHEN is_diajukan = 0 THEN 1 END) as konsep,
+                COUNT(CASE WHEN is_diajukan = 1 AND is_diterima IS NULL THEN 1 END) as diajukan,
+                COUNT(CASE WHEN is_diajukan = 1 AND is_diterima = 1 THEN 1 END) as diterima,
+                COUNT(CASE WHEN is_diajukan = 1 AND is_diterima = 0 THEN 1 END) as ditolak
+            ")
+                ->whereYear('tanggal', $tahun_sekarang);
+            if (!in_array('Admin', $rolesAkun)) {
+                $suratMasuk->where('user_id', $user_id);
+            }
+            $data['surat_masuk'] = $suratMasuk->first();
+
+            //untuk info ttd qrcode
+            $ttd = TtdQrcode::selectRaw("
+                COUNT(CASE WHEN is_diajukan = 0 THEN 1 END) as konsep,
+                COUNT(CASE WHEN is_diajukan = 1 AND is_diterima IS NULL THEN 1 END) as diajukan,
+                COUNT(CASE WHEN is_diajukan = 1 AND is_diterima = 1 THEN 1 END) as diterima,
+                COUNT(CASE WHEN is_diajukan = 1 AND is_diterima = 0 THEN 1 END) as ditolak
+            ")
+                ->where(function ($query) use ($user_id) {
+                    $query->where('user_id', $user_id)
+                        ->orWhere('user_ttd_id', $user_id);
+                })
+                ->whereYear('tanggal', $tahun_sekarang);
+            $data['ttd'] = $ttd->first();
+
+            //untuk info surat keluar
+            $aksespola = getAksesPola($user_id, $tahun_sekarang);
+            $suratKeluar = SuratKeluar::selectRaw("
+                COUNT(CASE WHEN is_diajukan = 0 THEN 1 END) as konsep,
+                COUNT(CASE WHEN is_diajukan = 1 AND is_diterima IS NULL THEN 1 END) as diajukan,
+                COUNT(CASE WHEN is_diajukan = 1 AND is_diterima = 1 THEN 1 END) as diterima,
+                COUNT(CASE WHEN is_diajukan = 1 AND is_diterima = 0 THEN 1 END) as ditolak
+            ")
+                ->whereYear('tanggal', $tahun_sekarang);
+
+            if (!empty($aksespola['data'])) {
+                $idAkses = $aksespola['data'];
+                $suratKeluar->where(function ($query) use ($user_id, $idAkses) {
+                    $query->orWhere('user_id', $user_id)
+                        ->orWhere(function ($query) use ($idAkses) {
+                            $query->whereIn('pola_spesimen_id', $idAkses);
+                        });
+                });
+            } else {
+                if (!in_array('Admin', $rolesAkun)) {
+                    $query->where('user_id', $user_id);
+                }
+            }
+            $data['surat_keluar'] = $ttd->first();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'data ditemukan',
+                'data' => $data,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

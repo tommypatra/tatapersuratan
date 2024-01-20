@@ -48,7 +48,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'User atau password anda salah',
-            ], 200);
+            ], 401);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -142,7 +142,7 @@ class AuthController extends Controller
                 'success' => true,
                 'message' => 'Pendaftaran berhasil, silahkan login dan memperbaharui data profil anda',
                 'data' => $data,
-            ], 200);
+            ], 201);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,

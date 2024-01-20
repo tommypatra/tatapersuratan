@@ -490,6 +490,7 @@
         CrudModule.fSave(setup_ajax, dataForm, function(response) {
             if (response.success) {
                 refresh();
+                updateNotifWeb();
                 // $('#modal-form').modal('hide');
             } 
             appShowNotification(response.success,[response.message]);
@@ -499,10 +500,8 @@
     // hapus
     function hapus(id) {
         CrudModule.fDelete(id, function(response) {
-            appShowNotification(response.success, [response.message]);
-            if (response.success) {
-                refresh();
-            }
+            refresh();
+            updateNotifWeb();
         });
     }
 
@@ -595,6 +594,7 @@
                     if(response.success){
                         appShowNotification(true, [response.message]);
                         refresh();
+                        updateNotifWeb();
                     }
                 },
                 error: function (xhr, status, error) {
@@ -692,38 +692,13 @@
                 url: "/api/lampiran-surat-keluar/"+id,
                 dataType: 'json',
                 success: function (response) {
-                    if (response.success) {
-                        loadData();
-                        if(confirm("Tautan berhasil dihapus, apakah anda juga ingin menghapus secara permanen file tersebut?")){
-                            hapusFileUpload(upload_id);
-                        }
-                    } else {
-                        appShowNotification(false, ["Failed to upload attachment."]);
-                    }
+                    loadData();
                 },
                 error: function (xhr, status, error) {
                     appShowNotification(false, ["Something went wrong. Please try again later."]);
                 },
             });
         }
-    }
-
-    function hapusFileUpload(id){
-        $.ajax({
-            type: "DELETE",
-            url: "/api/upload/"+id,
-            dataType: 'json',
-            success: function (response) {
-                if (response.success) {
-                    appShowNotification(response.success, [response.message]);
-                } else {
-                    appShowNotification(false, ["Failed to upload attachment."]);
-                }
-            },
-            error: function (xhr, status, error) {
-                appShowNotification(false, ["Something went wrong. Please try again later."]);
-            },
-        });
     }
 
     $(document).on("click", ".uploadLampiran", function () {
@@ -748,8 +723,10 @@
                 data: {'id':id},
                 dataType: 'json',
                 success: function (response) {
-                    if(response.success)
+                    if(response.success){
                         refresh();
+                        updateNotifWeb();
+                    }
                     appShowNotification(response.success, response.msg);
                 },
                 error: function (xhr, status, error) {
@@ -814,7 +791,7 @@
             user_id: "pilih user dulu",
         },
         submitHandler: function(form) {
-            simpanDistribusi()
+            simpanDistribusi();
         }
     });
 
@@ -838,6 +815,7 @@
                     if (completedRequests === totalRequests) {
                         refresh();
                         appShowNotification(true, ["Selsai dilakukan"]);
+                        updateNotifWeb();
                     }                    
                 },
                 error: function (xhr, status, error) {

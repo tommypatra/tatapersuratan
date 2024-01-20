@@ -133,7 +133,8 @@
 <script type="text/javascript">
     var vApi='/api/tujuan';
     var vJudul='Disposisi Baca';
-
+    showNotif=false;
+    
     function refresh(){
         infoDisposisi();                
         initData();
@@ -178,13 +179,9 @@
                             updateWaktuAkses(cariData[0].id,cariData[0].surat_masuk_id);
                         }
                     }
-                    // else if(response.data.user_id==vUserId) {
-                    //     window.location.replace("{{ route('akun-dashboard') }}"); 
-                    //     alert("Maaf, akses ditolak");
-                    //     return;
-                    // }
+                    showNotif=true;
+                    updateNotifWeb();
 
-                    // console.log(suratMasuk);
                     $("#asal").html(suratMasuk.asal);
                     $("#no_surat").html(suratMasuk.no_surat);
                     $("#tempat_tanggal").html(suratMasuk.tempat+', '+suratMasuk.tanggal);
@@ -277,7 +274,7 @@
                         `);
                     });
                     
-
+                    
                 }else{
                     // window.location.replace("{{ route('akun-dashboard') }}");
                 } 
@@ -292,8 +289,18 @@
     function updateWaktuAkses(id,surat_masuk_id){
         let setup_ajax={type:'PUT',url:'/api/tujuan/'+id};
         let dataForm = {id:id,user_id:vUserId,surat_masuk_id:surat_masuk_id};
-        CrudModule.fSave(setup_ajax, dataForm, function(response) {
+        $.ajax({
+            type: setup_ajax.type,
+            url: setup_ajax.url,
+            data: dataForm,
+            dataType: 'json',
+            success: function(response) {
+            },
+            error: function(xhr, status, error) {
+                appShowNotification(false, ['Something went wrong. Please try again later.']);
+            }
         });
+
     }
 
     $(document).on("click",".img-preview",function(){
@@ -352,10 +359,7 @@
     function hapusDisposisi(id) {
         CrudModule.setApi('/api/tujuan');
         CrudModule.fDelete(id, function(response) {
-            appShowNotification(response.success, [response.message]);
-            if (response.success) {
-                refresh();
-            }
+            refresh();
         });
     }
 

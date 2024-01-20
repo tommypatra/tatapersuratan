@@ -72,7 +72,7 @@ class GrupUserController extends Controller
             'success' => true,
             'message' => 'ditemukan',
             'data' => $data,
-        ], 201);
+        ], 200);
     }
 
     //OKE PUT application/x-www-form-urlencoded
@@ -142,7 +142,7 @@ class GrupUserController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'deleted successfully',
-            ], 200);
+            ], 204);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

@@ -27,8 +27,9 @@ class TtdQrcodeResource extends JsonResource
             'jabatan' => $this->jabatan,
             'qrcode' => $this->qrcode,
             'file' => $this->file,
+            'is_diajukan' => $this->is_diajukan,
             'is_diterima' => $this->is_diterima,
-            'catatan' => formatNotNull($this->is_diterima),
+            'catatan' => formatNotNull($this->catatan),
 
             'user_ttd_id' => $this->user_ttd_id,
             'user_id' => $this->user_id,

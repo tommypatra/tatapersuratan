@@ -75,6 +75,7 @@ Route::middleware(['auth:sanctum', 'ability:Admin,Pengguna'])->group(function ()
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('info-tujuan-disposisi', [UtilityController::class, 'infoDisposisi']);
     Route::get('info-distribusi', [UtilityController::class, 'infoDistribusi']);
+    Route::get('info-general', [UtilityController::class, 'infoGeneral']);
 
     Route::get('encode/{id}', [UtilityController::class, 'encode']);
     Route::get('encode/{id}', [UtilityController::class, 'encode']);
@@ -93,5 +94,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('get-klasifikasi-surat-keluar', [UtilityController::class, 'getKlasifikasiSuratKeluar']);
 
     Route::post('ganti-foto-profil', [UtilityController::class, 'gantiFotoProfil']);
-    Route::put('ttd-elektronik-verifikasi/{id}', [TtdQrcodeController::class, 'verifikasi']);
+    Route::post('ajukan-ttd-elektronik', [TtdQrcodeController::class, 'ajukan']);
+    Route::post('verifikasi-ttd-elektronik', [TtdQrcodeController::class, 'verifikasi']);
 });

@@ -73,7 +73,7 @@ class LampiranSuratKeluarController extends Controller
             'success' => true,
             'message' => 'ditemukan',
             'data' => $data,
-        ], 201);
+        ], 200);
     }
 
     //OKE PUT application/x-www-form-urlencoded
@@ -190,12 +190,18 @@ class LampiranSuratKeluarController extends Controller
     {
         try {
             $data = $this->findId($id);
+            $upload_id = $data->upload_id;
+            $data->delete();
+
+            //cari file
+            $data = UploadController::findId($upload_id);
+            File::delete(public_path($data->path));
             $data->delete();
 
             return response()->json([
                 'success' => true,
                 'message' => 'deleted successfully',
-            ], 200);
+            ], 204);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

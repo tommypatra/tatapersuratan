@@ -24,7 +24,7 @@
                                 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                                     <li><a href="javascript:;" id="btnRefresh" onclick="refresh()" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="refresh-cw"></i> Refresh</a></li>
                                     <li><a href="javascript:;" id="btnTambah" onclick="tambah()" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="plus-circle"></i> Tambah</a></li>
-                                    <li><a href="#" id="btnCoba" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="filter"></i> Filter</a></li>
+                                    <li><a href="#" id="btnFilter" onclick="setfilter()" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="filter"></i> Filter</a></li>
                                 </ul>                        
                                 <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
                                     <input type="search" id="search-data" class="form-control" placeholder="Search..." aria-label="Search">
@@ -38,7 +38,10 @@
 
                     <ul class="nav nav-tabs">
                         <li class="nav-item">
-                            <a class="nav-link active" href="javascript:;" id="tabAjukan" onclick="setActiveTab('tabAjukan')">Diajukan</a>
+                            <a class="nav-link active" href="javascript:;" id="tabKonsep" onclick="setActiveTab('tabKonsep')">Konsep</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="javascript:;" id="tabAjukan" onclick="setActiveTab('tabAjukan')">Diajukan</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="javascript:;" id="tabTerima" onclick="setActiveTab('tabTerima')">Diterima</a>
@@ -53,7 +56,7 @@
                             <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th style="width:15%">Pejabat Spesimen</th>
+                                    <th style="width:15%">Pejabat Spesimen/ Asal</th>
                                     <th style="width:50%">Tanggal/ Nomor/ Perihal</th>
                                     <th style="width:20%">Lampiran</th>
                                     <th></th>
@@ -191,10 +194,23 @@
     var vApi='/api/ttd-elektronik';
     var vJudul='Tanda Tangan Elektronik';
     var vsurat_keluar_id;
-    // console.log(hakAkses);
+
     var hakAkses = {!! session()->get('akses') !!};
-    if(hakAkses>1)
-        CrudModule.setFilter(`{"user_id":"${vUserId}"}`);
+    var tahunFilter = '{{ date("Y") }}';
+
+    function setfilter(){
+        tahunFilter = prompt('Masukkan tahun:');
+        if (!isValidTahun(tahunFilter)) {
+            appShowNotification(false,['Tahun yang dimasukkan tidak valid. Mohon masukkan tahun yang benar.']);
+        }else{
+            refresh();
+        }
+    }
+
+    function isValidTahun(input) {
+        const regex = /^\d{4}$/;
+        return regex.test(input);
+    }   
 
     var fieldInit={
         'id': { action: 'val' },
@@ -221,6 +237,9 @@
         $('#' + tabId).addClass('active');
         console.log(tabId);
         switch (tabId) {
+            case 'tabKonsep':
+                loadDataKonsep();
+                break;
             case 'tabAjukan':
                 loadDataMasuk();
                 break;
@@ -234,11 +253,6 @@
                 loadDataMasuk();
                 break;
         }    
-    }
-
-    //refresh
-    function refresh(){
-        CrudModule.refresh(displayData);
     }
 
     //pencarian data
@@ -263,23 +277,26 @@
         if(data.length>0)
             $.each(data, function(index, dt) {
                 
-                var lblstatus=`<span class="badge bg-warning">Belum Diperiksa</span>`;
-                if(dt.is_diterima==1)
-                    lblstatus=`<span class="badge bg-success">Diterima</span>`;
-                else if(dt.is_diterima==0)
-                    lblstatus=`<span class="badge bg-danger">Ditolak</span>`;
-                var catatan=(dt.catatan)?dt.catatan:"";
+                var labelApp=labelSetupVerifikasi(dt.is_diajukan,dt.is_diterima,dt.catatan,dt.tujuan.name);
 
-                var my_menu=`<ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                <li><a class="dropdown-item" href="tte/${dt.kode}" target="_blank"><i class="fa-solid fa-book"></i> Detail</a></li>`;
-                if(dt.user_ttd_id==vUserId && dt.is_diterima==null){
-                    my_menu+=`  <li><a class="dropdown-item" href="javascript:;" onclick="verifikasi(${dt.id})"><i class="fa-solid fa-check-to-slot"></i> Verifikasi</a></li>`;
+                var my_menu=`<ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">`;
+
+                if(dt.user_id==vUserId){
+                    if(!dt.is_diajukan){
+                        my_menu+=`  <li><a class="dropdown-item" href="javascript:;" onclick="ajukan(${dt.id})"><i class="fa-regular fa-share-from-square"></i> Ajukan</a></li>
+                                    <li><a class="dropdown-item" href="javascript:;" onclick="ganti(${dt.id})"><i class="fa-solid fa-pen-to-square"></i> Ganti</a></li>
+                                    <li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>`;
+                    }
                 }
-                if(dt.is_diterima==null){
-                    my_menu+=`  <li><a class="dropdown-item" href="javascript:;" onclick="ganti(${dt.id})"><i class="fa-solid fa-pen-to-square"></i> Ganti</a></li>
-                                <li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>`;
+                if(dt.user_ttd_id==vUserId){
+                    if(dt.is_diajukan && dt.is_diterima==null){
+                        my_menu+=`  <li><a class="dropdown-item" href="javascript:;" onclick="validasi(1,${dt.id})"><i class="fa-solid fa-envelope-circle-check"></i> Terima</a></li>
+                                    <li><a class="dropdown-item" href="javascript:;" onclick="validasi(0,${dt.id})"><i class="fa-solid fa-rectangle-xmark"></i> Tolak</a></li>`;
+                    }
                 }
-                my_menu+=`</ul>`;
+
+                my_menu+=`      <li><a class="dropdown-item" href="tte/${dt.kode}" target="_blank"><i class="fa-solid fa-book"></i> Detail</a></li>
+                            </ul>`;
 
                 var qrcode=(dt.qrcode)?`<img src="${dt.qrcode}" class="mt-2 mb-2" height="100px">`:'';
                 
@@ -289,6 +306,9 @@
                         <td>
                             ${dt.tujuan.name}
                             <div style="font-style:italic;">${dt.tujuan.jabatan.jabatan}</div>
+                            <div style="font-size:10px;font-style:italic;">                                
+                                (${dt.user.name}) 
+                            </div>
                         </td>
                         <td><span class="badge bg-primary">${dt.tanggal}</span><br>${dt.no_surat}
                             <div>
@@ -298,13 +318,11 @@
                                     ${dt.perihal}
                                     </p>
                                 </blockquote>
-                                <figcaption class="blockquote-footer mb-0">
-                                    ${dt.user.name} 
-                                </figcaption>                                   
+                                ${labelApp.catatan}                                 
                             </div>                               
                         </td>
                         <td>
-                            ${lblstatus}
+                            <div>${labelApp.label}</div>
                             <div>
                                 ${qrcode}
                                 <div><a href="${dt.file}" id="urlpdf" target="_blank">Lampiran File</a></div>
@@ -411,10 +429,8 @@
     // hapus
     function hapus(id) {
         CrudModule.fDelete(id, function(response) {
-            appShowNotification(response.success, [response.message]);
-            if (response.success) {
-                refresh();
-            }
+            refresh();
+            updateNotifWeb();
         });
     }
 
@@ -456,6 +472,64 @@
         }
     });   
 
+    function ajukan(id){
+        if(confirm("apakah anda yakin?")){
+            $.ajax({
+                url: "/api/ajukan-ttd-elektronik",
+                type: "POST",
+                data: {'id':id},
+                dataType: 'json',
+                success: function (response) {
+                    if(response.success){
+                        refresh();
+                        updateNotifWeb()
+                    }
+                    appShowNotification(response.success, response.msg);
+                },
+                error: function (xhr, status, error) {
+                    appShowNotification(false, ["Something went wrong. Please try again later."]);
+                }
+            });
+        }
+    }    
+
+
+    function validasi(is_diterima,id){
+        var label='tolak';
+        var catatan='';
+        if(is_diterima){
+            label='terima';
+        }
+
+        if(confirm('apakah anda yakin '+label+' usulan ini?')){
+            if(!is_diterima)
+                catatan = prompt("Tuliskan alasan mengapa usulan ini ditolak?");
+
+            $.ajax({
+                url: '/api/verifikasi-ttd-elektronik',
+                method: 'POST',
+                dataType: 'json',
+                data: {
+                    'id':id,
+                    'is_diterima':is_diterima,
+                    'catatan':catatan,
+                },
+                dataType: 'json',
+                success: function (response) {
+                    if(response.success){
+                        appShowNotification(true, [response.message]);
+                        refresh();
+                        updateNotifWeb();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    appShowNotification(false, ["Something went wrong. Please try again later."]);
+                }
+            });                
+        }
+    }    
+
+
     // ganti dan populasi data
     function simpanVerifikasi(form) {
         let id=$("#idttd").data('id');
@@ -473,6 +547,7 @@
                 if (response.success) {
                     showHideModal('modal-verifikasi',false);
                     refresh();
+                    updateNotifWeb();
                 } 
                 appShowNotification(response.success,[response.message]);
             },
@@ -526,18 +601,28 @@
     }
 
 
+    function refresh(){
+        CrudModule.refresh(displayData);
+    }
+
+
+    function loadDataKonsep(page = 1) {
+        CrudModule.setFilter('{"kategori":"konsep","tahun":'+tahunFilter+'}');
+        CrudModule.fRead(page, displayData);
+    }
+
     function loadDataMasuk(page = 1) {
-        CrudModule.setFilter('masuk')
+        CrudModule.setFilter('{"kategori":"diajukan","tahun":'+tahunFilter+'}');
         CrudModule.fRead(page, displayData);
     }
 
     function loadDataDiterima(page = 1) {
-        CrudModule.setFilter('diterima')
+        CrudModule.setFilter('{"kategori":"diterima","tahun":'+tahunFilter+'}');
         CrudModule.fRead(page, displayData);
     }
 
     function loadDataDitolak(page = 1) {
-        CrudModule.setFilter('ditolak')
+        CrudModule.setFilter('{"kategori":"ditolak","tahun":'+tahunFilter+'}');
         CrudModule.fRead(page, displayData);
     }
 
@@ -545,7 +630,7 @@
 
         CrudModule.setApi(vApi);
         // Load data default
-        loadDataMasuk();
+        loadDataKonsep();
 
         //load user
         $.ajax({
