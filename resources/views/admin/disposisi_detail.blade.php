@@ -133,7 +133,6 @@
 <script type="text/javascript">
     var vApi='/api/tujuan';
     var vJudul='Disposisi Baca';
-    showNotif=false;
     
     function refresh(){
         infoDisposisi();                
@@ -179,8 +178,7 @@
                             updateWaktuAkses(cariData[0].id,cariData[0].surat_masuk_id);
                         }
                     }
-                    showNotif=true;
-                    updateNotifWeb();
+                    InfoModule.updateNotifWeb();
 
                     $("#asal").html(suratMasuk.asal);
                     $("#no_surat").html(suratMasuk.no_surat);

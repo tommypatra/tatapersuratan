@@ -430,7 +430,7 @@
     function hapus(id) {
         CrudModule.fDelete(id, function(response) {
             refresh();
-            updateNotifWeb();
+            InfoModule.updateNotifWeb();
         });
     }
 
@@ -519,7 +519,7 @@
                     if(response.success){
                         appShowNotification(true, [response.message]);
                         refresh();
-                        updateNotifWeb();
+                        InfoModule.updateNotifWeb();
                     }
                 },
                 error: function (xhr, status, error) {
@@ -547,7 +547,7 @@
                 if (response.success) {
                     showHideModal('modal-verifikasi',false);
                     refresh();
-                    updateNotifWeb();
+                    InfoModule.updateNotifWeb();
                 } 
                 appShowNotification(response.success,[response.message]);
             },
@@ -631,6 +631,7 @@
         CrudModule.setApi(vApi);
         // Load data default
         loadDataKonsep();
+        InfoModule.updateNotifWeb();
 
         //load user
         $.ajax({

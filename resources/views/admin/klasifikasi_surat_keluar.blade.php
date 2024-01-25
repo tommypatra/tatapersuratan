@@ -267,6 +267,7 @@
         function loadData(page = 1) {
             CrudModule.fRead(page, displayData);
         }
+        InfoModule.updateNotifWeb();
     });
 </script>
 @endsection

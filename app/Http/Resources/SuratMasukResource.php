@@ -23,6 +23,7 @@ class SuratMasukResource extends JsonResource
             'perihal' => $this->perihal,
             'asal' => $this->asal,
             'tempat' => $this->tempat,
+            'type' => 'Surat Masuk',
 
             'is_diterima' => $this->is_diterima,
             'is_diajukan' => $this->is_diajukan,

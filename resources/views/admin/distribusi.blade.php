@@ -174,6 +174,7 @@
         function loadData(page = 1) {
             CrudModule.fRead(page, displayData,'filter={"user_id":"'+vUserId+'"}');
         }
+        InfoModule.updateNotifWeb();
     });
 </script>
 @endsection

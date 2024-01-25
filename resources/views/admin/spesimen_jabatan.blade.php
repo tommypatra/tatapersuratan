@@ -269,15 +269,6 @@
         });
     }
 
-    $(document).ready(function() {
-        CrudModule.setApi(vApi);
-        // Load data default
-        loadData();
-        function loadData(page = 1) {
-            CrudModule.fRead(page, displayData);
-        }
-    });
-
     //load user
     $.ajax({
         url: '/api/user-app?page=all',
@@ -296,6 +287,17 @@
             console.error(error);
         }
     });
+
+    $(document).ready(function() {
+        CrudModule.setApi(vApi);
+        // Load data default
+        loadData();
+        function loadData(page = 1) {
+            CrudModule.fRead(page, displayData);
+        }
+        InfoModule.updateNotifWeb();
+    });
+
 
 </script>
 @endsection

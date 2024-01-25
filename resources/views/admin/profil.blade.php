@@ -165,6 +165,7 @@
     $(document).ready(function() {
         CrudModule.setApi(vApi);
         initData();
+        InfoModule.updateNotifWeb();
     });
 </script>
 

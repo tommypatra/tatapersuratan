@@ -363,6 +363,54 @@ class UtilityController extends Controller
 
         return PolaSpesimenResource::collection($data);
     }
+
+
+    public function dataInfo($data)
+    {
+        $totalKonsep = 0;
+        $totalDiajukan = 0;
+        $totalDiterima = 0;
+        $totalDitolak = 0;
+
+        $bulanArray = range(0, 11);
+        $perbulan = [];
+        $grafik = [];
+        foreach ($bulanArray as $bulan) {
+            $konsep = isset($data[$bulan]) ? (int)$data[$bulan]['konsep'] : 0;
+            $diajukan = isset($data[$bulan]) ? (int)$data[$bulan]['diajukan'] : 0;
+            $diterima = isset($data[$bulan]) ? (int)$data[$bulan]['diterima'] : 0;
+            $ditolak = isset($data[$bulan]) ? (int)$data[$bulan]['ditolak'] : 0;
+            $total = $konsep + $diajukan + $diterima + $ditolak;
+            $perbulan[] = [
+                'konsep' => $konsep,
+                'diajukan' => $diajukan,
+                'diterima' => $diterima,
+                'ditolak' => $ditolak,
+                'total' => $total,
+                'bulan' => isset($data[$bulan]) ? (int)$data[$bulan]['bulan'] : $bulan + 1,
+            ];
+
+            $grafik[$bulan] = $total;
+        }
+
+        $retVal['grafik'] = $grafik;
+        $retVal['perbulan'] = $perbulan;
+
+        foreach ($data as $bulanData) {
+            $totalKonsep += $bulanData['konsep'];
+            $totalDiajukan += $bulanData['diajukan'];
+            $totalDiterima += $bulanData['diterima'];
+            $totalDitolak += $bulanData['ditolak'];
+        }
+        $retVal['total'] = [
+            'konsep' => $totalKonsep,
+            'diajukan' => $totalDiajukan,
+            'diterima' => $totalDiterima,
+            'ditolak' => $totalDitolak,
+        ];
+        return $retVal;
+    }
+
     public function infoGeneral()
     {
         try {
@@ -375,27 +423,35 @@ class UtilityController extends Controller
                 COUNT(CASE WHEN is_diajukan = 0 THEN 1 END) as konsep,
                 COUNT(CASE WHEN is_diajukan = 1 AND is_diterima IS NULL THEN 1 END) as diajukan,
                 COUNT(CASE WHEN is_diajukan = 1 AND is_diterima = 1 THEN 1 END) as diterima,
-                COUNT(CASE WHEN is_diajukan = 1 AND is_diterima = 0 THEN 1 END) as ditolak
+                COUNT(CASE WHEN is_diajukan = 1 AND is_diterima = 0 THEN 1 END) as ditolak,
+                DATE_FORMAT(tanggal, '%c') AS bulan
             ")
-                ->whereYear('tanggal', $tahun_sekarang);
+                ->whereYear('tanggal', $tahun_sekarang)
+                ->orderBy('bulan')
+                ->groupBy('bulan');
             if (!in_array('Admin', $rolesAkun)) {
                 $suratMasuk->where('user_id', $user_id);
             }
-            $data['surat_masuk'] = $suratMasuk->first();
+            $runQuery = $suratMasuk->get();
+            $data['surat_masuk'] = $this->dataInfo($runQuery);
 
             //untuk info ttd qrcode
             $ttd = TtdQrcode::selectRaw("
                 COUNT(CASE WHEN is_diajukan = 0 THEN 1 END) as konsep,
                 COUNT(CASE WHEN is_diajukan = 1 AND is_diterima IS NULL THEN 1 END) as diajukan,
                 COUNT(CASE WHEN is_diajukan = 1 AND is_diterima = 1 THEN 1 END) as diterima,
-                COUNT(CASE WHEN is_diajukan = 1 AND is_diterima = 0 THEN 1 END) as ditolak
+                COUNT(CASE WHEN is_diajukan = 1 AND is_diterima = 0 THEN 1 END) as ditolak,
+                DATE_FORMAT(tanggal, '%c') AS bulan
             ")
                 ->where(function ($query) use ($user_id) {
                     $query->where('user_id', $user_id)
                         ->orWhere('user_ttd_id', $user_id);
                 })
-                ->whereYear('tanggal', $tahun_sekarang);
-            $data['ttd'] = $ttd->first();
+                ->whereYear('tanggal', $tahun_sekarang)
+                ->orderBy('bulan')
+                ->groupBy('bulan');
+            $runQuery = $ttd->get();
+            $data['ttd'] = $this->dataInfo($runQuery);
 
             //untuk info surat keluar
             $aksespola = getAksesPola($user_id, $tahun_sekarang);
@@ -403,9 +459,12 @@ class UtilityController extends Controller
                 COUNT(CASE WHEN is_diajukan = 0 THEN 1 END) as konsep,
                 COUNT(CASE WHEN is_diajukan = 1 AND is_diterima IS NULL THEN 1 END) as diajukan,
                 COUNT(CASE WHEN is_diajukan = 1 AND is_diterima = 1 THEN 1 END) as diterima,
-                COUNT(CASE WHEN is_diajukan = 1 AND is_diterima = 0 THEN 1 END) as ditolak
+                COUNT(CASE WHEN is_diajukan = 1 AND is_diterima = 0 THEN 1 END) as ditolak,
+                DATE_FORMAT(tanggal, '%c') AS bulan
             ")
-                ->whereYear('tanggal', $tahun_sekarang);
+                ->whereYear('tanggal', $tahun_sekarang)
+                ->orderBy('bulan')
+                ->groupBy('bulan');
 
             if (!empty($aksespola['data'])) {
                 $idAkses = $aksespola['data'];
@@ -420,7 +479,8 @@ class UtilityController extends Controller
                     $query->where('user_id', $user_id);
                 }
             }
-            $data['surat_keluar'] = $ttd->first();
+            $runQuery = $suratKeluar->get();
+            $data['surat_keluar'] = $this->dataInfo($runQuery);
 
             return response()->json([
                 'success' => true,

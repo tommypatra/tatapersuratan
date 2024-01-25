@@ -73,6 +73,9 @@ class SuratKeluarController extends Controller
                                 $query->where('user_id', auth()->user()->id);
                             }
                         }
+                    } elseif ($i == 'bulan') {
+                        $bulan_sekarang = $dp;
+                        $query->whereMonth('tanggal', $bulan_sekarang);
                     } else
                         $query->where($i, $dp);
                 }

@@ -20,7 +20,8 @@ class TtdQrcodeController extends Controller
     //OKE
     public function index(Request $request)
     {
-        $query = TtdQrcode::orderBy('is_diajukan', 'asc')
+        $query = TtdQrcode::orderBy('created_at', 'desc')
+            ->orderBy('is_diajukan', 'asc')
             ->orderBy('is_diterima', 'asc')
             ->orderBy('tanggal', 'asc')
             ->orderBy('perihal', 'asc')
@@ -60,6 +61,9 @@ class TtdQrcodeController extends Controller
                     elseif ($i == 'tahun') {
                         $tahun_sekarang = $dp;
                         $query->whereYear('tanggal', $tahun_sekarang);
+                    } elseif ($i == 'bulan') {
+                        $bulan_sekarang = $dp;
+                        $query->whereMonth('tanggal', $bulan_sekarang);
                     } else
                         $query->where($i, $dp);
                 }

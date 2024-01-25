@@ -43,6 +43,7 @@ class SuratKeluarResource extends JsonResource
             'jumlah_distribusi' => count($this->distribusi),
             'klasifikasi_surat' => $this->klasifikasiSurat,
             'lampiran_surat_keluar' => $this->lampiranSuratKeluar,
+            'type' => 'Surat Keluar',
 
             'created_at' => Carbon::parse($this->created_at)->format('Y-m-d H:i:s'),
             'jumlah_lampiran' => LampiranSuratKeluarResource::collection($this->lampiranSuratKeluar)->count(),

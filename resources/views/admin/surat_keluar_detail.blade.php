@@ -109,6 +109,7 @@
     initData();
 
     function initData() {
+        InfoModule.updateNotifWeb();
         //load data tujuan berdasarkan id
         var htmlData;
         //reset form

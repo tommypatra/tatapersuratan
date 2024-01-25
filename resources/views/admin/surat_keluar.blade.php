@@ -490,7 +490,7 @@
         CrudModule.fSave(setup_ajax, dataForm, function(response) {
             if (response.success) {
                 refresh();
-                updateNotifWeb();
+                InfoModule.updateNotifWeb();
                 // $('#modal-form').modal('hide');
             } 
             appShowNotification(response.success,[response.message]);
@@ -501,7 +501,7 @@
     function hapus(id) {
         CrudModule.fDelete(id, function(response) {
             refresh();
-            updateNotifWeb();
+            InfoModule.updateNotifWeb();
         });
     }
 
@@ -594,7 +594,7 @@
                     if(response.success){
                         appShowNotification(true, [response.message]);
                         refresh();
-                        updateNotifWeb();
+                        InfoModule.updateNotifWeb();
                     }
                 },
                 error: function (xhr, status, error) {
@@ -725,7 +725,7 @@
                 success: function (response) {
                     if(response.success){
                         refresh();
-                        updateNotifWeb();
+                        InfoModule.updateNotifWeb();
                     }
                     appShowNotification(response.success, response.msg);
                 },
@@ -815,7 +815,7 @@
                     if (completedRequests === totalRequests) {
                         refresh();
                         appShowNotification(true, ["Selsai dilakukan"]);
-                        updateNotifWeb();
+                        InfoModule.updateNotifWeb();
                     }                    
                 },
                 error: function (xhr, status, error) {
@@ -860,6 +860,7 @@
         CrudModule.setApi(vApi);
         // Load data default
         loadDataKonsep();
+        InfoModule.updateNotifWeb();
 
         // Ambil referensi elemen
         const cameraElement = document.getElementById("camera");

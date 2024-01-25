@@ -30,7 +30,7 @@ class SuratMasukController extends Controller
                                 $query->select('id', 'name', 'email');
                             }
                         ]
-                    )->orderBy('created_at', 'asc');
+                    )->orderBy('created_at', 'desc');
                 },
             ]);
 
@@ -63,6 +63,9 @@ class SuratMasukController extends Controller
                     elseif ($i == 'tahun') {
                         $tahun_sekarang = $dp;
                         $query->whereYear('tanggal', $tahun_sekarang);
+                    } elseif ($i == 'bulan') {
+                        $bulan_sekarang = $dp;
+                        $query->whereMonth('tanggal', $bulan_sekarang);
                     } else
                         $query->where($i, $dp);
                 }

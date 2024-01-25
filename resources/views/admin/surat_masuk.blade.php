@@ -554,7 +554,7 @@ function displayPagination(response) {
                 dataType: 'json',
                 success: function(response) {
                     refresh();
-                    updateNotifWeb();
+                    InfoModule.updateNotifWeb();
                 },
                 error: function(xhr, status, error) {
                     appShowNotification(false,[error]);
@@ -619,7 +619,7 @@ function displayPagination(response) {
             success: function (response) {
                 if(response.success){
                     refresh();
-                    updateNotifWeb();
+                    InfoModule.updateNotifWeb();
                     $('#modal-disposisi').modal('hide');
                 }   
                 appShowNotification(response.success,[response.message]);
@@ -660,7 +660,7 @@ function displayPagination(response) {
             success: function(response) {
                 if (response.success) {
                     refreshData();
-                    updateNotifWeb();
+                    InfoModule.updateNotifWeb();
                     $('#modal-form').modal('hide');
                 } 
                 appShowNotification(response.success,[response.message]);
@@ -679,7 +679,7 @@ function displayPagination(response) {
             success: function(response) {
                 if (response.success) {
                     showModalForm();
-                    updateNotifWeb();
+                    InfoModule.updateNotifWeb();
                     populateEditForm(response.data);
                 }else 
                     appShowNotification(response.success,[response.message]);
@@ -792,7 +792,7 @@ function displayPagination(response) {
                 success: function (response) {
                     if(response.success){
                         refresh();
-                        updateNotifWeb();
+                        InfoModule.updateNotifWeb();
                     }
                     appShowNotification(response.success, response.msg);
                 },
@@ -827,7 +827,7 @@ function displayPagination(response) {
                     if(response.success){
                         appShowNotification(true, [response.message]);
                         refresh();
-                        updateNotifWeb();
+                        InfoModule.updateNotifWeb();
                     }
                 },
                 error: function (xhr, status, error) {
@@ -903,6 +903,7 @@ function displayPagination(response) {
         CrudModule.setApi(vApi);
         // Load data default
         loadDataKonsep();        
+        InfoModule.updateNotifWeb();
         // Ambil referensi elemen
         const cameraElement = document.getElementById("camera");
         const takePhotoButton = document.getElementById("take-photo");

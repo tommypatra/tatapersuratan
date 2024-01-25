@@ -70,54 +70,6 @@
 				<div class="navbar-collapse collapse">
 					<ul class="navbar-nav navbar-align">
 						<li class="nav-item dropdown">
-							<a class="nav-icon dropdown-toggle" href="#" id="alertsDropdown2" data-bs-toggle="dropdown">
-								<div class="position-relative">
-									<i class="align-middle" data-feather="layers"></i>
-								</div>
-							</a>
-							<div class="dropdown-menu dropdown-menu-lg dropdown-menu-end py-0" aria-labelledby="alertsDropdown2">
-								<div class="list-group" id="data_notif_info">
-									<table class="table">
-										<thead>
-											<tr style="font-weight: bold;">
-												<td>Tahap</td>
-												<td style="text-align:center;">Surat Masuk</td>
-												<td style="text-align:center;">Surat Keluar</td>
-												<td style="text-align:center;">TTD QrCode</td>
-											</tr>
-										</thead>
-										<tbody>
-											<tr>
-												<td><span class="badge bg-warning">Konsep</span></td>
-												<td id="konsep-masuk" style="text-align:center;">0</td>
-												<td id="konsep-keluar" style="text-align:center;">0</td>
-												<td id="konsep-ttd" style="text-align:center;">0</td>
-											</tr>
-											<tr>
-												<td><span class="badge bg-info">Diajukan</span></td>
-												<td id="diajukan-masuk" style="text-align:center;">0</td>
-												<td id="diajukan-keluar" style="text-align:center;">0</td>
-												<td id="diajukan-ttd" style="text-align:center;">0</td>
-											</tr>
-											<tr>
-												<td><span class="badge bg-success">Diterima</span></td>
-												<td id="diterima-masuk" style="text-align:center;">0</td>
-												<td id="diterima-keluar" style="text-align:center;">0</td>
-												<td id="diterima-ttd" style="text-align:center;">0</td>
-											</tr>
-											<tr>
-												<td><span class="badge bg-danger">Ditolak</span></td>
-												<td id="ditolak-masuk" style="text-align:center;">0</td>
-												<td id="ditolak-keluar" style="text-align:center;">0</td>
-												<td id="ditolak-ttd" style="text-align:center;">0</td>
-											</tr>
-										</tbody>
-									</table>
-								</div>
-							</div>
-						</li>
-
-						<li class="nav-item dropdown">
 							<a class="nav-icon dropdown-toggle" href="#" id="alertsDropdown" data-bs-toggle="dropdown">
 								<div class="position-relative">
 									<i class="align-middle" data-feather="bell"></i>
@@ -210,18 +162,17 @@
 	<script src="{{ asset('js/sweetalert2/dist/sweetalert2.min.js') }}"></script>
 	<script src="{{ asset('js/app.js') }}"></script>
 	<script src="{{ asset('js/loading/loading.js') }}"></script>
+	<script src="{{ asset('js/info.js') }}"></script>
 	
 	<script>
-		var showNotif = true;
+		var dataNotif=[];
     	var authToken="{{ session()->get('access_token') }}";
 		$.ajaxSetup({
 			headers: {
 				'Authorization': 'Bearer ' + authToken
 			}
 		});
-	</script>
-	@yield('scriptJs')
-	<script>
+
 		$("#ganti-akses").click(function(){
 			$.get("{{ route('akun-daftar-akses') }}", function(response, status){
 				if(status=='success'){
@@ -244,94 +195,8 @@
 			$('#daftar-hakakses').html(hakakses);
         }
 
-		function infoDisposisi(){
-			$.get("/api/info-tujuan-disposisi", function (response) {
-				let data_notif_tujuan ='';
-
-				$(".jumlah_tujuan_belum_diakses").html(response.jumlah_tujuan_belum_diakses);
-				jQuery.each(response.data, function (i, val) {
-					data_notif_tujuan +=`									
-						<a href="/disposisi-detail/${val.surat_masuk.id}" class="list-group-item" id="baca-disposisi">
-							<div class="row g-0 align-items-center">
-								<div class="col-2">
-									<i class="fa-regular fa-envelope fa-2xl"></i>
-								</div>
-								<div class="col-10">
-									<div class="text-dark">${val.surat_masuk.perihal}</div>
-									<div class="text-muted small mt-1">${val.surat_masuk.asal} (${val.surat_masuk.tempat})</div>
-									<div class="text-muted small mt-1">${val.surat_masuk.no_surat}</div>
-									<div class="text-muted small mt-1"><i class="fa-regular fa-clock"></i> ${waktuLalu(val.created_at)}</div>
-								</div>
-							</div>
-						</a>
-					`;
-				});
-				$("#data_notif_tujuan").html(data_notif_tujuan);
-			});
-		}
-
-		function infoDistribusi(){
-			$.get("/api/info-distribusi", function (response) {
-				let data_notif_distribusi ='';
-
-				$(".jumlah_distribusi_belum_diakses").html(response.jumlah_distribusi_belum_diakses);
-				jQuery.each(response.data, function (i, val) {
-					data_notif_distribusi +=`									
-						<a href="/surat-keluar-detail/${val.surat_keluar.id}" class="list-group-item" id="baca-disposisi">
-							<div class="row g-0 align-items-center">
-								<div class="col-2">
-									<i class="fa-regular fa-envelope fa-2xl"></i>
-								</div>
-								<div class="col-10">
-									<div class="text-dark">${val.surat_keluar.perihal}</div>
-									<div class="text-muted small mt-1">${val.surat_keluar.asal}</div>
-									<div class="text-muted small mt-1">${val.surat_keluar.no_surat}</div>
-									<div class="text-muted small mt-1"><i class="fa-regular fa-clock"></i> ${waktuLalu(val.created_at)}</div>
-								</div>
-							</div>
-						</a>
-					`;
-				});
-				$("#data_notif_distribusi").html(data_notif_distribusi);
-			});
-		}
-		
-		function infoGeneral(){
-			$.get("/api/info-general", function (response) {
-				if(response.success){
-					let surat_masuk=response.data.surat_masuk;
-					$('#konsep-masuk').text(surat_masuk.konsep);
-					$('#diajukan-masuk').text(surat_masuk.diajukan);
-					$('#diterima-masuk').text(surat_masuk.diterima);
-					$('#ditolak-masuk').text(surat_masuk.ditolak);
-
-					let surat_keluar=response.data.surat_keluar;
-					$('#konsep-keluar').text(surat_keluar.konsep);
-					$('#diajukan-keluar').text(surat_keluar.diajukan);
-					$('#diterima-keluar').text(surat_keluar.diterima);
-					$('#ditolak-keluar').text(surat_keluar.ditolak);
-
-					let ttd=response.data.ttd;
-					$('#konsep-ttd').text(ttd.konsep);
-					$('#diajukan-ttd').text(ttd.diajukan);
-					$('#diterima-ttd').text(ttd.diterima);
-					$('#ditolak-ttd').text(ttd.ditolak);
-
-				}
-			});
-		}
-		
-		function updateNotifWeb(){
-			if(showNotif){
-				infoDisposisi();
-				infoDistribusi();
-				infoGeneral();
-			}
-		}
-
-		updateNotifWeb();
-
 	</script>
+	@yield('scriptJs')
 </body>
 
 </html>
