@@ -47,6 +47,18 @@ class ProfilController extends Controller
         return ProfilResource::collection($data);
     }
 
+    public function infoAkunLogin()
+    {
+        $user_id = auth()->user()->id;
+        $data = User::where('id', $user_id)->with(['profil'])->first();
+        return response()->json([
+            'success' => true,
+            'message' => 'data ditemukan',
+            'data' => new ProfilResource($data),
+        ], 200);
+        // return ProfilResource::collection($data);
+    }
+
     //OKE 
     public function findID($id)
     {

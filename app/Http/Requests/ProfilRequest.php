@@ -25,7 +25,6 @@ class ProfilRequest extends FormRequest
     {
         return [
             'jenis_kelamin' => 'required',
-            'user_id' => 'required',
             'alamat' => 'required',
             'hp' => 'required',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4096',

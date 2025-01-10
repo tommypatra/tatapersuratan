@@ -29,7 +29,6 @@
                 <div class="card-body">                    
 
                     <form id="myForm">
-                        <input type="hidden" name="user_id" id="user_id" value="{{ auth()->user()->id }}">
                         <input type="hidden" name="id" id="id" >
                         <div class="row">
                             <div class="col-lg-8 mb-3">
@@ -37,7 +36,7 @@
                                 <div id="email" style="font-style:italic;"></div>
                             </div>
                             <div class="col-lg-4 mb-3">
-                                <img src="{{ asset(session()->get("foto")) }}" class="foto-profil" height="100px ">
+                                <img src="{{ url('images/user-avatar.png') }}" class="foto-profil" height="100px ">
                                 <input name="foto" id="foto" type="file" accept="image/*" onchange="uploadFoto()" class="form-control" >
                             </div>
                             <div class="col-lg-4 mb-3">
@@ -78,8 +77,10 @@
 <script src="{{ asset('js/crud.js') }}"></script>
 
 <script type="text/javascript">
+    cekAkses('pengguna');
     var vApi='/api/profil';
     var vJudul='Profil';
+    var user_id;
     sel2_jeniskelamin("#jenis_kelamin");
     function refresh(){
         initData();
@@ -87,30 +88,29 @@
 
     //initData()
     function initData(){
-        let id=$("#user_id").val();
-        CrudModule.fSearchId(id, function(response) {
-            if (response.data.length>0) {
-                displayData(response);
+        ajaxRequest(vBaseUrl+'/api/info-akun-login', 'GET', null, false,
+            function(response) {
+                displayData(response.data);
             }
-        });
+        );        
     }
 
     //display data
-    function displayData(response) {
-        let dt = response.data[0];        
+    function displayData(dt) {
         $('#myForm')[0].reset();
         $("#jenis_kelamin").val("").trigger("change"); 
         $("#id").val("");
-
+        user_id=dt.id;
         $("#name").html(dt.name);
         $("#email").html(dt.email);
 
         let profil=dt.profil;
-        $("#id").val(profil.id);
+        // $("#id").val(profil.id);
         $("#hp").val(profil.hp);
         $("#nip").val(profil.nip);
         $("#alamat").val(profil.alamat);
         $('#jenis_kelamin').val(profil.jenis_kelamin).trigger("change");
+        
         if(profil.foto){
             $('.foto-profil').attr('src', profil.foto);
         }
@@ -120,7 +120,7 @@
     $("#myForm").validate({
         submitHandler: function(form) {
             let setup_ajax={type:'POST',url:vApi};
-            let id=$("#id").val();
+            let id=user_id;
             if (id !== "")
                 setup_ajax={type:'PUT',url:vApi+'/'+id};
             simpan(setup_ajax,form)
@@ -152,6 +152,7 @@
                 contentType: false,
                 success: function (response) {
                     if(response.success){
+			            localStorage.setItem('foto', response.data.foto);
                         $('.foto-profil').attr('src', response.data.foto);
                     }
                 },

@@ -227,3 +227,25 @@ function cekAkses(grup){
         }
     );
 }
+
+function showAkses(id_attr='#daftar-akses') {
+    $(id_attr).html('');
+    var daftar_akses = localStorage.getItem('hakakses');
+    var nama = localStorage.getItem('nama');
+    daftar_akses = JSON.parse(daftar_akses);
+    if (daftar_akses && daftar_akses.length > 1) {
+        var htmlOptions = `<div>Hi ${nama}, pilih akses anda:</div>`;
+        htmlOptions += '<ul>';
+        daftar_akses.forEach(function(akses, index) {
+        htmlOptions += `<li><a href="javascript:;" class="set-akses" data-grup_name="${akses.grup.grup}" data-grup_id="${akses.grup.id}">${akses.grup.grup}</a></li>`;
+        });
+        htmlOptions += '</ul>';
+        $(id_attr).html(htmlOptions);
+    }
+}
+
+$(document).on('click','.set-akses',function(){
+    let base_url = window.location.origin;
+    localStorage.setItem('akses', $(this).attr('data-grup_id'));
+    window.location.replace(base_url+'/akun-dashboard');
+})

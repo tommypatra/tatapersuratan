@@ -26,11 +26,11 @@
 										<form>
 											<div class="mb-3">
 												<label class="form-label">Email</label>
-												<input class="form-control form-control-lg" type="email" value="admin@app.com" name="email" id="email" required data-rule-email="true" placeholder="Enter your email" />
+												<input class="form-control form-control-lg" type="email" name="email" id="email" required data-rule-email="true" placeholder="Enter your email" />
 											</div>
 											<div class="mb-3">
 												<label class="form-label">Password</label>
-												<input class="form-control form-control-lg" type="password" value="00000000" name="password" id="password" required minlength="8" placeholder="Enter your password" />
+												<input class="form-control form-control-lg" type="password" name="password" id="password" required minlength="8" placeholder="Enter your password" />
 											</div>
 											<div>
 												<div class="form-check align-items-center">
@@ -113,7 +113,8 @@
 			localStorage.setItem('nama', param.akun.name);
 			localStorage.setItem('id', param.akun.id);
 			showModalAkses();
-		}
+		}	
+
 
 		function showModalAkses() {
 			$('#daftar-akses').html('');
@@ -121,24 +122,13 @@
 			var nama = localStorage.getItem('nama');
 			daftar_akses = JSON.parse(daftar_akses);
 			if (daftar_akses && daftar_akses.length > 1) {
-				var htmlOptions = `<div>Hi ${nama}, pilih akses anda:</div>`;
-				htmlOptions += '<ul>';
-				daftar_akses.forEach(function(akses, index) {
-				htmlOptions += `<li><a href="javascript:;" class="set-akses" data-grup_name="${akses.grup.grup}" data-grup_id="${akses.grup.id}">${akses.grup.grup}</a></li>`;
-				});
-				htmlOptions += '</ul>';
-				$('#daftar-akses').html(htmlOptions);
+				showAkses();
 				myModalAkses.show();
 			}else{
 				window.location.replace(base_url+'/akun-dashboard');
 			}
 		}	
 		
-		$(document).on('click','.set-akses',function(){
-			localStorage.setItem('akses', $(this).attr('data-grup_id'));
-			window.location.replace(base_url+'/akun-dashboard');
-		})
-
 		function login(form) {
 			$('#daftar-hakakses').html('');
 			$.ajax({

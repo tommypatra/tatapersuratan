@@ -16,7 +16,7 @@ class CreateKlasifikasiSuratsTable extends Migration
         Schema::create('klasifikasi_surats', function (Blueprint $table) {
             $table->id();
             $table->string('kode');
-            $table->string('klasifikasi');
+            $table->text('klasifikasi');
             $table->string('keterangan')->nullable();
             $table->boolean('is_aktif')->default(true);
             $table->timestamps();

@@ -119,7 +119,7 @@
 							<div class="dropdown-menu dropdown-menu-end">
 								<a class="dropdown-item" href="{{  route('profil') }}"><i class="align-middle me-1" data-feather="user"></i> Profile</a>
 								<div class="dropdown-divider"></div>
-								<a class="dropdown-item" href="{{  route('akun-keluar') }}">Log out</a>
+								<a class="dropdown-item" href="javascript:;" id="akun-keluar">Log out</a>
 							</div>
 						</li>
 					</ul>
@@ -177,7 +177,7 @@
 			localStorage.removeItem('foto');
 			localStorage.removeItem('nama');
 			localStorage.removeItem('id');
-			window.location.replace(vBaseUrl);
+			window.location.replace(vBaseUrl+'/akun-keluar');
 		}
 		
 	</script>
@@ -193,14 +193,30 @@
 			pilihAkses();
 		});
 
+		$('#akun-keluar').click(function(){
+			forceLogout();
+		})
+
+		// function showModalAkses() {
+		// 	$('#daftar-akses').html('');
+		// 	var daftar_akses = localStorage.getItem('hakakses');
+		// 	var nama = localStorage.getItem('nama');
+		// 	daftar_akses = JSON.parse(daftar_akses);
+		// 	if (daftar_akses && daftar_akses.length > 1) {
+		// 		showAkses();
+		// 		myModalAkses.show();
+		// 	}else{
+		// 		window.location.replace(base_url+'/akun-dashboard');
+		// 	}
+		// }
+				
         function pilihAkses(){
-			$('#daftar-hakakses').html("");
             var myModal1 = new bootstrap.Modal(document.getElementById('modal-ganti-akses'), {
                 backdrop: 'static',
                 keyboard: false,
             });
             myModal1.toggle();
-			$('#daftar-hakakses').html();
+			showAkses('#daftar-hakakses');
         }
 
 		loadMenu();		

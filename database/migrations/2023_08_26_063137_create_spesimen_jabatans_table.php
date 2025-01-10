@@ -20,7 +20,7 @@ class CreateSpesimenJabatansTable extends Migration
             $table->string('keterangan')->nullable();
             $table->boolean('is_aktif')->default(true);
             $table->timestamps();
-            $table->foreignId('user_pejabat_id');
+            $table->foreignId('user_pejabat_id')->nullable();
             $table->foreign('user_pejabat_id')->references('id')->on('users')->restrictOnDelete();
             $table->foreignId('user_id');
             $table->foreign('user_id')->references('id')->on('users')->restrictOnDelete();

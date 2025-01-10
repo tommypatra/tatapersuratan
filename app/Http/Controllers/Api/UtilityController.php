@@ -205,8 +205,9 @@ class UtilityController extends Controller
             $validatedData = $request->validate([
                 'foto' => 'required|image|mimes:jpeg,png,jpg,gif|max:3000',
             ]);
+            $user_id = auth()->user()->id;
 
-            $user = Profil::where('user_id', auth()->user()->id)->first();
+            $user = Profil::where('user_id', $user_id)->first();
             if ($user->foto) {
                 File::delete(public_path($user->foto));
             }
@@ -219,7 +220,7 @@ class UtilityController extends Controller
             if (!File::isDirectory(public_path($storagePath))) {
                 File::makeDirectory(public_path($storagePath), 0755, true);
             }
-            $fileName = auth()->user()->id . '.' . $uploadedFile->guessExtension();
+            $fileName = $user_id . '.' . $uploadedFile->guessExtension();
             $uploadedFile->move(public_path($storagePath), $fileName);
 
             //simpan ke database

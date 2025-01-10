@@ -65,6 +65,7 @@ Route::middleware(['auth.jwt'])->group(function () {
     Route::get('get-users', [UtilityController::class, 'getUsers']);
     Route::get('get-klasifikasi-surat-keluar', [UtilityController::class, 'getKlasifikasiSuratKeluar']);
     Route::post('ganti-foto-profil', [UtilityController::class, 'gantiFotoProfil']);
+    Route::get('info-akun-login', [ProfilController::class, 'infoAkunLogin']);
     Route::post('ajukan-ttd-elektronik', [TtdQrcodeController::class, 'ajukan']);
     Route::post('verifikasi-ttd-elektronik', [TtdQrcodeController::class, 'verifikasi']);
 
