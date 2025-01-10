@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UserAppRequest extends FormRequest
 {
@@ -23,9 +24,17 @@ class UserAppRequest extends FormRequest
      */
     public function rules()
     {
+        $id = $this->input('id');
+        // echo "ID : " . $id;
+        // $id = $this->input('id');
         $rules = [
             'name' => 'required',
-            'email' => 'required|email|unique:users,email',
+            'email' => [
+                'required',
+                'email',
+                'string',
+                Rule::unique('users', 'email')->ignore($id), // Abaikan record dengan ID ini saat update
+            ],
         ];
 
         if ($this->isMethod('put')) {

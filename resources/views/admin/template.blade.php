@@ -6,9 +6,11 @@
 	@yield('scriptHead')
 	<script type="text/javascript">
 		var vBaseUrl = '{{ url("/") }}';
-        var vUserId = '{{ auth()->user()->id }}';
+        var vUserId = localStorage.getItem('id');
+        var vAksesId = localStorage.getItem('akses');
+        var vNama = localStorage.getItem('nama');
         var vTahunApp = {{ env("APP_TAHUN") }};
-		var vFoto = '{{ session()->get("foto") }}';
+		var vFoto = vBaseUrl+'/'+localStorage.getItem('foto');
 	</script>
 </head>
 
@@ -53,9 +55,7 @@
 							<i class="align-middle" data-feather="mail"></i> <span class="align-middle">Penomoran Surat</span>
 						</a>
 					</li>				
-					@if(session()->get('akses') == 1)
-						@include('admin.partials.menu_admin')
-					@endif
+					<div id="menu-user"></div>
 				</ul>
 				@include('admin.partials.menu_general')
 			</div>
@@ -64,8 +64,8 @@
 		<div class="main">
 			<nav class="navbar navbar-expand navbar-light navbar-bg">
 				<a class="sidebar-toggle js-sidebar-toggle">
-          <i class="hamburger align-self-center"></i>
-        </a>
+					<i class="hamburger align-self-center"></i>
+				</a>
 
 				<div class="navbar-collapse collapse">
 					<ul class="navbar-nav navbar-align">
@@ -83,7 +83,7 @@
 								<div class="list-group" id="data_notif_tujuan">
 								</div>
 								<div class="dropdown-menu-footer">
-									<a href="disposisi" class="text-muted">Tampilkan semua disposisi</a>
+									<a href="{{ route('disposisi') }}" class="text-muted">Tampilkan semua disposisi</a>
 								</div>
 							</div>
 						</li>
@@ -101,7 +101,7 @@
 								<div class="list-group" id="data_notif_distribusi">
 								</div>
 								<div class="dropdown-menu-footer">
-									<a href="distribusi" class="text-muted">Tampilkan semua surat</a>
+									<a href="{{ route('distribusi') }}" class="text-muted">Tampilkan semua surat</a>
 								</div>
 							</div>
 						</li>
@@ -109,12 +109,12 @@
 
 						<li class="nav-item dropdown">
 							<a class="nav-icon dropdown-toggle d-inline-block d-sm-none" href="#" data-bs-toggle="dropdown">
-                <i class="align-middle" data-feather="settings"></i>
-              </a>
+								<i class="align-middle" data-feather="settings"></i>
+							</a>
 
 							<a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-bs-toggle="dropdown">
-								<img src="{{ asset(session()->get("foto")) }}" class="avatar img-fluid rounded me-1 foto-profil" alt="foto" /> 
-								<span class="text-dark">{{ auth()->user()->name }}</span>
+								<img src="{{ url('images/user-avatar.png') }}" class="avatar img-fluid rounded me-1 foto-profil" id="navbar-foto" alt="foto" /> 
+								<span class="text-dark" id="navbar-nama"></span>
 							</a>
 							<div class="dropdown-menu dropdown-menu-end">
 								<a class="dropdown-item" href="{{  route('profil') }}"><i class="align-middle me-1" data-feather="user"></i> Profile</a>
@@ -160,40 +160,73 @@
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{{ asset('js/jquery-validation-1.19.5/dist/jquery.validate.min.js') }}"></script>
 	<script src="{{ asset('js/sweetalert2/dist/sweetalert2.min.js') }}"></script>
-	<script src="{{ asset('js/app.js') }}"></script>
-	<script src="{{ asset('js/loading/loading.js') }}"></script>
-	<script src="{{ asset('js/info.js') }}"></script>
-	
 	<script>
 		var dataNotif=[];
-    	var authToken="{{ session()->get('access_token') }}";
+    	var authToken=localStorage.getItem('access_token');
 		$.ajaxSetup({
 			headers: {
 				'Authorization': 'Bearer ' + authToken
 			}
 		});
 
+		function forceLogout(){
+			localStorage.removeItem('access_token');
+			localStorage.removeItem('email');
+			localStorage.removeItem('hakakses');
+			localStorage.removeItem('akses');
+			localStorage.removeItem('foto');
+			localStorage.removeItem('nama');
+			localStorage.removeItem('id');
+			window.location.replace(vBaseUrl);
+		}
+		
+	</script>
+	<script src="{{ asset('js/app.js') }}"></script>
+	<script src="{{ asset('js/loading/loading.js') }}"></script>
+	<script src="{{ asset('js/info.js') }}"></script>
+	
+	<script>
+		$('#navbar-nama').html(vNama);
+		$('#navbar-foto').attr('src',vFoto);
+
 		$("#ganti-akses").click(function(){
-			$.get("{{ route('akun-daftar-akses') }}", function(response, status){
-				if(status=='success'){
-					if(response.hakakses.length>1){
-						pilihAkses(response.hakakses_html);
-					}else{
-						location.href = '{{ route("akun-dashboard") }}';
-					}
-				}
-			});
+			pilihAkses();
 		});
 
-        function pilihAkses(hakakses){
+        function pilihAkses(){
 			$('#daftar-hakakses').html("");
             var myModal1 = new bootstrap.Modal(document.getElementById('modal-ganti-akses'), {
                 backdrop: 'static',
                 keyboard: false,
             });
             myModal1.toggle();
-			$('#daftar-hakakses').html(hakakses);
+			$('#daftar-hakakses').html();
         }
+
+		loadMenu();		
+		function loadMenu(){
+			$('#menu-user').empty();
+			ajaxRequest(vBaseUrl+'/api/get-menu/'+vAksesId, 'GET', null, false,
+				function(response) {
+					console.log(response.data);
+					if (response.data.length > 0) {
+						var menuHtml = '';
+						response.data.forEach(function(item) {
+							menuHtml += `
+								<li class="sidebar-item">
+									<a class="sidebar-link" href="${vBaseUrl}/${item.route}">
+										<i class="align-middle" data-feather="${item.icon}"></i> 
+										<span class="align-middle">${item.label}</span>
+									</a>
+								</li>
+							`;
+						});
+						$('#menu-user').append(menuHtml);
+						feather.replace();
+					} 
+				}
+			);
+		}
 
 	</script>
 	@yield('scriptJs')

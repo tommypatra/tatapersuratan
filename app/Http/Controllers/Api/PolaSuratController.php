@@ -75,6 +75,7 @@ class PolaSuratController extends Controller
     {
         try {
             $validatedData = $request->validated();
+            $validatedData['user_id'] = auth()->user()->id;
 
             $data = PolaSurat::create($validatedData);
 
@@ -104,6 +105,8 @@ class PolaSuratController extends Controller
 
         try {
             $validatedData = $request->validated();
+            $validatedData['user_id'] = auth()->user()->id;
+
             $data = $this->findId($id);
             $data->update($validatedData);
 

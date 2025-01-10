@@ -74,7 +74,7 @@ class KategoriSuratMasukController extends Controller
     {
         try {
             $validatedData = $request->validated();
-
+            $validatedData['user_id'] = auth()->user()->id;
             $data = KategoriSuratMasuk::create($validatedData);
 
             return response()->json([
@@ -103,6 +103,7 @@ class KategoriSuratMasukController extends Controller
 
         try {
             $validatedData = $request->validated();
+            $validatedData['user_id'] = auth()->user()->id;
             $data = $this->findId($id);
 
             if (isset($validatedData['password'])) {

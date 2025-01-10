@@ -131,6 +131,8 @@
 <script src="{{ asset('js/img-viewer/viewer.min.js') }}"></script>
 
 <script type="text/javascript">
+    cekAkses('pengguna');
+
     var vApi='/api/tujuan';
     var vJudul='Disposisi Baca';
     

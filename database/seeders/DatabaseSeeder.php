@@ -29,7 +29,8 @@ class DatabaseSeeder extends Seeder
 
         //nilai default grup
         $dtdef = [
-            "Admin", "Pengguna",
+            "Admin",
+            "Pengguna",
         ];
 
         foreach ($dtdef as $dt) {
@@ -41,15 +42,15 @@ class DatabaseSeeder extends Seeder
         //untuk admin
         User::create([
             'name' => 'Administrator',
-            'email' => 'admin@thisapp.com', //email login
+            'email' => 'admin@app.com', //email login
             'password' => Hash::make('00000000'), // password default login 
         ]);
 
         //untuk pengguna
-        for ($i = 1; $i <= 20; $i++) {
+        for ($i = 1; $i < 5; $i++) {
             User::create([
                 'name' => 'Pengguna ' . $i,
-                'email' => 'pengguna' . $i . '@thisapp.com', //email login
+                'email' => 'pengguna' . $i . '@app.com', //email login
                 'password' => Hash::make('00000000'), // password default login 
             ]);
         }
@@ -66,7 +67,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         //untuk pengguna
-        for ($i = 1; $i <= 20; $i++) {
+        for ($i = 1; $i < 5; $i++) {
             GrupUser::create([
                 'user_id' => $i + 1,
                 'grup_id' => 2,
@@ -96,7 +97,8 @@ class DatabaseSeeder extends Seeder
 
         //nilai default kategori surat
         $dtdef = [
-            "Sangat Penting", "Penting",
+            "Sangat Penting",
+            "Penting",
         ];
 
         foreach ($dtdef as $dt) {

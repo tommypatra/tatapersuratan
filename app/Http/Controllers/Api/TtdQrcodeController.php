@@ -31,7 +31,8 @@ class TtdQrcodeController extends Controller
                     ->orWhere('user_ttd_id', $userId);
             })
             ->with([
-                'user', 'ttd'
+                'user',
+                'ttd'
             ]);
 
 
@@ -90,7 +91,8 @@ class TtdQrcodeController extends Controller
     public function findID($id)
     {
         $data = TtdQrcode::with([
-            'user', 'ttd'
+            'user',
+            'ttd'
         ])->findOrFail($id);
         if (!$data) {
             return response()->json([
@@ -117,6 +119,7 @@ class TtdQrcodeController extends Controller
     {
         try {
             $validatedData = $request->validated();
+            $validatedData['user_id'] = auth()->user()->id;
             if ($request->hasFile('file')) {
                 $validatedData['file'] = uploadFile($request);
             }
@@ -155,6 +158,7 @@ class TtdQrcodeController extends Controller
 
         try {
             $validatedData = $request->validated();
+            $validatedData['user_id'] = auth()->user()->id;
             $data = $this->findId($id);
 
             if ($request->hasFile('file')) {

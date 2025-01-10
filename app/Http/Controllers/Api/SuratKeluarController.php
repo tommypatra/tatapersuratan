@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Models\AksesPola;
+use App\Models\SuratKeluar;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 use App\Http\Requests\SuratKeluarRequest;
 use App\Http\Resources\SuratKeluarResource;
-use App\Models\SuratKeluar;
+use Illuminate\Validation\ValidationException;
 
 class SuratKeluarController extends Controller
 {
@@ -22,16 +23,19 @@ class SuratKeluarController extends Controller
             ->orderBy('no_sub_indeks', 'desc')
             ->orderBy('perihal', 'asc')
             ->with([
-                'klasifikasiSurat', 'user', 'lampiranSuratKeluar.upload',
-                'polaSpesimen.polaSurat', 'polaSpesimen.spesimenJabatan', 'distribusi.user' => function ($query) {
+                'klasifikasiSurat',
+                'user',
+                'lampiranSuratKeluar.upload',
+                'polaSpesimen.polaSurat',
+                'polaSpesimen.spesimenJabatan',
+                'distribusi.user' => function ($query) {
                     $query->select('id', 'name', 'email');
                 },
             ]);
 
-        // $rolesAkun = $request->input('roles_akun');
-        // if (!in_array('Admin', $rolesAkun)) {
-        //     $query->where('user_id', auth()->user()->id);
-        // }
+        if (!izinkanAkses("admin")) {
+            $query->where('user_id', auth()->user()->id);
+        }
 
         $filter = $request->input('filter');
         if ($filter) {
@@ -68,16 +72,17 @@ class SuratKeluarController extends Controller
                                     });
                             });
                         } else {
-                            $rolesAkun = $request->input('roles_akun');
-                            if (!in_array('Admin', $rolesAkun)) {
-                                $query->where('user_id', auth()->user()->id);
-                            }
+                            // $rolesAkun = $request->input('roles_akun');
+                            // if (!izinkanAkses("admin")) {
+                            //     $query->where('user_id', auth()->user()->id);
+                            // }
                         }
                     } elseif ($i == 'bulan') {
                         $bulan_sekarang = $dp;
                         $query->whereMonth('tanggal', $bulan_sekarang);
-                    } else
+                    } else {
                         $query->where($i, $dp);
+                    }
                 }
             }
         }
@@ -129,21 +134,35 @@ class SuratKeluarController extends Controller
         ], 200);
     }
 
+    public function cekAksesPola($tanggal_surat = null, $pola_spesimen_id = null)
+    {
+        $tanggal_surat = $tanggal_surat ?? date('Y-m-d');
+        $timestamp = strtotime($tanggal_surat);
+        if (!$timestamp || !$pola_spesimen_id) {
+            return false;
+        }
+        $tahun = date('Y', $timestamp);
+        $cek = AksesPola::where('user_id', auth()->user()->id)
+            ->where('tahun', $tahun)
+            ->where('pola_spesimen_id', $pola_spesimen_id)
+            ->exists();
+
+        return $cek;
+    }
+
     //OKE PUT application/x-www-form-urlencoded
     public function store(SuratKeluarRequest $request)
     {
         try {
             $validatedData = $request->validated();
+            $validatedData['user_id'] = auth()->user()->id;
             // $validatedData['waktu_buat'] = date("Y-m-d H:i:s");
             // dd($validatedData);
             $data = SuratKeluar::create($validatedData);
 
-            $akses_pola_id = $data->akses_pola_id;
-            $daftarAksesPola = getAksesPola(auth()->user()->id, substr($data->tanggal, 0, 4));
-
             // jika ada akses maka generatekan nomor suratnya
             $pesan = 'pengajuan pengambilan surat berhasil dibuat';
-            if (in_array($akses_pola_id, $daftarAksesPola['data'])) {
+            if ($this->cekAksesPola($data->tanggal, $data->pola_spesimen_id)) {
                 $generateValue = $this->updateNoSurat($data->id, $data);
                 // dd($generateValue);
                 $dataSave = [
@@ -188,6 +207,8 @@ class SuratKeluarController extends Controller
 
         try {
             $validatedData = $request->validated();
+            $validatedData['user_id'] = auth()->user()->id;
+
             $data = $this->findId($id);
             $data->update($validatedData);
 

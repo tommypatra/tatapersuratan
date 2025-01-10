@@ -79,6 +79,7 @@ class SpesimenJabatanController extends Controller
     {
         try {
             $validatedData = $request->validated();
+            $validatedData['user_id'] = auth()->user()->id;
 
             $data = SpesimenJabatan::create($validatedData);
 
@@ -108,6 +109,8 @@ class SpesimenJabatanController extends Controller
 
         try {
             $validatedData = $request->validated();
+            $validatedData['user_id'] = auth()->user()->id;
+
             $data = $this->findId($id);
             $data->update($validatedData);
 

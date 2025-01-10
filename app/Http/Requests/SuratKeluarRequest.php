@@ -44,7 +44,6 @@ class SuratKeluarRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_id' => 'required',
             'klasifikasi_surat_id' => 'nullable|integer',
             'no_sub_indeks' => 'nullable|integer',
             'pola_spesimen_id' => 'nullable|integer',
@@ -66,7 +65,6 @@ class SuratKeluarRequest extends FormRequest
     public function attributes()
     {
         return [
-            'user_id' => 'pengguna',
             'klasifikasi_surat_id' => 'klasifikasi',
             'no_sub_indeks' => 'no sub indeks',
             'pola_spesimen_id' => 'pola spesimen',

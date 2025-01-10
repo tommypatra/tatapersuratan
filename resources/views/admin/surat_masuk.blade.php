@@ -89,7 +89,6 @@
 <div class="modal fade modal-lg" id="modal-form" role="dialog">
     <div class="modal-dialog">
         <form id="myForm">
-            <input type="hidden" name="user_id" id="user_id" value="{{ auth()->user()->id }}">
             <input type="hidden" name="id" id="id" >
             <div class="modal-content">
                 <div class="modal-header">
@@ -207,12 +206,13 @@
 <script src="{{ asset('js/img-viewer/viewer.min.js') }}"></script>
 
 <script type="text/javascript">
+    cekAkses('pengguna');
     var vApi='/api/surat-masuk';
     var vJudul='Surat Masuk';
     var vPage = 1;
     var vsurat_masuk_id;
 
-    var hakAkses = {!! session()->get('akses') !!};
+    var hakAkses = vAksesId;
     var tahunFilter = '{{ date("Y") }}';
 
     function setfilter(){
@@ -431,7 +431,7 @@
                         track_disposisi =`<span class="badge bg-warning">Belum terdisposisi</span>`;
                         if(suratMasuk.tujuan.length>0){
                             status_disposisi="";
-                            menu_detail=`<li><a class="dropdown-item" href="/disposisi-detail/${suratMasuk.id}"><i class="fa-brands fa-readme"></i> Detail Disposisi</a></li>`;
+                            // menu_detail=`<li><a class="dropdown-item" href="/disposisi-detail/${suratMasuk.id}"><i class="fa-brands fa-readme"></i> Detail Disposisi</a></li>`;
                             track_disposisi =`<div style="font-size:11px;">`;
                             let conv;
                             let badge_clr;
@@ -482,9 +482,8 @@
                             <div class="btn-group" role="group">
                                 <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
                                 <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                    ${menu_detail}
+                                    <li><a class="dropdown-item" href="{{ asset('surat-masuk-detail/${dt.id}') }}" target="_blank"><i class="fa-solid fa-newspaper"></i> Selengkapnya</a></li>
                                     ${menu_edit}
-                                    <li><a class="dropdown-item" href="{{ asset('surat-keluar-detail/${dt.id}') }}" target="_blank"><i class="fa-solid fa-newspaper"></i> Selengkapnya</a></li>
                                 </ul>
                             </div>                    
                         </td>
@@ -744,7 +743,6 @@ function displayPagination(response) {
 
     $(document).on("click", ".uploadLampiran", function () {
         var surat_masuk_id = $(this).data("surat_masuk_id");
-        var user_id = "{{ auth()->user()->id }}";
         var fileInput = $('<input type="file" id="lampiran" name="lampiran" accept=".jpg, .jpeg, .png, .pdf, .doc, .docx, .ppt, .pptx, .xls, .xlsx" style="display: none;">');
         $("body").append(fileInput);
         fileInput.click();
@@ -752,14 +750,13 @@ function displayPagination(response) {
         fileInput.change(function () {
             var selectedFile = this.files[0];
             if (selectedFile) {
-                uploadFile(surat_masuk_id, user_id, selectedFile);
+                uploadFile(surat_masuk_id, selectedFile);
             }
         });
     });
 
-    function uploadFile(surat_masuk_id, user_id, file, fileName) {
+    function uploadFile(surat_masuk_id, file, fileName) {
         const formData = new FormData();
-        formData.append("user_id", user_id);
         formData.append("surat_masuk_id", surat_masuk_id);
         formData.append("file", file, fileName);
 
@@ -982,8 +979,7 @@ function displayPagination(response) {
                     );
                     canvas.toBlob(function(blob) {
                         if (blob) {
-                            const user_id = "{{ auth()->user()->id }}";
-                            uploadFile(vsurat_masuk_id, user_id, blob, 'capture.jpg');
+                            uploadFile(vsurat_masuk_id, blob, 'capture.jpg');
                         }
                         isUploading = false;
                         takePhotoButton.disabled = false;

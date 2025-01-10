@@ -24,7 +24,6 @@ class SuratMasukRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_id' => 'required',
             'kategori_surat_masuk_id' => 'required',
             'no_agenda' => 'required',
             'no_surat' => 'required',
@@ -39,7 +38,6 @@ class SuratMasukRequest extends FormRequest
     public function attributes()
     {
         return [
-            'user_id' => 'pengguna',
             'kategori_surat_masuk_id' => 'kategori',
             'no_agenda' => 'no agenda',
             'no_surat' => 'no surat',

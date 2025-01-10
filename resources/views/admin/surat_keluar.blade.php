@@ -91,7 +91,6 @@
             <input type="hidden" name="id" id="id" >
             <input type="hidden" name="pola" id="pola" >
             <input type="hidden" name="no_surat" id="no_surat" >
-            <input type="hidden" name="user_id" id="user_id" value="{{ auth()->user()->id }}">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modal-label">Form</h5>
@@ -228,12 +227,13 @@
 <script src="{{ asset('js/img-viewer/viewer.min.js') }}"></script>
 
 <script type="text/javascript">
+    cekAkses('pengguna');
     var vApi='/api/surat-keluar';
     var vJudul='Penomoran Surat Keluar';
     var vsurat_keluar_id;
     var tahunFilter = '{{ date("Y") }}';
     // console.log(hakAkses);
-    var hakAkses = {!! session()->get('akses') !!};
+    var hakAkses = vAksesId;
     // if(hakAkses>1)
     //     CrudModule.setFilter(`{"user_id":"${vUserId}"}`);
 
@@ -354,8 +354,8 @@
                             lampiran +=`<li><span class="fa-li"><i class="fa-solid fa-arrow-up-right-from-square"></i></span><a href="${ds.upload.path}" target="_blank">${ds.upload.name}</a> <a href="javascript:;" onclick="hapusLampiranSuratKeluar(${ds.id},${ds.upload.id})"><i class="fa-regular fa-trash-can"></i></a></li>`;
                     });
                     lampiran +=`</ul>`;
-
-                    menu_detail=`<li><a class="dropdown-item" href="javascript:;" onclick="prosesdistribusi(${dt.id})"><i class="fa-regular fa-paper-plane"></i> Ajukan</a></li>`;
+                    if(dt.is_diterima)
+                        menu_detail=`<li><a class="dropdown-item" href="javascript:;" onclick="prosesdistribusi(${dt.id})"><i class="fa-regular fa-paper-plane"></i> Distribusi</a></li>`;
                 }
                 
                 var lblaktif=(!dt.is_aktif)?`<span class="badge bg-danger">Tidak Aktif</span>`:`<span class="badge bg-success">Aktif</span>`;
@@ -710,7 +710,7 @@
         fileInput.change(function () {
             var selectedFile = this.files[0];
             if (selectedFile) {
-                uploadFile(surat_keluar_id, vUserId, selectedFile);
+                uploadFile(surat_keluar_id, selectedFile);
             }
         });
     });  
@@ -736,9 +736,8 @@
         }
     }
 
-    function uploadFile(surat_keluar_id, user_id, file, fileName) {
+    function uploadFile(surat_keluar_id,  file, fileName) {
         const formData = new FormData();
-        formData.append("user_id", user_id);
         formData.append("surat_keluar_id", surat_keluar_id);
         formData.append("file", file, fileName);
 
@@ -940,8 +939,7 @@
                     );
                     canvas.toBlob(function(blob) {
                         if (blob) {
-                            const user_id = "{{ auth()->user()->id }}";
-                            uploadFile(vsurat_masuk_id, user_id, blob, 'capture.jpg');
+                            uploadFile(vsurat_masuk_id, blob, 'capture.jpg');
                         }
                         isUploading = false;
                         takePhotoButton.disabled = false;

@@ -118,6 +118,8 @@ class UserAppController extends Controller
             $validatedData = $request->validated();
             if (isset($validatedData['password'])) {
                 $validatedData['password'] = Hash::make($validatedData['password']);
+            } else {
+                unset($validatedData['password']);
             }
 
             $data = $this->findId($id);

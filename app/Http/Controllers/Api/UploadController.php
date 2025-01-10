@@ -76,6 +76,7 @@ class UploadController extends Controller
     {
         try {
             $validatedData = $request->validated();
+            $validatedData['user_id'] = auth()->user()->id;
             $uploadedFile = $request->file('file');
 
             $originalFileName = $uploadedFile->getClientOriginalName();
@@ -97,7 +98,7 @@ class UploadController extends Controller
                 'name' => $originalFileName,
                 'size' => $ukuranFile,
                 'type' => $tipeFile,
-                'user_id' => $request->input('user_id'),
+                'user_id' => auth()->user()->id,
             ]);
             $data->save();
 
@@ -127,6 +128,7 @@ class UploadController extends Controller
 
         try {
             $validatedData = $request->validated();
+            $validatedData['user_id'] = auth()->user()->id;
             $data = $this->findId($id);
 
             $data->update($validatedData);

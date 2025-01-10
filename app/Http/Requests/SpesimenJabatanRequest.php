@@ -28,7 +28,6 @@ class SpesimenJabatanRequest extends FormRequest
             'jabatan' => 'required',
             'keterangan' => 'nullable',
             'user_pejabat_id' => 'required',
-            'user_id' => 'required',
             'is_aktif' => 'required',
         ];
     }
@@ -40,7 +39,6 @@ class SpesimenJabatanRequest extends FormRequest
             'jabatan' => 'jabatan',
             'keterangan' => 'keterangan',
             'user_pejabat_id' => 'pejabat',
-            'user_id' => 'pengguna',
             'is_aktif' => 'status aktif',
         ];
     }

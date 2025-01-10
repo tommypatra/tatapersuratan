@@ -88,7 +88,6 @@
     <div class="modal-dialog">
         <form id="myForm">
             <input type="hidden" name="id" id="id" >
-            <input type="hidden" name="user_id" id="user_id" value="{{ auth()->user()->id }}">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modal-label">Form</h5>
@@ -108,7 +107,7 @@
 
                     <div class="row">
                         <div class="col-lg-8 mb-3">
-                            <label class="form-label">Pegawai Tujuan</label>
+                            <label class="form-label">Pejabat Bertanda Tangan</label>
                             <select class="form-control" id="user_ttd_id" name="user_ttd_id" required></select>
                         </div>
 						<div class="col-lg-6 mb-3">
@@ -191,11 +190,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
 <script type="text/javascript">
+    cekAkses('pengguna');
+
     var vApi='/api/ttd-elektronik';
     var vJudul='Tanda Tangan Elektronik';
     var vsurat_keluar_id;
 
-    var hakAkses = {!! session()->get('akses') !!};
     var tahunFilter = '{{ date("Y") }}';
 
     function setfilter(){
@@ -298,7 +298,7 @@
                 my_menu+=`      <li><a class="dropdown-item" href="tte/${dt.kode}" target="_blank"><i class="fa-solid fa-book"></i> Detail</a></li>
                             </ul>`;
 
-                var qrcode=(dt.qrcode)?`<img src="${dt.qrcode}" class="mt-2 mb-2" height="100px">`:'';
+                var qrcode=(dt.qrcode)?`<img src="${vBaseUrl}/${dt.qrcode}" class="mt-2 mb-2" height="100px">`:'';
                 
                 var row = `
                     <tr>

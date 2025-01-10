@@ -71,7 +71,6 @@
 <div class="modal fade modal-lg" id="modal-form" role="dialog">
     <div class="modal-dialog">
         <form id="myForm">
-            <input type="hidden" name="user_id" id="user_id" value="{{ auth()->user()->id }}">
             <input type="hidden" name="id" id="id" >
             <div class="modal-content">
                 <div class="modal-header">
@@ -118,6 +117,7 @@
 <script src="{{ asset('js/crud.js') }}"></script>
 
 <script type="text/javascript">
+    cekAkses('admin');
     var vApi='/api/klasifikasi-surat-keluar';
     var vJudul='Klasifikasi Surat Keluar';
     var fieldInit={

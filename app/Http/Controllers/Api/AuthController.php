@@ -21,34 +21,40 @@ class AuthController extends Controller
 
         try {
             $credentials = $request->validated();
-            if (Auth::attempt($credentials)) {
-                $user = User::where('email', $request->email)->with(['profil'])->first();
-                // $user = new AuthResource($user);
-                $foto = ($user->profil->foto) ? $user->profil->foto : 'foto/user-avatar.png';
-                $daftarAksesData = $this->daftarAkses($request)->getData();
-                $hakakses = $daftarAksesData->data->hakakses;
-                // dd($daftarAksesData->data->grup);
 
-                $token = $user->createToken('api_token', $daftarAksesData->data->grup)->plainTextToken;
+            if (!$token = auth()->guard('api')->attempt($credentials)) {
+                // if (!$token = auth()->guard('api')->claims([
+                //     'email' => $request->input('email')
+                // ])->attempt($credentials)) {
+                return response()->json([
+                    'status' => false,
+                    'data'    => null,
+                    'message'   => "login gagal"
+                ], 401);
+            }
 
-                $akses = $daftarAksesData->data->akses;
-                // dd($daftarAksesData->data->grup);
-                $respon_data = [
-                    'success' => true,
-                    'message' => 'user ditemukan',
-                    'data' => $user,
+            $user = auth()->guard('api')->user();
+            // $user = new AuthResource($user);
+            $foto = ($user->profil->foto) ? $user->profil->foto : 'foto/user-avatar.png';
+            $daftarAksesData = $this->daftarAkses($request)->getData();
+
+            $hakakses = $daftarAksesData->data->hakakses;
+            // dd($daftarAksesData->data->grup);
+
+            $akses = $daftarAksesData->data->akses;
+            // dd($daftarAksesData->data->grup);
+            $respon_data = [
+                'success' => true,
+                'message' => 'user ditemukan',
+                'data' => [
+                    'akun' => $user,
                     'foto' => $foto,
                     'access_token' => $token,
                     'hakakses' => $hakakses,
                     'akses' => $akses,
-                    'token_type' => 'Bearer',
-                ];
-                return response()->json($respon_data, 200);
-            }
-            return response()->json([
-                'success' => false,
-                'message' => 'User atau password anda salah',
-            ], 401);
+                ]
+            ];
+            return response()->json($respon_data, 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -56,6 +62,48 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+    // public function login(AuthRequest $request)
+    // {
+
+    //     try {
+    //         $credentials = $request->validated();
+    //         if (Auth::attempt($credentials)) {
+    //             $user = User::where('email', $request->email)->with(['profil'])->first();
+    //             // $user = new AuthResource($user);
+    //             $foto = ($user->profil->foto) ? $user->profil->foto : 'foto/user-avatar.png';
+    //             $daftarAksesData = $this->daftarAkses($request)->getData();
+    //             $hakakses = $daftarAksesData->data->hakakses;
+    //             // dd($daftarAksesData->data->grup);
+
+    //             $token = $user->createToken('api_token', $daftarAksesData->data->grup)->plainTextToken;
+
+    //             $akses = $daftarAksesData->data->akses;
+    //             // dd($daftarAksesData->data->grup);
+    //             $respon_data = [
+    //                 'success' => true,
+    //                 'message' => 'user ditemukan',
+    //                 'data' => $user,
+    //                 'foto' => $foto,
+    //                 'access_token' => $token,
+    //                 'hakakses' => $hakakses,
+    //                 'akses' => $akses,
+    //                 'token_type' => 'Bearer',
+    //             ];
+    //             return response()->json($respon_data, 200);
+    //         }
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'User atau password anda salah',
+    //         ], 401);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Something went wrong. Please try again later.',
+    //         ], 500);
+    //     }
+    // }
+
 
     public function daftarAkses(Request $request)
     {

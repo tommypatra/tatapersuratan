@@ -82,7 +82,7 @@
 		loadTTE('{{ $kode }}');
 		function loadTTE(kode) {
 			$.ajax({
-				url: '/api/tte/'+kode,
+				url: vBaseUrl+'/api/tte/'+kode,
 				method: 'GET',
 				dataType: 'json',
 				success: function (response){
@@ -110,7 +110,7 @@
 				},
 				error: function(xhr, status, error) {
 					alert(error);
-					window.location.href = '{{ route("akun-masuk") }}';
+					// window.location.href = '{{ route("akun-masuk") }}';
 				}
 			});
 		}

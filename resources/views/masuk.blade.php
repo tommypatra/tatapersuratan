@@ -26,11 +26,11 @@
 										<form>
 											<div class="mb-3">
 												<label class="form-label">Email</label>
-												<input class="form-control form-control-lg" type="email" name="email" id="email" required data-rule-email="true" placeholder="Enter your email" />
+												<input class="form-control form-control-lg" type="email" value="admin@app.com" name="email" id="email" required data-rule-email="true" placeholder="Enter your email" />
 											</div>
 											<div class="mb-3">
 												<label class="form-label">Password</label>
-												<input class="form-control form-control-lg" type="password" name="password" id="password" required minlength="8" placeholder="Enter your password" />
+												<input class="form-control form-control-lg" type="password" value="00000000" name="password" id="password" required minlength="8" placeholder="Enter your password" />
 											</div>
 											<div>
 												<div class="form-check align-items-center">
@@ -62,15 +62,15 @@
 			<div class="modal-header">
 				<h5 class="modal-title">PILIH AKSES AKUN</h5>
 			</div>
-			<div class="modal-body" id="daftar-hakakses">
+			<div class="modal-body" id="daftar-akses">
 			</div>
 		</div>
     </div>
 </div>
 <!-- AKHIR MODAL -->	
 
-	<script src="admin/adminkit-dev/static/js/app.js"></script>
 	<script src="js/jquery-3.6.3.min.js"></script>
+	<script src="admin/adminkit-dev/static/js/app.js"></script>
     <script src="js/jquery-validation-1.19.5/dist/jquery.validate.min.js"></script>
 	<script src="js/sweetalert2/dist/sweetalert2.min.js"></script>
 	<script src="js/app.js"></script>
@@ -78,123 +78,120 @@
 
 <script>
     var csrfToken = $('meta[name="csrf-token"]').attr('content');
+	var base_url = "{{ url('/') }}";
+	var access_token=localStorage.getItem('access_token');
+	if(access_token){
+		window.location.replace(base_url+'/akun-dashboard');
+	}
 
 	$(document).ready(function() {
-			function pilihAkses(hakakses){
-				$('#daftar-hakakses').html("");
-				var myModal1 = new bootstrap.Modal(document.getElementById('modal-pilih-akses'), {
-					backdrop: 'static',
-					keyboard: false,
-				});
-				$('#daftar-hakakses').html(hakakses);
-				myModal1.toggle();
-			}
-
-			$('#modal-pilih-akses').on('hidden.bs.modal', function(e) {
-				// location.href = '{{ route("akun-dashboard") }}';
-			});
-
-			$("#myForm").validate({
-				messages: {
-					email: "Please enter a valid email address.",
-					password: {
-						required: "Password cannot be empty.",
-						minlength: "Password must be at least 8 characters."
-					}
-				},
-				submitHandler: function(form) {
-					disableForm();
-					login(form)
-				}
-			});
-
-
-
-			function setSession(param){
-				let postData={
-					access_token: param.access_token,
-					email: param.data.email,
-					hakakses: param.hakakses,
-					akses: param.akses,
-					foto: param.foto,
-				};
-				$.ajax({
-					url: '{{ route("akun-set-session") }}',
-					type: 'POST',
-					data: postData,
-					headers: {
-						'X-CSRF-TOKEN': csrfToken
-					},
-					success: function (response) {
-                        if (response.success) {
-							if(response.hakakses.length>1){
-								pilihAkses(response.hakakses_html);
-							}else{
-								location.href = '{{ route("akun-dashboard") }}';
-							}
-						}else {
-							appShowNotification(false,['session tidak tersimpan hubungi admin web']);
-                        }
-					},
-					error: function (error) {
-						console.error(error);
-					}
-				});
-			}
-
-			function login(form) {
-				$('#daftar-hakakses').html('');
-                $.ajax({
-                    type: 'POST',
-                    url: '{{ route("auth-login") }}',
-                    data: $(form).serialize(),
-                    success: function(response) {
-                        if (response.success) {
-							setSession(response);				
-                        } else {
-							disableForm(false);
-							appShowNotification(false,[response.message]);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-						disableForm(false);
-						appShowNotification(false,['Something went wrong. Please try again later.']);
-                    }
-                });
-			}
-						
-			function goDashboard(){
-				let timerInterval;
-				Swal.fire({
-				title: 'Login Berhasil!',
-				html: 'Anda akan di arahkan secara otomatis dalam <b></b> milliseconds, silahkan menunggu',
-				timer: 2000,
-				icon: 'success',
-				allowOutsideClick: false,
-				timerProgressBar: true,
-				didOpen: () => {
-					Swal.showLoading()
-					const b = Swal.getHtmlContainer().querySelector('b')
-					timerInterval = setInterval(() => {
-					b.textContent = Swal.getTimerLeft()
-					}, 100)
-				},
-				willClose: () => {
-					clearInterval(timerInterval)
-				}
-				}).then((result) => {
-					if (result.dismiss === Swal.DismissReason.timer) {
-						if(response.hakakses.length>1){
-							pilihAkses(response.hakakses_html);
-						}else{
-							location.href = '{{ route("akun-dashboard") }}';
-						}
-					}
-				})
-
-			}
-
+		var myModalAkses = new bootstrap.Modal(document.getElementById('modal-pilih-akses'), {
+			backdrop: 'static', // nda bisa klik diluar modal
+			keyboard: false     // tombol esc tidak berfungsi untuk tutup modal  
 		});
+
+		$("#myForm").validate({
+			messages: {
+				email: "Please enter a valid email address.",
+				password: {
+					required: "Password cannot be empty.",
+					minlength: "Password must be at least 8 characters."
+				}
+			},
+			submitHandler: function(form) {
+				// disableForm();
+				login(form)
+			}
+		});
+
+		function setSession(param){
+			localStorage.setItem('access_token', param.access_token);
+			localStorage.setItem('email', param.akun.email);
+			localStorage.setItem('hakakses', JSON.stringify(param.hakakses));
+			localStorage.setItem('akses', param.akses);
+			localStorage.setItem('foto', param.foto);
+			localStorage.setItem('nama', param.akun.name);
+			localStorage.setItem('id', param.akun.id);
+			showModalAkses();
+		}
+
+		function showModalAkses() {
+			$('#daftar-akses').html('');
+			var daftar_akses = localStorage.getItem('hakakses');
+			var nama = localStorage.getItem('nama');
+			daftar_akses = JSON.parse(daftar_akses);
+			if (daftar_akses && daftar_akses.length > 1) {
+				var htmlOptions = `<div>Hi ${nama}, pilih akses anda:</div>`;
+				htmlOptions += '<ul>';
+				daftar_akses.forEach(function(akses, index) {
+				htmlOptions += `<li><a href="javascript:;" class="set-akses" data-grup_name="${akses.grup.grup}" data-grup_id="${akses.grup.id}">${akses.grup.grup}</a></li>`;
+				});
+				htmlOptions += '</ul>';
+				$('#daftar-akses').html(htmlOptions);
+				myModalAkses.show();
+			}else{
+				window.location.replace(base_url+'/akun-dashboard');
+			}
+		}	
+		
+		$(document).on('click','.set-akses',function(){
+			localStorage.setItem('akses', $(this).attr('data-grup_id'));
+			window.location.replace(base_url+'/akun-dashboard');
+		})
+
+		function login(form) {
+			$('#daftar-hakakses').html('');
+			$.ajax({
+				type: 'POST',
+				url: '{{ route("auth-login") }}',
+				data: $(form).serialize(),
+				success: function(response) {
+					// console.log(response);
+					if (response.success) {
+						setSession(response.data);		
+					} else {
+						disableForm(false);
+						appShowNotification(false,[response.message]);
+					}
+				},
+				error: function(xhr, status, error) {
+					disableForm(false);
+					appShowNotification(false,['Something went wrong. Please try again later.']);
+				}
+			});
+		}
+					
+		function goDashboard(){
+			let timerInterval;
+			Swal.fire({
+			title: 'Login Berhasil!',
+			html: 'Anda akan di arahkan secara otomatis dalam <b></b> milliseconds, silahkan menunggu',
+			timer: 2000,
+			icon: 'success',
+			allowOutsideClick: false,
+			timerProgressBar: true,
+			didOpen: () => {
+				Swal.showLoading()
+				const b = Swal.getHtmlContainer().querySelector('b')
+				timerInterval = setInterval(() => {
+				b.textContent = Swal.getTimerLeft()
+				}, 100)
+			},
+			willClose: () => {
+				clearInterval(timerInterval)
+			}
+			}).then((result) => {
+				if (result.dismiss === Swal.DismissReason.timer) {
+					if(response.hakakses.length>1){
+						pilihAkses(response.hakakses_html);
+					}else{
+						location.href = '{{ route("akun-dashboard") }}';
+					}
+				}
+			})
+		}
+
+	});
 	</script>
 
 

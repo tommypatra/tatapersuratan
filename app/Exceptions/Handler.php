@@ -38,4 +38,21 @@ class Handler extends ExceptionHandler
             //
         });
     }
+
+    public function render($request, Throwable $exception)
+    {
+        if ($exception instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException) {
+            return response()->json(['error' => 'Token expired'], 401);
+        }
+
+        if ($exception instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException) {
+            return response()->json(['error' => 'Invalid token'], 401);
+        }
+
+        if ($exception instanceof \Tymon\JWTAuth\Exceptions\JWTException) {
+            return response()->json(['error' => 'Token not provided'], 401);
+        }
+
+        return parent::render($request, $exception);
+    }
 }

@@ -27,7 +27,6 @@ class KlasifikasiSuratRequest extends FormRequest
             'kode' => 'required',
             'klasifikasi' => 'required',
             'keterangan' => 'nullable',
-            'user_id' => 'required',
             'is_aktif' => 'required',
         ];
     }
@@ -38,7 +37,6 @@ class KlasifikasiSuratRequest extends FormRequest
             'kode' => 'kode',
             'klasifikasi' => 'klasifikasi',
             'keterangan' => 'keterangan',
-            'user_id' => 'pengguna',
             'is_aktif' => 'status aktif',
         ];
     }

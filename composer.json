@@ -13,7 +13,8 @@
         "laravel/tinker": "^2.5",
         "setasign/fpdf": "^1.8",
         "setasign/fpdi": "^2.6",
-        "simplesoftwareio/simple-qrcode": "^4.2"
+        "simplesoftwareio/simple-qrcode": "^4.2",
+        "tymon/jwt-auth": "^1.0@dev"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

@@ -22,7 +22,7 @@
                             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
                                 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                                     <li><a href="javascript:;" id="btnRefresh" onclick="refresh()" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="refresh-cw"></i> Refresh</a></li>
-                                    <li id="tombol-distribusi"><a href="javascript:;" id="btndistribusi" onclick="prosesdistribusi()" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="send"></i> distribusi</a></li>
+                                    <li id="tombol-distribusi"><a href="javascript:;" id="btndistribusi" style="display:none;" onclick="prosesdistribusi()" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="send"></i> distribusi</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -98,7 +98,10 @@
 <script src="{{ asset('js/img-viewer/viewer.min.js') }}"></script>
 
 <script type="text/javascript">
+    cekAkses('pengguna');
+
     var vApi = '/api/distribusi';
+    var id = "{{ $id }}";
     var vJudul = 'Detail Surat Keluar';
 
     function refresh() {
@@ -122,7 +125,8 @@
         $("#surat_keluar_id").val("");
 
         CrudModule.setApi('/api/surat-keluar');
-        CrudModule.fSearchId("{{ $id }}", function(response) {
+        CrudModule.fSearchId(id, function(response) {
+            // alert(id);
             if (response.data.length > 0) {
                 let suratKeluar = response.data[0];
                 let cariData = cariArray(suratKeluar.distribusi, parseInt(vUserId), 'user_id');
@@ -150,6 +154,9 @@
                 $("#created_at").html(suratKeluar.created_at);
 
                 $("#surat_keluar_id").val(suratKeluar.id);
+
+                if(suratKeluar.is_diterima)
+                    $('#btndistribusi').show();
 
                 //lampiran
                 var lampiran = `<span class="badge bg-danger">Belum terupload</span>`;
@@ -198,7 +205,7 @@
                 $("#track_distribusi").html(track_distribusi);
 
             } else {
-                window.location.replace("{{ route('akun-dashboard') }}");
+                // window.location.replace("{{ route('akun-dashboard') }}");
             }
         });
     }

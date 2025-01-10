@@ -71,7 +71,6 @@
 <div class="modal fade modal-lg" id="modal-form" role="dialog">
     <div class="modal-dialog">
         <form id="myForm">
-            <input type="hidden" name="user_id" id="user_id" value="{{ auth()->user()->id }}">
             <input type="hidden" name="id" id="id" >
             <div class="modal-content">
                 <div class="modal-header">
@@ -141,6 +140,7 @@
 <script src="{{ asset('js/crud.js') }}"></script>
 
 <script type="text/javascript">
+    cekAkses('admin');
     var vApi='/api/user-app';
     var vJudul='Pengguna App';
     var fieldInit={
@@ -271,8 +271,16 @@
             password: {
                 required: "Password tidak boleh kosong",
                 minlength: "Password harus minimal 8 karakter"
-            }        
+            }
         },
+        rules: {
+            password: {
+                required: function() {
+                    return !$("#id").val();
+                },
+                minlength: 8
+            }
+        },        
         submitHandler: function(form) {
             let setup_ajax={type:'POST',url:vApi};
             let id=$("#id").val();

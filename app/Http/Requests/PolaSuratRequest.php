@@ -26,7 +26,6 @@ class PolaSuratRequest extends FormRequest
         return [
             'kategori' => 'required',
             'pola' => 'required',
-            'user_id' => 'required',
             'is_aktif' => 'required',
         ];
     }
@@ -36,7 +35,6 @@ class PolaSuratRequest extends FormRequest
         return [
             'kategori' => 'kategori',
             'pola' => 'pola',
-            'user_id' => 'pengguna',
             'is_aktif' => 'status aktif',
         ];
     }

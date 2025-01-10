@@ -170,3 +170,60 @@ function labelSetupVerifikasi(is_diajukan=null,is_diterima=null,catatan=null,ver
 
     return {'label':'<div>'+label_disetujui+'</div>','catatan':catatan_verifikasi}
 }
+
+function ajaxRequest(url, method, data=null, adaResponError=false, successCallback, errorCallback) {
+    var hasFile = false;
+    if (data instanceof FormData) {
+        data.forEach(function(value, key) {
+            if (value instanceof File) {
+                hasFile = true;
+                
+            }
+        });
+    }
+    var ajaxOptions = {
+        url: url,
+        type: method,
+        data: data,
+        contentType: hasFile ? false : 'application/x-www-form-urlencoded; charset=UTF-8',
+        processData: !hasFile,        
+        success: function(response) {
+            if (successCallback) {
+                successCallback(response);
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            if (!adaResponError) {
+                return;
+            }
+
+            if (jqXHR.status === 401) {
+                forceLogout();
+            } else if (jqXHR.status === 403) {
+                window.location.replace(vBaseUrl+'/akun-dashboard');
+            } else {
+                if (jqXHR.status === 422) {
+                    const errors = jqXHR.responseJSON.errors;
+                    $.each(errors, function(index, dt) {
+                        toastr.error(dt, 'terjadi kesalahan');
+                    });
+                } else {
+                    toastr.error(jqXHR.responseJSON.message, 'terjadi kesalahan');
+                }
+            }
+            if (errorCallback) {
+                errorCallback(jqXHR, textStatus, errorThrown);
+            }
+            
+        }
+    };
+    $.ajax(ajaxOptions);
+}
+
+function cekAkses(grup){
+    ajaxRequest(vBaseUrl+'/api/cek-akses/'+grup, 'GET', null, true,
+        function(response) {
+            console.log(response);
+        }
+    );
+}

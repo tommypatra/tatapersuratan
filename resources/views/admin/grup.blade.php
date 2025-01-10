@@ -237,9 +237,7 @@
 
     $(document).ready(function() {
         CrudModule.setApi(vApi);
-        
-
-        // Load data default
+        cekAkses('admin');
         loadData();
         function loadData(page = 1) {
             CrudModule.fRead(page, displayData);

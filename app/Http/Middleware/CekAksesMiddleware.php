@@ -14,20 +14,11 @@ class CekAksesMiddleware
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle($request, $next, ...$abilities)
+    public function handle(Request $request, Closure $next, $role)
     {
-        if (!$request->user() || !$request->user()->currentAccessToken()) {
-            throw new AuthenticationException;
+        if (!izinkanAkses($role)) {
+            return response()->json(['success' => false, 'message' => 'akses ditolak'], 403);
         }
-        $roles = cekAkses($request->user()->id);
-        $request->merge(array("roles_akun" => $roles));
-        foreach ($abilities as $ability) {
-            if (in_array($ability, $roles)) {
-                return $next($request);
-            }
-        }
-        return response()->json([
-            'error' => 'Akses ditolak',
-        ], 401);
+        return $next($request);
     }
 }

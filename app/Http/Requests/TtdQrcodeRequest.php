@@ -37,7 +37,7 @@ class TtdQrcodeRequest extends FormRequest
             'catatan' => 'nullable',
             'user_ttd_id' => 'required',
             'qrcode' => 'nullable',
-            'user_id' => 'required',
+            // 'user_id' => 'required',
         ];
 
         if ($this->isMethod('put')) {
@@ -63,7 +63,7 @@ class TtdQrcodeRequest extends FormRequest
             'is_diajukan' => 'status diajukan',
             'catatan' => 'catatan',
             'user_ttd_id' => 'pejabat tanda tangan',
-            'user_id' => 'sumber',
+            // 'user_id' => 'sumber',
         ];
     }
 }

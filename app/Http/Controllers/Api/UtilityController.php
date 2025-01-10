@@ -106,7 +106,9 @@ class UtilityController extends Controller
             ->orderBy('tanggal', 'desc')
             ->orderBy('perihal', 'asc')
             ->with([
-                'kategoriSuratMasuk', 'user', 'lampiranSuratMasuk.upload',
+                'kategoriSuratMasuk',
+                'user',
+                'lampiranSuratMasuk.upload',
                 'tujuan' => function ($query) {
                     $query->with(
                         [
@@ -264,6 +266,7 @@ class UtilityController extends Controller
 
 
         $data = $query->first();
+        // dd($data);
 
         $barcode = generateQrCode($data);
         if (!$data) {
@@ -494,5 +497,13 @@ class UtilityController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function cekAkses($grup)
+    {
+        if (!izinkanAkses($grup)) {
+            return response()->json(['success' => false, 'message' => 'akses ditolak'], 403);
+        }
+        return response()->json(['success' => true, 'message' => 'akses diperbolehkan'], 200);
     }
 }

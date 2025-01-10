@@ -102,7 +102,7 @@
         if(data.length>0)
             $.each(data, function(index, tujuan) {
                 var suratMasuk=tujuan.surat_masuk;
-                var linkDetail=`/disposisi-detail/${suratMasuk.id}`;
+                var linkDetail=`/surat-masuk-detail/${suratMasuk.id}`;
                 const sudahDisposisi = isUserInDisposisi(suratMasuk.tujuan,vUserId);
                 
                 var ketAkses=`<span class="badge bg-danger">belum dibaca</span>`;

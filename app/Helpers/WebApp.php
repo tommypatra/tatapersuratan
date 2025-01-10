@@ -19,6 +19,15 @@ use App\Http\Resources\TujuanResource;
 use App\Http\Resources\DistribusiResource;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
+function d($var = [], $is_ajax = false)
+{
+    if ($is_ajax) {
+        return response()->json($var, 200);
+    } else {
+        print_r($var);
+    }
+    die();
+}
 
 function uploadFile($request)
 {
@@ -323,20 +332,6 @@ function showQRCode($kode, $size = 300)
     return $base64;
 }
 
-function listAksesHtml($hakakses = [])
-{
-    // dd($hakakses)
-    // $hakakses = (object) $hakakses;
-    $retval = '<ul>';
-    foreach ($hakakses as $i => $dp) {
-        // $dp = (object) $dp;
-        $link = route('akun-set-akses', ['grup_id' => $dp['grup']['id']]);
-        $retval .= '<li><a href="' . $link . '">' . $dp['grup']['grup'] . '</a></li>';
-    }
-    $retval .= '</ul>';
-    return $retval;
-}
-
 function generateToken($length = 64)
 {
     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -352,8 +347,10 @@ function generateToken($length = 64)
 function generateQrCode($data)
 {
     $pathqr = 'qrcodes/' . date('Y') . '/' . date('m') . '/' . date('d') . '/img-' . $data->id . '-' . time() . '-footer.png';
-    if (!File::exists(dirname($pathqr))) {
-        if (!File::makeDirectory(dirname($pathqr), 0755, true, true)) {
+    $fullPath = public_path($pathqr); // Pastikan menggunakan public_path untuk path absolut
+
+    if (!File::exists(dirname($fullPath))) {
+        if (!File::makeDirectory(dirname($fullPath), 0755, true, true)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create directory',
@@ -361,10 +358,12 @@ function generateQrCode($data)
         }
     }
     $link = url('/') . '/tte/' . $data->kode;
-    // dd($link);
-    QrCode::size(65)->format('png')->generate($link, $pathqr);
-    return $pathqr;
+
+    // Generate QR code
+    \QrCode::size(65)->format('png')->generate($link, $fullPath);
+    return $pathqr; // Path relatif untuk digunakan di URL
 }
+
 
 
 function cekAkses($id = null)
@@ -431,4 +430,63 @@ function cekPort($host = '127.0.0.1', $ports = ['6001'])
 function formatNotNull($check = null)
 {
     return ($check) ? $check : "";
+}
+
+if (!function_exists('daftarAkses')) {
+    function daftarAkses($user_id)
+    {
+        $listAkses = [];
+        $getUser = User::with(['grupUser.grup'])->where('id', $user_id)->first();
+        if (is_null($getUser)) {
+            return [];
+        }
+
+        foreach ($getUser->grupUser as $i => $dt) {
+            $listAkses[] = ['user_grup_id' => $dt->id, 'user_id' => $dt->user_id, 'grup' => $dt->grup->grup, 'grup_id' => $dt->grup->id];
+        }
+        // d($listAkses);
+        return json_decode(json_encode($listAkses));
+    }
+}
+
+if (!function_exists('cekGrup')) {
+
+    function cekGrup($daftar_grup, $grup_name)
+    {
+        $aksesArray = json_decode(json_encode($daftar_grup), true);
+        foreach ($aksesArray as $aksesItem) {
+            if (strtolower($aksesItem['grup']) === strtolower($grup_name)) {
+                return $aksesItem['user_grup_id'];
+            }
+        }
+        return 0;
+    }
+}
+
+
+if (!function_exists('getEmailsByGrup')) {
+    function getEmailsByGrup(array $grupName)
+    {
+        return User::with(['grupUser.grup'])
+            ->whereHas('grupUser.grup', function ($query) use ($grupName) {
+                $query->whereIn('nama', $grupName);
+            })
+            ->distinct()
+            ->pluck('email');
+    }
+}
+
+if (!function_exists('izinkanAkses')) {
+    function izinkanAkses($grup = "global")
+    {
+        if ($grup != "global") {
+            $user = auth()->user();
+            $daftar_grup = daftarAkses($user->id);
+            $userGrupId = cekGrup($daftar_grup, $grup);
+            if (!$userGrupId) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

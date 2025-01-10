@@ -15,11 +15,14 @@ class SuratMasukController extends Controller
     //OKE
     public function index(Request $request)
     {
+
         $query = SuratMasuk::orderBy('created_at', 'desc')
             ->orderBy('tanggal', 'desc')
             ->orderBy('perihal', 'asc')
             ->with([
-                'kategoriSuratMasuk', 'user', 'lampiranSuratMasuk.upload',
+                'kategoriSuratMasuk',
+                'user',
+                'lampiranSuratMasuk.upload',
                 'tujuan' => function ($query) {
                     $query->with(
                         [
@@ -34,10 +37,6 @@ class SuratMasukController extends Controller
                 },
             ]);
 
-        $rolesAkun = $request->input('roles_akun');
-        if (!in_array('Admin', $rolesAkun)) {
-            $query->where('user_id', auth()->user()->id);
-        }
 
         //untuk filter lebih dari 1 kolom
         $filter = $request->input('filter');
@@ -83,6 +82,9 @@ class SuratMasukController extends Controller
                 ->orWhere('asal', 'LIKE', "%$keyword%");
         }
 
+        if (!izinkanAkses("admin")) {
+            $query->where('user_id', auth()->user()->id);
+        }
 
         $perPage = $request->input('per_page', env('DATA_PER_PAGE', 10));
         if ($perPage === 'all') {
@@ -121,9 +123,10 @@ class SuratMasukController extends Controller
     {
         try {
             $validatedData = $request->validated();
+            $validatedData['user_id'] = auth()->user()->id;
 
             $rolesAkun = $request->input('roles_akun');
-            if (in_array('Admin', $rolesAkun)) {
+            if (izinkanAkses("admin")) {
                 $validatedData['is_diajukan'] = 1;
                 $validatedData['is_diterima'] = 1;
                 $validatedData['verifikator'] = auth()->user()->name;
@@ -159,6 +162,8 @@ class SuratMasukController extends Controller
 
         try {
             $validatedData = $request->validated();
+            $validatedData['user_id'] = auth()->user()->id;
+
             $data = $this->findId($id);
             $data->update($validatedData);
 

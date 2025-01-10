@@ -191,13 +191,16 @@ class LampiranSuratMasukController extends Controller
     {
         try {
             $data = $this->findId($id);
+            // dd($data);
             $upload_id = $data->upload_id;
             $data->delete();
 
             //cari file
-            $data = UploadController::findId($upload_id);
-            File::delete(public_path($data->path));
-            $data->delete();
+            $uploadController = new UploadController();
+            $uploadData = $uploadController->findId($upload_id);
+
+            File::delete(public_path($uploadData->path));
+            $uploadData->delete();
 
             return response()->json([
                 'success' => true,

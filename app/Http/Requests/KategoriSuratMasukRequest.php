@@ -24,7 +24,6 @@ class KategoriSuratMasukRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_id' => 'required',
             'kategori' => 'required',
             'is_aktif' => 'required',
         ];
@@ -33,7 +32,6 @@ class KategoriSuratMasukRequest extends FormRequest
     public function attributes()
     {
         return [
-            'user_id' => 'pengguna',
             'kategori' => 'kategori',
             'is_aktif' => 'status aktif',
         ];
