@@ -132,7 +132,7 @@
                     <div class="row">
                         <div class="col-lg-8 mb-3">
                             <label class="form-label">Perihal</label>
-                            <textarea name="perihal" id="perihal" rows="7" class="form-control" required></textarea>
+                            <textarea name="perihal" id="perihal" rows="5" class="form-control" required></textarea>
                         </div>
                         <div class="col-lg-4 mb-3 row">
                             <div class="col-lg-12 mb-3">
@@ -141,7 +141,9 @@
                             </div>
                             <div class="col-lg-12 mb-3">
                                 <label class="form-label">Tujuan</label>
-                                <textarea name="tujuan" id="tujuan" rows="3" class="form-control" required></textarea>
+                                <textarea name="tujuan" id="tujuan" rows="5" class="form-control"></textarea>
+                                <input type="checkbox" id="gabungkan" name="gabungkan" value="1"> gabung perihal dan tujuan
+        
                             </div>
                         </div>
                     </div>
@@ -433,7 +435,9 @@
     }
 
     // tambah data
-    function tambah() {
+    function tambah() 
+    {
+        $('#gabungkan').removeAttr('disabled');
         showModalForm();
         $('#modal-label').text('Tambah '+vJudul);
         $('#btn-simpan').text('Simpan');
@@ -441,6 +445,7 @@
 
     // ganti dan populasi data
     function ganti(id) {
+        $('#gabungkan').attr('disabled', true);
         $.ajax({
             // url: '/api/surat-keluar?keyword={"id":"'+id+'"}',
             url: '/api/surat-keluar/'+id,
@@ -856,102 +861,116 @@
     }
         
     $(document).ready(function() {
-        CrudModule.setApi(vApi);
-        // Load data default
-        loadDataKonsep();
-        InfoModule.updateNotifWeb();
+    // Mengatur API untuk CrudModule
+    CrudModule.setApi(vApi);
+    // Load data default
+    loadDataKonsep();
+    InfoModule.updateNotifWeb();
 
-        // Ambil referensi elemen
-        const cameraElement = document.getElementById("camera");
-        const takePhotoButton = document.getElementById("take-photo");
-        const switchCameraButton = document.getElementById("switch-camera"); // Tambahkan ini
+    // Ambil referensi elemen
+    const cameraElement = document.getElementById("camera");
+    const takePhotoButton = document.getElementById("take-photo");
+    const switchCameraButton = document.getElementById("switch-camera");
 
-        let isUploading = false;
-        let stream; // Tambahkan ini untuk menyimpan referensi stream kamera
+    let isUploading = false;
+    let stream; // Referensi untuk stream kamera
 
-        function stopCamera() {
-            if (stream) {
-                const tracks = stream.getTracks();
-                tracks.forEach(function(track) {
-                    track.stop();
-                });
-                cameraElement.srcObject = null;
-            }
-        }
-
-        // Tambahkan fungsi untuk switch kamera
-        function switchCamera() {
-            stopCamera();
-
-            const videoConstraints = {
-                video: {
-                    facingMode: (stream.getVideoTracks()[0].getSettings().facingMode === 'user') ? 'environment' : 'user'
-                }
-            };
-
-            navigator.mediaDevices.getUserMedia(videoConstraints)
-                .then(function(newStream) {
-                    stream = newStream;
-                    cameraElement.srcObject = newStream;
-                })
-                .catch(function(error) {
-                    console.error("Error switching camera:", error);
-                });
-        }
-
-        $('#modal-upload').on('shown.bs.modal', function() {
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(function(initialStream) {
-                    stream = initialStream; // Simpan referensi stream
-                    cameraElement.srcObject = initialStream;
-                })
-                .catch(function(error) {
-                    console.error("Error accessing camera:", error);
-                });
-
-            // Tambahkan event listener untuk switch camera
-            switchCameraButton.addEventListener("click", switchCamera);
-
-            takePhotoButton.addEventListener("click", function() {
-                if (!isUploading) {
-                    isUploading = true;
-                    takePhotoButton.disabled = true;
-
-                    const canvas = document.createElement("canvas");
-                    const scaleFactor = 1.5;
-                    const targetWidth = cameraElement.videoWidth * scaleFactor;
-                    const targetHeight = cameraElement.videoHeight * scaleFactor;
-
-                    canvas.width = targetWidth;
-                    canvas.height = targetHeight;
-
-                    const context = canvas.getContext("2d");
-                    context.drawImage(
-                        cameraElement,
-                        (cameraElement.videoWidth - targetWidth) / 2,
-                        (cameraElement.videoHeight - targetHeight) / 2,
-                        targetWidth,
-                        targetHeight,
-                        0,
-                        0,
-                        canvas.width,
-                        canvas.height
-                    );
-                    canvas.toBlob(function(blob) {
-                        if (blob) {
-                            uploadFile(vsurat_masuk_id, blob, 'capture.jpg');
-                        }
-                        isUploading = false;
-                        takePhotoButton.disabled = false;
-                    }, "image/jpeg", 1);
-                }
+    // Fungsi untuk menghentikan kamera
+    function stopCamera() {
+        if (stream) {
+            const tracks = stream.getTracks();
+            tracks.forEach(function(track) {
+                track.stop(); // Hentikan setiap track
             });
-        });
+            cameraElement.srcObject = null;
+        }
+    }
 
-        $('#modal-upload').on('hidden.bs.modal', function() {
-            stopCamera();
+    // Fungsi untuk switch kamera
+    function switchCamera() {
+        // Hentikan kamera yang aktif
+        stopCamera();
+
+        // Tentukan mode kamera (user = depan, environment = belakang)
+        const facingMode = (stream.getVideoTracks()[0].getSettings().facingMode === 'user') ? 'environment' : 'user';
+
+        // Akses stream baru dengan kamera yang berbeda
+        const videoConstraints = {
+            video: {
+                facingMode: facingMode
+            }
+        };
+
+        navigator.mediaDevices.getUserMedia(videoConstraints)
+            .then(function(newStream) {
+                stream = newStream; // Simpan referensi stream baru
+                cameraElement.srcObject = newStream; // Set stream ke elemen kamera
+            })
+            .catch(function(error) {
+                console.error("Error switching camera:", error);
+            });
+    }
+
+    // Ketika modal upload ditampilkan
+    $('#modal-upload').on('shown.bs.modal', function() {
+        // Akses kamera pertama kali ketika modal muncul
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(initialStream) {
+                stream = initialStream; // Simpan referensi stream pertama
+                cameraElement.srcObject = initialStream; // Set stream ke elemen kamera
+            })
+            .catch(function(error) {
+                console.error("Error accessing camera:", error);
+            });
+
+        // Tambahkan event listener untuk tombol switch kamera
+        switchCameraButton.addEventListener("click", switchCamera);
+
+        // Tambahkan event listener untuk tombol ambil foto
+        takePhotoButton.addEventListener("click", function() {
+            if (!isUploading) {
+                isUploading = true;
+                takePhotoButton.disabled = true;
+
+                const canvas = document.createElement("canvas");
+                const scaleFactor = 1.5;
+                const targetWidth = cameraElement.videoWidth * scaleFactor;
+                const targetHeight = cameraElement.videoHeight * scaleFactor;
+
+                canvas.width = targetWidth;
+                canvas.height = targetHeight;
+
+                const context = canvas.getContext("2d");
+                context.drawImage(
+                    cameraElement,
+                    (cameraElement.videoWidth - targetWidth) / 2,
+                    (cameraElement.videoHeight - targetHeight) / 2,
+                    targetWidth,
+                    targetHeight,
+                    0,
+                    0,
+                    canvas.width,
+                    canvas.height
+                );
+
+                // Konversi canvas ke blob dan upload
+                canvas.toBlob(function(blob) {
+                    if (blob) {
+                        uploadFile(vsurat_masuk_id, blob, 'capture.jpg');
+                    }
+                    isUploading = false;
+                    takePhotoButton.disabled = false;
+                }, "image/jpeg", 1);
+            }
         });
-    });    
+    });
+
+    // Ketika modal upload disembunyikan, hentikan kamera
+    $('#modal-upload').on('hidden.bs.modal', function() {
+        stopCamera();
+    });
+});
+
 
 </script>
 @endsection

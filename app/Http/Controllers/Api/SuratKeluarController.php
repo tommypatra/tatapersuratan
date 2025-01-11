@@ -154,37 +154,46 @@ class SuratKeluarController extends Controller
     public function store(SuratKeluarRequest $request)
     {
         try {
+
             $validatedData = $request->validated();
             $validatedData['user_id'] = auth()->user()->id;
-            // $validatedData['waktu_buat'] = date("Y-m-d H:i:s");
-            // dd($validatedData);
-            $data = SuratKeluar::create($validatedData);
+            $gabungkan = isset($request['gabungkan']) ? true : false;
+            $tujuan = $this->parseTujuan($validatedData['tujuan']);
+            $perihal = $validatedData['perihal'];
+            $pesan = "";
+            $responseData = [];
+            foreach ($tujuan as $i => $dp) {
+                if ($gabungkan)
+                    $validatedData['perihal'] = $perihal . " " . $dp;
+                $data = SuratKeluar::create($validatedData);
 
-            // jika ada akses maka generatekan nomor suratnya
-            $pesan = 'pengajuan pengambilan surat berhasil dibuat';
-            if ($this->cekAksesPola($data->tanggal, $data->pola_spesimen_id)) {
-                $generateValue = $this->updateNoSurat($data->id, $data);
-                // dd($generateValue);
-                $dataSave = [
-                    'is_diterima' => 1,
-                    'is_diajukan' => 1,
-                    'catatan' => null,
-                    'verifikator' => auth()->user()->name,
-                    'no_surat' => $generateValue['no_surat'],
-                    'no_indeks' => $generateValue['no_indeks'],
-                    'no_sub_indeks' => $generateValue['no_sub_indeks'],
-                    'pola' => $generateValue['pola'],
-                ];
-                $pesan = '  Pengambilan nomor surat perihal <i>' . $data->perihal . '</i> tanggal <i>' . $data->tanggal . '
-                            </i> berhasil, dengan nomor <b>' . $generateValue['no_surat'] . '</b>';
-                $data->update($dataSave);
+                // jika ada akses maka generatekan nomor suratnya
+                $pesan .= '<p>pengajuan pengambilan surat <i>' . $data->perihal . '</i>';
+                if ($this->cekAksesPola($data->tanggal, $data->pola_spesimen_id)) {
+                    $generateValue = $this->updateNoSurat($data->id, $data);
+                    $dataSave = [
+                        'is_diterima' => 1,
+                        'is_diajukan' => 1,
+                        'catatan' => null,
+                        'verifikator' => auth()->user()->name,
+                        'no_surat' => $generateValue['no_surat'],
+                        'no_indeks' => $generateValue['no_indeks'],
+                        'no_sub_indeks' => $generateValue['no_sub_indeks'],
+                        'pola' => $generateValue['pola'],
+                    ];
+                    $pesan .= '  dengan nomor <b>' . $generateValue['no_surat'] . "</b>";
+                    $data->update($dataSave);
+                }
+                $pesan .= '  berhasil dibuat</p>';
+
+                $responseData[] = new SuratKeluarResource($data);
             }
 
             // $data['tanggal']
             return response()->json([
                 'success' => true,
                 'message' => $pesan,
-                'data' => new SuratKeluarResource($data),
+                'data' => $responseData,
             ], 201);
         } catch (ValidationException $e) {
             return response()->json([
@@ -200,6 +209,29 @@ class SuratKeluarController extends Controller
             ], 500);
         }
     }
+
+    private function parseTujuan($tujuan = null)
+    {
+        $result = [];
+        if ($tujuan) {
+            // Ganti newline (\n) dengan koma untuk konsistensi pemrosesan
+            $tujuan = preg_replace('/\s*\n\s*/', ',', $tujuan);
+
+            // Pola untuk memisahkan berdasarkan angka dan titik, atau hanya koma
+            $pattern = '/\s*,\s*(?=\d+\.)|\s*,\s*/';
+
+            // Pisahkan data berdasarkan pola
+            $split = preg_split($pattern, trim($tujuan));
+
+            foreach ($split as $item) {
+                // Jika ada angka dan titik, hapus mereka; jika tidak, tetap gunakan
+                $cleaned = preg_replace('/^\d+\.\s*/', '', $item);
+                $result[] = trim($cleaned); // Hilangkan spasi
+            }
+        }
+        return $result;
+    }
+
 
     //OKE PUT application/x-www-form-urlencoded
     public function update(SuratKeluarRequest $request, $id)
