@@ -15,18 +15,18 @@ class CreateSuratMasuksTable extends Migration
     {
         Schema::create('surat_masuks', function (Blueprint $table) {
             $table->id();
-            $table->string('no_agenda');
-            $table->string('no_surat');
-            $table->string('perihal');
-            $table->string('asal');
-            $table->string('tempat');
-            $table->string('ringkasan')->nullable();
+            $table->string('no_agenda', 190);
+            $table->string('no_surat', 190);
+            $table->string('perihal', 190);
+            $table->string('asal', 190);
+            $table->string('tempat', 190);
+            $table->string('ringkasan', 190)->nullable();
             $table->date('tanggal');
             $table->timestamps();
 
             $table->boolean('is_diajukan')->default(false);
             $table->boolean('is_diterima')->nullable();
-            $table->string('verifikator')->nullable();
+            $table->string('verifikator', 190)->nullable();
             $table->text('catatan')->nullable();
 
             $table->foreignId('user_id');

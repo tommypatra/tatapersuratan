@@ -15,20 +15,20 @@ class CreateSuratKeluarsTable extends Migration
     {
         Schema::create('surat_keluars', function (Blueprint $table) {
             $table->id();
-            $table->string('no_surat')->nullable();
+            $table->string('no_surat', 190)->nullable();
             $table->integer('no_indeks')->nullable();
             $table->integer('no_sub_indeks')->nullable();
-            $table->string('perihal');
-            $table->string('asal');
-            $table->string('pola')->nullable();
-            $table->string('tujuan')->nullable();
-            $table->string('ringkasan')->nullable();
+            $table->string('perihal', 190);
+            $table->string('asal', 190);
+            $table->string('pola', 190)->nullable();
+            $table->string('tujuan', 190)->nullable();
+            $table->string('ringkasan', 190)->nullable();
             $table->date('tanggal');
             $table->timestamps();
 
             $table->boolean('is_diajukan')->default(false);
             $table->boolean('is_diterima')->nullable();
-            $table->string('verifikator')->nullable();
+            $table->string('verifikator', 190)->nullable();
             $table->text('catatan')->nullable();
 
             $table->foreignId('klasifikasi_surat_id')->nullable();

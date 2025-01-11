@@ -15,9 +15,9 @@ class CreateProfilsTable extends Migration
     {
         Schema::create('profils', function (Blueprint $table) {
             $table->id();
-            $table->string('foto')->nullable();
-            $table->string('nip')->nullable();
-            $table->string('alamat')->nullable();
+            $table->string('foto', 190)->nullable();
+            $table->string('nip', 190)->nullable();
+            $table->string('alamat', 190)->nullable();
             $table->string('hp', 15)->nullable();
             $table->enum('jenis_kelamin', ['L', 'P']);
             $table->timestamps();

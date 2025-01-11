@@ -15,9 +15,9 @@ class CreateSpesimenJabatansTable extends Migration
     {
         Schema::create('spesimen_jabatans', function (Blueprint $table) {
             $table->id();
-            $table->string('kode')->nullable();
-            $table->string('jabatan');
-            $table->string('keterangan')->nullable();
+            $table->string('kode', 190)->nullable();
+            $table->string('jabatan', 190);
+            $table->string('keterangan', 190)->nullable();
             $table->boolean('is_aktif')->default(true);
             $table->timestamps();
             $table->foreignId('user_pejabat_id')->nullable();

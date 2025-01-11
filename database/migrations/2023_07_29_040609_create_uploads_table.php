@@ -15,10 +15,10 @@ class CreateUploadsTable extends Migration
     {
         Schema::create('uploads', function (Blueprint $table) {
             $table->id();
-            $table->string('path')->nullable();
-            $table->string('name')->nullable();
+            $table->string('path', 190)->nullable();
+            $table->string('name', 190)->nullable();
             $table->unsignedBigInteger('size')->nullable();
-            $table->string('type')->nullable();
+            $table->string('type', 190)->nullable();
             $table->timestamps();
             $table->foreignId('user_id');
             $table->foreign('user_id')->references('id')->on('users')->restrictOnDelete();

@@ -15,8 +15,8 @@ class CreatePolaSuratsTable extends Migration
     {
         Schema::create('pola_surats', function (Blueprint $table) {
             $table->id();
-            $table->string('kategori');
-            $table->string('pola');
+            $table->string('kategori', 190);
+            $table->string('pola', 190);
             $table->boolean('needs_klasifikasi')->default(true);
             $table->boolean('is_aktif')->default(true);
             $table->timestamps();

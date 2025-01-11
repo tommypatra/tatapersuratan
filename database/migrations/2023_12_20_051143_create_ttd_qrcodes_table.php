@@ -15,14 +15,14 @@ class CreateTtdQrcodesTable extends Migration
     {
         Schema::create('ttd_qrcodes', function (Blueprint $table) {
             $table->id();
-            $table->string('kode')->nullable();
+            $table->string('kode', 190)->nullable();
             $table->date('tanggal');
-            $table->string('no_surat');
-            $table->string('perihal');
-            $table->string('pejabat');
-            $table->string('jabatan');
-            $table->string('file');
-            $table->string('qrcode')->nullable();
+            $table->string('no_surat', 190);
+            $table->string('perihal', 190);
+            $table->string('pejabat', 190);
+            $table->string('jabatan', 190);
+            $table->string('file', 190);
+            $table->string('qrcode', 190)->nullable();
             // $table->text('file_detail');
 
             $table->boolean('is_diajukan')->default(false);
