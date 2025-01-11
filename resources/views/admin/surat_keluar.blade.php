@@ -862,115 +862,114 @@
     }
         
     $(document).ready(function() {
-    // Mengatur API untuk CrudModule
-    CrudModule.setApi(vApi);
-    // Load data default
-    loadDataKonsep();
-    InfoModule.updateNotifWeb();
+        // Mengatur API untuk CrudModule
+        CrudModule.setApi(vApi);
+        // Load data default
+        loadDataKonsep();
+        InfoModule.updateNotifWeb();
 
-    // Ambil referensi elemen
-    const cameraElement = document.getElementById("camera");
-    const takePhotoButton = document.getElementById("take-photo");
-    const switchCameraButton = document.getElementById("switch-camera");
+        // Ambil referensi elemen
+        const cameraElement = document.getElementById("camera");
+        const takePhotoButton = document.getElementById("take-photo");
+        const switchCameraButton = document.getElementById("switch-camera");
 
-    let isUploading = false;
-    let stream; // Referensi untuk stream kamera
+        let isUploading = false;
+        let stream; // Referensi untuk stream kamera
 
-    // Fungsi untuk menghentikan kamera
-    function stopCamera() {
-        if (stream) {
-            const tracks = stream.getTracks();
-            tracks.forEach(function(track) {
-                track.stop(); // Hentikan setiap track
-            });
-            cameraElement.srcObject = null;
+        // Fungsi untuk menghentikan kamera
+        function stopCamera() {
+            if (stream) {
+                const tracks = stream.getTracks();
+                tracks.forEach(function(track) {
+                    track.stop(); // Hentikan setiap track
+                });
+                cameraElement.srcObject = null;
+            }
         }
-    }
 
-    // Fungsi untuk switch kamera
-    function switchCamera() {
-        // Hentikan kamera yang aktif
-        stopCamera();
+        // Fungsi untuk switch kamera
+        function switchCamera() {
+            stopCamera(); // Hentikan kamera aktif
 
-        // Tentukan mode kamera (user = depan, environment = belakang)
-        const facingMode = (stream.getVideoTracks()[0].getSettings().facingMode === 'user') ? 'environment' : 'user';
+            // Periksa apakah facingMode ada, jika tidak, gunakan default
+            const currentFacingMode = stream && stream.getVideoTracks()[0].getSettings().facingMode;
+            const nextFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
 
-        // Akses stream baru dengan kamera yang berbeda
-        const videoConstraints = {
-            video: {
-                facingMode: facingMode
-            }
-        };
+            const videoConstraints = {
+                video: {
+                    facingMode: nextFacingMode
+                }
+            };
 
-        navigator.mediaDevices.getUserMedia(videoConstraints)
-            .then(function(newStream) {
-                stream = newStream; // Simpan referensi stream baru
-                cameraElement.srcObject = newStream; // Set stream ke elemen kamera
-            })
-            .catch(function(error) {
-                console.error("Error switching camera:", error);
+            navigator.mediaDevices.getUserMedia(videoConstraints)
+                .then(function(newStream) {
+                    stream = newStream; // Simpan referensi stream baru
+                    cameraElement.srcObject = newStream; // Set stream ke elemen video
+                })
+                .catch(function(error) {
+                    console.error("Error switching camera:", error);
+                });
+        }
+
+        // Ketika modal upload ditampilkan
+        $('#modal-upload').on('shown.bs.modal', function() {
+            // Akses kamera pertama kali ketika modal muncul
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(initialStream) {
+                    stream = initialStream; // Simpan referensi stream pertama
+                    cameraElement.srcObject = initialStream; // Set stream ke elemen kamera
+                })
+                .catch(function(error) {
+                    console.error("Error accessing camera:", error);
+                });
+
+            // Tambahkan event listener untuk tombol switch kamera
+            switchCameraButton.addEventListener("click", switchCamera);
+
+            // Tambahkan event listener untuk tombol ambil foto
+            takePhotoButton.addEventListener("click", function() {
+                if (!isUploading) {
+                    isUploading = true;
+                    takePhotoButton.disabled = true;
+
+                    const canvas = document.createElement("canvas");
+                    const scaleFactor = 1.5;
+                    const targetWidth = cameraElement.videoWidth * scaleFactor;
+                    const targetHeight = cameraElement.videoHeight * scaleFactor;
+
+                    canvas.width = targetWidth;
+                    canvas.height = targetHeight;
+
+                    const context = canvas.getContext("2d");
+                    context.drawImage(
+                        cameraElement,
+                        (cameraElement.videoWidth - targetWidth) / 2,
+                        (cameraElement.videoHeight - targetHeight) / 2,
+                        targetWidth,
+                        targetHeight,
+                        0,
+                        0,
+                        canvas.width,
+                        canvas.height
+                    );
+
+                    // Konversi canvas ke blob dan upload
+                    canvas.toBlob(function(blob) {
+                        if (blob) {
+                            uploadFile(vsurat_masuk_id, blob, 'capture.jpg');
+                        }
+                        isUploading = false;
+                        takePhotoButton.disabled = false;
+                    }, "image/jpeg", 1);
+                }
             });
-    }
+        });
 
-    // Ketika modal upload ditampilkan
-    $('#modal-upload').on('shown.bs.modal', function() {
-        // Akses kamera pertama kali ketika modal muncul
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(function(initialStream) {
-                stream = initialStream; // Simpan referensi stream pertama
-                cameraElement.srcObject = initialStream; // Set stream ke elemen kamera
-            })
-            .catch(function(error) {
-                console.error("Error accessing camera:", error);
-            });
-
-        // Tambahkan event listener untuk tombol switch kamera
-        switchCameraButton.addEventListener("click", switchCamera);
-
-        // Tambahkan event listener untuk tombol ambil foto
-        takePhotoButton.addEventListener("click", function() {
-            if (!isUploading) {
-                isUploading = true;
-                takePhotoButton.disabled = true;
-
-                const canvas = document.createElement("canvas");
-                const scaleFactor = 1.5;
-                const targetWidth = cameraElement.videoWidth * scaleFactor;
-                const targetHeight = cameraElement.videoHeight * scaleFactor;
-
-                canvas.width = targetWidth;
-                canvas.height = targetHeight;
-
-                const context = canvas.getContext("2d");
-                context.drawImage(
-                    cameraElement,
-                    (cameraElement.videoWidth - targetWidth) / 2,
-                    (cameraElement.videoHeight - targetHeight) / 2,
-                    targetWidth,
-                    targetHeight,
-                    0,
-                    0,
-                    canvas.width,
-                    canvas.height
-                );
-
-                // Konversi canvas ke blob dan upload
-                canvas.toBlob(function(blob) {
-                    if (blob) {
-                        uploadFile(vsurat_masuk_id, blob, 'capture.jpg');
-                    }
-                    isUploading = false;
-                    takePhotoButton.disabled = false;
-                }, "image/jpeg", 1);
-            }
+        // Ketika modal upload disembunyikan, hentikan kamera
+        $('#modal-upload').on('hidden.bs.modal', function() {
+            stopCamera();
         });
     });
-
-    // Ketika modal upload disembunyikan, hentikan kamera
-    $('#modal-upload').on('hidden.bs.modal', function() {
-        stopCamera();
-    });
-});
 
 
 </script>
