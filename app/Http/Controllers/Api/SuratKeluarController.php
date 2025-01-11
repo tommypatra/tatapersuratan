@@ -162,6 +162,8 @@ class SuratKeluarController extends Controller
             $perihal = $validatedData['perihal'];
             $pesan = "";
             $responseData = [];
+            // dd($tujuan);
+            $jumlah_tujuan = count($tujuan);
             foreach ($tujuan as $i => $dp) {
                 if ($gabungkan)
                     $validatedData['perihal'] = $perihal . " " . $dp;
@@ -184,7 +186,13 @@ class SuratKeluarController extends Controller
                     $pesan .= '  dengan nomor <b>' . $generateValue['no_surat'] . "</b>";
                     $data->update($dataSave);
                 }
-                $pesan .= '  berhasil dibuat</p>';
+                $pesan .= '  berhasil dibuat';
+                if ($i + 1 < $jumlah_tujuan)
+                    $pesan .= ', ';
+                else
+                    $pesan .= '.';
+
+                $pesan .= '</p>';
 
                 $responseData[] = new SuratKeluarResource($data);
             }
@@ -192,7 +200,7 @@ class SuratKeluarController extends Controller
             // $data['tanggal']
             return response()->json([
                 'success' => true,
-                'message' => $pesan,
+                'message' => '<div id="salinText" onclick="salinText()">' . $pesan . '</div>',
                 'data' => $responseData,
             ], 201);
         } catch (ValidationException $e) {
@@ -212,8 +220,9 @@ class SuratKeluarController extends Controller
 
     private function parseTujuan($tujuan = null)
     {
-        $result = [];
+        $result = [""];
         if ($tujuan) {
+            $result = [];
             // Ganti newline (\n) dengan koma untuk konsistensi pemrosesan
             $tujuan = preg_replace('/\s*\n\s*/', ',', $tujuan);
 

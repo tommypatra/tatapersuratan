@@ -130,21 +130,21 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-lg-8 mb-3">
+                        <div class="col-lg-12 mb-3">
                             <label class="form-label">Perihal</label>
                             <textarea name="perihal" id="perihal" rows="5" class="form-control" required></textarea>
                         </div>
-                        <div class="col-lg-4 mb-3 row">
-                            <div class="col-lg-12 mb-3">
-                                <label class="form-label">Asal</label>
-                                <input name="asal" id="asal" type="text" class="form-control" required>
-                            </div>
-                            <div class="col-lg-12 mb-3">
-                                <label class="form-label">Tujuan</label>
-                                <textarea name="tujuan" id="tujuan" rows="5" class="form-control"></textarea>
-                                <input type="checkbox" id="gabungkan" name="gabungkan" value="1"> gabung perihal dan tujuan
-        
-                            </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-8 mb-3">
+                            <label class="form-label">Tujuan</label>
+                            <textarea name="tujuan" id="tujuan" rows="5" class="form-control"></textarea>
+                            <input type="checkbox" id="gabungkan" name="gabungkan" value="1"> gabung perihal dan tujuan
+                        </div>
+                        <div class="col-lg-4 mb-3">
+                            <label class="form-label">Asal</label>
+                            <input name="asal" id="asal" type="text" class="form-control" required>
                         </div>
                     </div>
 
@@ -832,13 +832,14 @@
 
     function salinText() {
         var textToCopy = $('#salinText').text().trim();
-        var textarea = $('<textarea>').val(textToCopy);
-        $('body').append(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        textarea.remove();
-        alert("Teks berhasil disalin ke clipboard!");
-    }    
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(textToCopy).then(function() {
+                alert("Teks berhasil disalin ke clipboard!");
+            }).catch(function(error) {
+                console.error("Gagal menyalin teks: ", error);
+            });
+        } 
+    }
 
     function loadDataKonsep(page = 1) {
         CrudModule.setFilter('{"kategori":"konsep","tahun":'+tahunFilter+'}');
