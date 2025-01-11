@@ -939,44 +939,41 @@ function displayPagination(response) {
                 });
         }
 
+        // Ketika modal upload ditampilkan
         $('#modal-upload').on('shown.bs.modal', function() {
-            navigator.mediaDevices.getUserMedia({ video: true })
+            // Pastikan akses langsung ke kamera belakang
+            const videoConstraints = {
+                video: {
+                    facingMode: 'environment' // Kamera belakang
+                }
+            };
+
+            navigator.mediaDevices.getUserMedia(videoConstraints)
                 .then(function(initialStream) {
                     stream = initialStream; // Simpan referensi stream
-                    cameraElement.srcObject = initialStream;
+                    cameraElement.srcObject = initialStream; // Tampilkan stream di elemen video
                 })
                 .catch(function(error) {
                     console.error("Error accessing camera:", error);
+                    alert("Gagal mengakses kamera. Pastikan Anda memberi izin.");
                 });
 
-            // Tambahkan event listener untuk switch camera
+            // Tambahkan event listener untuk tombol switch kamera
             switchCameraButton.addEventListener("click", switchCamera);
 
+            // Tambahkan event listener untuk tombol ambil foto
             takePhotoButton.addEventListener("click", function() {
                 if (!isUploading) {
                     isUploading = true;
                     takePhotoButton.disabled = true;
 
                     const canvas = document.createElement("canvas");
-                    const scaleFactor = 1.5;
-                    const targetWidth = cameraElement.videoWidth * scaleFactor;
-                    const targetHeight = cameraElement.videoHeight * scaleFactor;
-
-                    canvas.width = targetWidth;
-                    canvas.height = targetHeight;
-
                     const context = canvas.getContext("2d");
-                    context.drawImage(
-                        cameraElement,
-                        (cameraElement.videoWidth - targetWidth) / 2,
-                        (cameraElement.videoHeight - targetHeight) / 2,
-                        targetWidth,
-                        targetHeight,
-                        0,
-                        0,
-                        canvas.width,
-                        canvas.height
-                    );
+                    const scaleFactor = 1.5;
+                    canvas.width = cameraElement.videoWidth * scaleFactor;
+                    canvas.height = cameraElement.videoHeight * scaleFactor;
+
+                    context.drawImage(cameraElement, 0, 0, canvas.width, canvas.height);
                     canvas.toBlob(function(blob) {
                         if (blob) {
                             uploadFile(vsurat_masuk_id, blob, 'capture.jpg');

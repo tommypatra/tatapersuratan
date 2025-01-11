@@ -49,7 +49,7 @@ class UploadController extends Controller
     }
 
     //OKE 
-    public function findID($id)
+    public static function findID($id)
     {
         $data = Upload::findOrFail($id);
         if (!$data) {
