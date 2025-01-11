@@ -234,6 +234,7 @@
     var vJudul='Penomoran Surat Keluar';
     var vsurat_keluar_id;
     var tahunFilter = '{{ date("Y") }}';
+    var vsurat_masuk_id;
     // console.log(hakAkses);
     var hakAkses = vAksesId;
     // if(hakAkses>1)
@@ -913,49 +914,49 @@
 
         // Ketika modal upload ditampilkan
         $('#modal-upload').on('shown.bs.modal', function() {
-    // Pastikan akses langsung ke kamera belakang
-    const videoConstraints = {
-        video: {
-            facingMode: 'environment' // Kamera belakang
-        }
-    };
-
-    navigator.mediaDevices.getUserMedia(videoConstraints)
-        .then(function(initialStream) {
-            stream = initialStream; // Simpan referensi stream
-            cameraElement.srcObject = initialStream; // Tampilkan stream di elemen video
-        })
-        .catch(function(error) {
-            console.error("Error accessing camera:", error);
-            alert("Gagal mengakses kamera. Pastikan Anda memberi izin.");
-        });
-
-    // Tambahkan event listener untuk tombol switch kamera
-    switchCameraButton.addEventListener("click", switchCamera);
-
-    // Tambahkan event listener untuk tombol ambil foto
-    takePhotoButton.addEventListener("click", function() {
-        if (!isUploading) {
-            isUploading = true;
-            takePhotoButton.disabled = true;
-
-            const canvas = document.createElement("canvas");
-            const context = canvas.getContext("2d");
-            const scaleFactor = 1.5;
-            canvas.width = cameraElement.videoWidth * scaleFactor;
-            canvas.height = cameraElement.videoHeight * scaleFactor;
-
-            context.drawImage(cameraElement, 0, 0, canvas.width, canvas.height);
-            canvas.toBlob(function(blob) {
-                if (blob) {
-                    uploadFile(vsurat_masuk_id, blob, 'capture.jpg');
+            // Pastikan akses langsung ke kamera belakang
+            const videoConstraints = {
+                video: {
+                    facingMode: 'environment' // Kamera belakang
                 }
-                isUploading = false;
-                takePhotoButton.disabled = false;
-            }, "image/jpeg", 1);
-        }
-    });
-});
+            };
+
+            navigator.mediaDevices.getUserMedia(videoConstraints)
+                .then(function(initialStream) {
+                    stream = initialStream; // Simpan referensi stream
+                    cameraElement.srcObject = initialStream; // Tampilkan stream di elemen video
+                })
+                .catch(function(error) {
+                    console.error("Error accessing camera:", error);
+                    alert("Gagal mengakses kamera. Pastikan Anda memberi izin.");
+                });
+
+            // Tambahkan event listener untuk tombol switch kamera
+            switchCameraButton.addEventListener("click", switchCamera);
+
+            // Tambahkan event listener untuk tombol ambil foto
+            takePhotoButton.addEventListener("click", function() {
+                if (!isUploading) {
+                    isUploading = true;
+                    takePhotoButton.disabled = true;
+
+                    const canvas = document.createElement("canvas");
+                    const context = canvas.getContext("2d");
+                    const scaleFactor = 1.5;
+                    canvas.width = cameraElement.videoWidth * scaleFactor;
+                    canvas.height = cameraElement.videoHeight * scaleFactor;
+
+                    context.drawImage(cameraElement, 0, 0, canvas.width, canvas.height);
+                    canvas.toBlob(function(blob) {
+                        if (blob) {
+                            uploadFile(vsurat_keluar_id, blob, 'capture.jpg');
+                        }
+                        isUploading = false;
+                        takePhotoButton.disabled = false;
+                    }, "image/jpeg", 1);
+                }
+            });
+        });
 
 
         // Ketika modal upload disembunyikan, hentikan kamera
