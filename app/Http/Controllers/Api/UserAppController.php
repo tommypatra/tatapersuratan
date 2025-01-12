@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use App\Http\Requests\UserAppRequest;
 use App\Http\Resources\UserAppResource;
+use App\Models\GrupUser;
 use App\Models\User;
 
 class UserAppController extends Controller
@@ -88,6 +89,12 @@ class UserAppController extends Controller
         $validatedData['password'] = Hash::make($validatedData['password']);
         try {
             $data = User::create($validatedData);
+
+            $data_save_grup = [
+                "user_id" => $data->id,
+                "grup_id" => 2,
+            ];
+            $data_grup = GrupUser::create($data_save_grup);
 
             // $data['tanggal']
             return response()->json([

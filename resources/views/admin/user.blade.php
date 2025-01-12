@@ -173,15 +173,15 @@
             $.each(data, function(index, dt) {
                 var grupakun=``;
                 if(dt.grup.length>0){
-                    grupakun=`<ul>`;
+                    // grupakun=`<ul>`;
                     $.each(dt.grup, function(index, dtgrp) {
                         badge='danger';
                         if(dtgrp.is_aktif){
                             badge='success';
                         }
-                        grupakun+=`<li><span class="badge bg-${badge}">${dtgrp.grup.grup}</span> <a href="javascript:;" onclick="hapus(${dtgrp.id},0)"><i class="fa-regular fa-trash-can"></i></a> </li>`;
+                        grupakun+=`<div><span class="badge bg-${badge}">${dtgrp.grup.grup}</span> <a href="javascript:;" onclick="hapus(${dtgrp.id},0)"><i class="fa-regular fa-trash-can"></i></a> </div>`;
                     });
-                    grupakun+=`</ul>`;
+                    // grupakun+=`</ul>`;
                 }
                 
                 var jk=(dt.profil)?dt.profil.jenis_kelamin:'';

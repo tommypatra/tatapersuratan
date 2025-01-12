@@ -159,7 +159,8 @@
         tableBody.empty();
         if(data.length>0)
             $.each(data, function(index, dt) {
-                var nip = (dt.pejabat.profil)?"NIP. "+dt.pejabat.profil.nip:"";
+                var nip = (dt.pejabat!==null)?"NIP. "+dt.pejabat.profil.nip:"";
+                var nama_pejabat = (dt.pejabat!==null)?dt.pejabat.name:"";
                 var lblaktif=(!dt.is_aktif)?`<span class="badge bg-danger">Tidak Aktif</span>`:`<span class="badge bg-success">Aktif</span>`;
                 var row = `
                     <tr>
@@ -168,7 +169,7 @@
                         <td>
                             ${dt.jabatan}
                             <div style="font-size:11px;">
-                                <div>${dt.pejabat.name}</div>
+                                <div>${nama_pejabat}</div>
                                 <div style="font-style:italic;">${nip}</div>
                             </div>
                         </td>

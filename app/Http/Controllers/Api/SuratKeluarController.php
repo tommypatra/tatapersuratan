@@ -18,6 +18,8 @@ class SuratKeluarController extends Controller
     {
 
         $user_id = auth()->user()->id;
+
+
         $query = SuratKeluar::orderBy('tanggal', 'desc')
             ->orderBy('no_indeks', 'desc')
             ->orderBy('no_sub_indeks', 'desc')
@@ -33,9 +35,9 @@ class SuratKeluarController extends Controller
                 },
             ]);
 
-        if (!izinkanAkses("admin")) {
-            $query->where('user_id', auth()->user()->id);
-        }
+        // if (!izinkanAkses("admin")) {
+        //     $query->where('user_id', auth()->user()->id);
+        // }
 
         $filter = $request->input('filter');
         if ($filter) {
@@ -61,10 +63,10 @@ class SuratKeluarController extends Controller
                         $tahun_sekarang = $dp;
                         $aksespola = getAksesPola($user_id, $tahun_sekarang);
                         // dd($aksespola['data']);
-
                         $query->whereYear('tanggal', $tahun_sekarang);
                         if (!empty($aksespola['data'])) {
                             $idAkses = $aksespola['data'];
+                            // dd($idAkses);
                             $query->where(function ($query) use ($user_id, $idAkses) {
                                 $query->orWhere('user_id', $user_id)
                                     ->orWhere(function ($query) use ($idAkses) {
@@ -73,9 +75,9 @@ class SuratKeluarController extends Controller
                             });
                         } else {
                             // $rolesAkun = $request->input('roles_akun');
-                            // if (!izinkanAkses("admin")) {
-                            //     $query->where('user_id', auth()->user()->id);
-                            // }
+                            if (!izinkanAkses("admin")) {
+                                $query->where('user_id', auth()->user()->id);
+                            }
                         }
                     } elseif ($i == 'bulan') {
                         $bulan_sekarang = $dp;
@@ -99,7 +101,7 @@ class SuratKeluarController extends Controller
                 ->orWhere('asal', 'LIKE', "%$keyword%");
         }
 
-        $perPage = $request->input('per_page', env('DATA_PER_PAGE', 10));
+        $perPage = $request->input('pet_page', env('DATA_PER_PAGE', 10));
 
 
         if ($perPage === 'all') {
@@ -341,17 +343,6 @@ class SuratKeluarController extends Controller
         $klasifikasi_surat_id = $data->klasifikasi_surat_id;
         $pola_spesimen_id = $data->pola_spesimen_id;
 
-        $daftarAksesPola = getAksesPola(auth()->user()->id, substr($data->tanggal, 0, 4));
-        // dd($pola_spesimen_id, $daftarAksesPola);
-
-        // jika tidak ada akses
-        if (!in_array($pola_spesimen_id, $daftarAksesPola['data'])) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal dilakukan',
-                'error' => ['tidak ada akses'],
-            ], 500);
-        }
         $generateValue = generateNomorKeluar($tanggal, $pola_spesimen_id, $klasifikasi_surat_id, $no_indeks, $no_sub_indeks, null);
         return $generateValue;
     }
@@ -365,6 +356,16 @@ class SuratKeluarController extends Controller
                 'verifikator' => auth()->user()->name,
             ];
             $data = $this->findId($request->input('id'));
+
+            //untuk filter siapa yang bisa setujui atau tolak ajuan surat
+            $daftarAksesPola = getAksesPola(auth()->user()->id, substr($data->tanggal, 0, 4));
+            if (!in_array($data->pola_spesimen_id, $daftarAksesPola['data'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal dilakukan',
+                    'error' => ['tidak ada akses'],
+                ], 500);
+            }
 
             $pesan = 'Pengajuan surat perihal <i>' . $data->perihal . '</i> tanggal <i>' . $data->tanggal;
             if ($request->input('is_diterima')) {

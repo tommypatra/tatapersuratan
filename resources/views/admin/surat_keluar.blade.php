@@ -235,6 +235,7 @@
     var vsurat_keluar_id;
     var tahunFilter = '{{ date("Y") }}';
     var vsurat_masuk_id;
+    var vPolaAkses={};
     // console.log(hakAkses);
     var hakAkses = vAksesId;
     // if(hakAkses>1)
@@ -320,11 +321,22 @@
         CrudModule.fRead(page, displayData);
     }
 
+    function cekAksesPola(pola_spesimen_id) {
+        let item = vPolaAkses.find(function(item) {
+            return item.pola_spesimen_id === pola_spesimen_id;
+        });
+
+        // Jika item ditemukan, return true, jika tidak ditemukan return false
+        return item !== undefined; 
+    }
+
+
     //read showdata
     function displayData(response) {
         var data = response.data;
         var tableBody = $('#dataTableBody');
         var nomor = response.meta.from;
+        // console.log(vPolaAkses);
         tableBody.empty();
         if(data.length>0)
             $.each(data, function(index, dt) {
@@ -332,6 +344,7 @@
                 var lampiran=`<span class="badge bg-danger">Belum terupload</span>`;
                 var labelApp=labelSetupVerifikasi(dt.is_diajukan,dt.is_diterima,dt.catatan,dt.verifikator);
                 var menu_edit=``;
+                var ada_akses = cekAksesPola(dt.pola_spesimen_id);
 
                 if(dt.user_id==vUserId){
                     menu_edit=` <li><a class="dropdown-item" href="javascript:;" onclick="ajukan(${dt.id})"><i class="fa-regular fa-share-from-square"></i> Ajukan</a></li>
@@ -341,7 +354,7 @@
                 
                 if(dt.is_diajukan){
                     menu_edit=``;
-                    if(dt.is_diterima==null && hakAkses==1){
+                    if(dt.is_diterima==null && ada_akses){
                         menu_edit=` <li><a class="dropdown-item" href="javascript:;" onclick="validasi(1,${dt.id})"><i class="fa-solid fa-envelope-circle-check"></i> Terima</a></li>
                                     <li><a class="dropdown-item" href="javascript:;" onclick="validasi(0,${dt.id})"><i class="fa-solid fa-rectangle-xmark"></i> Tolak</a></li>`;
                     }
@@ -381,7 +394,7 @@
                             </div>  
                             <div>${labelApp.catatan}</div>                             
                         </td>
-                        <td>${dt.tujuan}<div style="font-style:italic;font-size:12px;">${ringkasan}</div></td>
+                        <td>${(dt.tujuan!=null)?dt.tujuan:""}<div style="font-style:italic;font-size:12px;">${ringkasan}</div></td>
                         <td style="text-align: center">
                             <div>${labelApp.label}</div>
                             <i class="fa-solid fa-users"></i> ${dt.jumlah_distribusi}
@@ -524,7 +537,23 @@
         initPola();
     });
 
-    initPola();
+    function initAkses(callback){
+        $.ajax({
+            url: `/api/get-akses-pola?page=all&filter={"tahun":2025,"user_id_login":null}`,
+            method: 'GET',
+            dataType: 'json',
+            success: function (response){
+                vPolaAkses = response.data;
+                console.log('initAkses selesai', vPolaAkses);
+                if (callback) 
+                    callback();            
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+            }
+        });
+    }     
+
     function initPola(){
         //set empty dan hide dulu
         $('#pola_spesimen_id').empty();
@@ -563,6 +592,8 @@
             }
         });
     }
+
+   
 
     $("#el-klasifikasi").hide();
     $('#pola_spesimen_id').on('change', function() {
@@ -863,11 +894,19 @@
     }
         
     $(document).ready(function() {
+
+
         // Mengatur API untuk CrudModule
         CrudModule.setApi(vApi);
         // Load data default
-        loadDataKonsep();
+
+        // Urutkan eksekusi
+        initAkses(function() {
+            initPola(); 
+            loadDataKonsep();
+        });        
         InfoModule.updateNotifWeb();
+
 
         // Ambil referensi elemen
         const cameraElement = document.getElementById("camera");

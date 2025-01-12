@@ -77,7 +77,10 @@ class UtilityController extends Controller
             $filterArray = json_decode($filter, true);
             if (is_array($filterArray)) {
                 foreach ($filterArray as $i => $dp) {
-                    $query->where($i, $dp);
+                    if ($i == 'user_id_login') {
+                        $query->where("user_id", auth()->user()->id);
+                    } else
+                        $query->where($i, $dp);
                 }
             } else {
                 // $query->whereHas('tujuan', function ($query) use ($filter) {
@@ -94,6 +97,9 @@ class UtilityController extends Controller
                     ->orWhere('email', 'LIKE', "%" . $keyword . "%");
             });
         }
+        $sql = $query->toSql();
+        // $bindings = $query->getBindings();
+        // dd($sql);
 
         $data = $query->get();
 
@@ -358,7 +364,7 @@ class UtilityController extends Controller
         }
 
         // echo $query->toSql();
-        $perPage = $request->input('per_page', env('DATA_PER_PAGE', 10));
+        $perPage = $request->input('page', env('DATA_PER_PAGE', 10));
         if ($perPage === 'all') {
             $data = $query->get();
         } else {

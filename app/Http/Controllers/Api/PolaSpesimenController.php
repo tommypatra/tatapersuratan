@@ -56,7 +56,8 @@ class PolaSpesimenController extends Controller
         }
 
         // echo $query->toSql();
-        $perPage = $request->input('per_page', env('DATA_PER_PAGE', 10));
+        $perPage = $request->input('page', env('DATA_PER_PAGE', 10));
+        // echo $perPage;
         if ($perPage === 'all') {
             $data = $query->get();
         } else {

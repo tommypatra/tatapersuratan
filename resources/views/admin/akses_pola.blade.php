@@ -253,7 +253,7 @@
                 //console.log(response);
             });
         });
-        $('#modal-form').modal('hide');
+        // $('#modal-form').modal('hide');
         refresh();
     }		    
 
