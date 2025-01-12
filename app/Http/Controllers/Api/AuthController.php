@@ -39,7 +39,10 @@ class AuthController extends Controller
             $profil = Profil::where("user_id", $user->id)->first();
 
             // $user = new AuthResource($user);
-            $foto = ($user->profil) ? $user->profil->foto : 'foto/user-avatar.png';
+            $foto = 'foto/user-avatar.png';
+            if ($user->profil) {
+                $foto = ($user->profil->foto) ? ($user->profil->foto) : 'foto/user-avatar.png';
+            }
             $daftarAksesData = $this->daftarAkses($request)->getData();
 
             $hakakses = $daftarAksesData->data->hakakses;
