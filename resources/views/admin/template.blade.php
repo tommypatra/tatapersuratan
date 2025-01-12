@@ -119,7 +119,7 @@
 							<div class="dropdown-menu dropdown-menu-end">
 								<a class="dropdown-item" href="{{  route('profil') }}"><i class="align-middle me-1" data-feather="user"></i> Profile</a>
 								<div class="dropdown-divider"></div>
-								<a class="dropdown-item" href="javascript:;" id="akun-keluar">Log out</a>
+								<a class="dropdown-item akun-keluar" href="javascript:;" >Log out</a>
 							</div>
 						</li>
 					</ul>
@@ -193,7 +193,7 @@
 			pilihAkses();
 		});
 
-		$('#akun-keluar').click(function(){
+		$('.akun-keluar').click(function(){
 			forceLogout();
 		})
 

@@ -13,7 +13,7 @@
             </a>
         </div>
         <div class="d-grid">
-            <a href="{{ route('akun-keluar') }}" class="btn btn-primary">
+            <a href="javascript:;" class="btn btn-primary akun-keluar">
                 <i data-feather="power"></i> Keluar
             </a>
         </div>
