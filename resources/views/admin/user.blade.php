@@ -191,9 +191,9 @@
                     <tr>
                         <td>${nomor++}</td>
                         <td>${dt.name} <i>${dt.email}</i></td>
-                        <td>${jk}</td>
-                        <td>${alamat}</td>
-                        <td>${hp}</td>
+                        <td>${jk||''}</td>
+                        <td>${alamat||''}</td>
+                        <td>${hp||''}</td>
                         <td>${grupakun}</td>
                         <td>${dt.created_at}</div></td>
                         <td>

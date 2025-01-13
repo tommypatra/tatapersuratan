@@ -19,7 +19,8 @@ class DistribusiController extends Controller
             ->with([
                 'user' => function ($query) {
                     $query->select('id', 'name', 'email');
-                }, 'suratKeluar'
+                },
+                'suratKeluar'
             ]);
 
         $query->where('user_id', auth()->user()->id);
@@ -44,7 +45,9 @@ class DistribusiController extends Controller
         }
 
         $perPage = $request->input('per_page', env('DATA_PER_PAGE', 10));
-        if ($perPage === 'all') {
+        $page = $request->input('page', env('DATA_PER_PAGE', 10));
+
+        if ($page === 'all') {
             $data = $query->get();
         } else {
             $data = $query->paginate($perPage);

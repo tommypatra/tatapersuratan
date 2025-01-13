@@ -79,7 +79,9 @@ class TtdQrcodeController extends Controller
         }
 
         $perPage = $request->input('per_page', env('DATA_PER_PAGE', 10));
-        if ($perPage === 'all') {
+        $page = $request->input('page', env('DATA_PER_PAGE', 10));
+
+        if ($page === 'all') {
             $data = $query->get();
         } else {
             $data = $query->paginate($perPage);

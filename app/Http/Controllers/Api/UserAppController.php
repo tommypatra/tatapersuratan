@@ -51,7 +51,9 @@ class UserAppController extends Controller
         }
 
         $perPage = $request->input('per_page', env('DATA_PER_PAGE', 10));
-        if ($perPage === 'all') {
+        $page = $request->input('page', env('DATA_PER_PAGE', 10));
+
+        if ($page === 'all') {
             $data = $query->get();
         } else {
             $data = $query->paginate($perPage);
@@ -89,6 +91,16 @@ class UserAppController extends Controller
         $validatedData['password'] = Hash::make($validatedData['password']);
         try {
             $data = User::create($validatedData);
+
+            $data_save_profil = [
+                "user_id" => $data->id,
+                "foto" => null,
+                "nip" => "",
+                "alamat" => "",
+                "hp" => "",
+                "jenis_kelamin" => "L",
+            ];
+            $data_profil = Profil::create($data_save_profil);
 
             $data_save_grup = [
                 "user_id" => $data->id,
