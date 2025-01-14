@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Models\Profil;
+use App\Models\GrupUser;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 use App\Http\Requests\UserAppRequest;
 use App\Http\Resources\UserAppResource;
-use App\Models\GrupUser;
-use App\Models\User;
+use Illuminate\Validation\ValidationException;
 
 class UserAppController extends Controller
 {
