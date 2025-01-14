@@ -174,4 +174,17 @@ class WebController extends Controller
     {
         return view('tte', ['kode' => $kode]);
     }
+
+    public function cekLoginEksternal($web = null)
+    {
+        switch ($web) {
+            case 'simpeg':
+                $url = "https://simpeg.iainkendari.ac.id/api/cek-status-login";
+                break;
+            default:
+                return redirect()->route('login')->with('error', 'Invalid external login web type.');
+                break;
+        }
+        return view('auto_login', ['url' => $url]);
+    }
 }

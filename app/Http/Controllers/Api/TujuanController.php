@@ -50,7 +50,7 @@ class TujuanController extends Controller
 
 
         $perPage = $request->input('per_page', env('DATA_PER_PAGE', 10));
-        $page = $request->input('page', env('DATA_PER_PAGE', 10));
+        $page = ($perPage == 'all') ? 'all' : $request->input('page', env('DATA_PER_PAGE', 10));
 
         if ($page === 'all') {
             $data = $query->get();

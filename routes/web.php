@@ -44,4 +44,7 @@ Route::get('/disposisi-detail/{id}', [WebController::class, 'disposisiDetail'])-
 Route::get('/surat-masuk-detail/{id}', [WebController::class, 'disposisiDetail'])->name('disposisi-baca');
 Route::get('/surat-keluar', [WebController::class, 'suratKeluar'])->name('surat-keluar');
 Route::get('/surat-keluar-detail/{id}', [WebController::class, 'suratKeluarDetail'])->name('surat-keluar-detail');
+
+Route::get('/cek-login-eksternal/{web}', [WebController::class, 'cekLoginEksternal'])->name('cek-login-eksternal');
+
 // });
