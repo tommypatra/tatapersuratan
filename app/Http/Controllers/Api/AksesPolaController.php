@@ -61,6 +61,8 @@ class AksesPolaController extends Controller
         if ($page === 'all') {
             $data = $query->get();
         } else {
+            $perPage = ($perPage == 'all') ? 20 : 20;
+
             $data = $query->paginate($perPage);
         }
 
