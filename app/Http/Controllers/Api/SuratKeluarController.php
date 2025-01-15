@@ -119,7 +119,7 @@ class SuratKeluarController extends Controller
     //OKE 
     public function findID($id)
     {
-        $data = SuratKeluar::findOrFail($id);
+        $data = SuratKeluar::with(['klasifikasiSurat'])->findOrFail($id);
         if (!$data) {
             return response()->json([
                 'success' => false,

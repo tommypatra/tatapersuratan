@@ -24,6 +24,7 @@ class SuratMasukResource extends JsonResource
             'asal' => $this->asal,
             'tempat' => $this->tempat,
             'type' => 'Surat Masuk',
+            'kategori_surat' => $this->kategori_surat,
 
             'is_diterima' => $this->is_diterima,
             'is_diajukan' => $this->is_diajukan,

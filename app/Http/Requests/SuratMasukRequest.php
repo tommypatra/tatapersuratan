@@ -29,6 +29,7 @@ class SuratMasukRequest extends FormRequest
             'no_surat' => 'required',
             'perihal' => 'required',
             'asal' => 'required',
+            'kategori_surat' => 'required',
             'tanggal' => 'required|date_format:Y-m-d',
             'tempat' => 'required',
             'ringkasan' => 'nullable|string',
@@ -38,7 +39,9 @@ class SuratMasukRequest extends FormRequest
     public function attributes()
     {
         return [
-            'kategori_surat_masuk_id' => 'kategori',
+            'kategori_surat_masuk_id' => 'sifat surat',
+            'kategori_surat' => 'kategori',
+
             'no_agenda' => 'no agenda',
             'no_surat' => 'no surat',
             'perihal' => 'perihal',

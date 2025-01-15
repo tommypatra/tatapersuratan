@@ -374,6 +374,10 @@
                         menu_detail=`<li><a class="dropdown-item" href="javascript:;" onclick="prosesdistribusi(${dt.id})"><i class="fa-regular fa-paper-plane"></i> Distribusi</a></li>`;
                 }
                 
+                if(dt.is_diterima && hakAkses==1)
+                    menu_detail+=`<li><a class="dropdown-item" href="javascript:;" onclick="ganti(${dt.id})"><i class="fa-solid fa-pen-to-square"></i> Ganti</a></li>
+                                  <li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>`;
+
                 var lblaktif=(!dt.is_aktif)?`<span class="badge bg-danger">Tidak Aktif</span>`:`<span class="badge bg-success">Aktif</span>`;
                 var ringkasan=(dt.ringkasan)?dt.ringkasan:"";
                 var row = `
@@ -477,7 +481,7 @@
                     $('#btn-simpan').text('Ubah Sekarang');
 
                     if(dt.klasifikasi_surat_id){                    
-                        let option_klasifikasi = new Option(dt.klasifikasi_surat.kode, dt.klasifikasi_surat.id, true, true);
+                        let option_klasifikasi = new Option(dt.klasifikasi_surat.kode+' '+dt.klasifikasi_surat.klasifikasi, dt.klasifikasi_surat.id, true, true);
                         $("#klasifikasi_surat_id").append(option_klasifikasi).trigger('change');
                     }                    
                 }

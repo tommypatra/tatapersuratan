@@ -39,7 +39,7 @@
                     
                     <ul class="nav nav-tabs">
                         <li class="nav-item">
-                            <a class="nav-link active" href="javascript:;" id="tabKonsep" onclick="setActiveTab('tabKonsep')">Konsep</a>
+                            <a class="nav-link active" href="javascript:;" id="tabKonsep" onclick="setActiveTab('tabKonsep')">Arsip</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="javascript:;" id="tabAjukan" onclick="setActiveTab('tabAjukan')">Diajukan</a>
@@ -109,12 +109,21 @@
                             <label class="form-label">Tanggal Surat</label>
                             <input name="tanggal" id="tanggal" type="text" class="form-control datepicker" value="{{ date("Y-m-d") }}" placeholder="" required>
                         </div>
+						<div class="col-lg-4 mb-3">
+                            <label class="form-label">Kategori</label>
+                            <select class="form-control" id="kategori_surat" name="kategori_surat" required>
+                                <option value="">- Pilih -</option>
+                                <option value="BMN">BMN</option>
+                                <option value="INTERNAL">INTERNAL</option>
+                                <option value="EKSTERNAL">EKSTERNAL</option>
+                            </select>
+                        </div>
 						<div class="col-lg-8 mb-3">
-                            <label class="form-label">Kategori Surat</label>
+                            <label class="form-label">Sifat Surat</label>
                             <select class="form-control" id="kategori_surat_masuk_id" name="kategori_surat_masuk_id" required></select>
                         </div>
 						<div class="col-lg-6 mb-3">
-                            <label class="form-label">Asal Daerah Surat</label>
+                            <label class="form-label">Daerah Asal Surat</label>
                             <input name="asal" id="asal" type="text" class="form-control" placeholder="ex : kendari atau jakarta, dst" required>
                         </div>
 						<div class="col-lg-6 mb-3">
@@ -423,9 +432,9 @@
                     lampiran +=`</ul>`;
                     if(suratMasuk.is_diterima){
                         
-                        if(hakAkses==1)
+                        if(hakAkses==1){
                             status_disposisi=`<span class="btn btn-primary btn-sm" onclick="prosesDisposisi(${suratMasuk.id})"><i class="fa-solid fa-envelopes-bulk"></i> Proses Disposisi</span>`;
-                        else{
+                        }else{
                             status_disposisi=`<span class="badge bg-warning"> Dalam proses</span>`;
                         }
                         track_disposisi =`<span class="badge bg-warning">Belum terdisposisi</span>`;
@@ -458,15 +467,22 @@
                     
                 }
 
+                if(suratMasuk.is_diterima && hakAkses==1)
+                    menu_edit=`<li><a class="dropdown-item" href="javascript:;" onclick="ganti(${dt.id})"><i class="fa-solid fa-pen-to-square"></i> Ganti</a></li>
+                               <li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>`;
+
+
                 var row = `
                     <tr>
                         <td>${nomor++}</td>
-                        <td><span class="badge bg-success">Tanggal : ${suratMasuk.tanggal}</span><br>
+                        <td>
+                            <h3>${suratMasuk.kategori_surat}</h3>                             
+                            <span class="badge bg-success">Tanggal : ${suratMasuk.tanggal}</span><br>
                             No. ${suratMasuk.no_surat} (${suratMasuk.no_agenda})
                             <div style="font-weight:bold;">${suratMasuk.perihal}</div>
                             <div style="font-style:italic;">Asal : ${suratMasuk.asal} (${suratMasuk.tempat})</div>
                             <div style="font-size:11px;">[Kategori : ${suratMasuk.kategori_surat_masuk.kategori}]</div>
-                            <div>${labelApp.catatan}</div>                             
+                            <div>${labelApp.catatan}</div>
                         </td>
                         <td style="text-align: center">
                             <div>${labelApp.label}</div>
@@ -494,7 +510,7 @@
         else{
             var row = `
                     <tr>
-                        <td colspan="4">Tidak ditemukan</td>
+                        <td colspan="5">Tidak ditemukan</td>
                     </tr>
                 `;
             tableBody.append(row);            
@@ -545,10 +561,10 @@ function displayPagination(response) {
         myModalForm.toggle();
     }
 
-    function hapus(id,url) {
+    function hapus(id) {
         if(confirm("apakah anda yakin?")){
             $.ajax({
-                url: url+id,
+                url: 'api/surat-masuk/'+id,
                 method: 'DELETE',
                 dataType: 'json',
                 success: function(response) {
@@ -572,6 +588,8 @@ function displayPagination(response) {
         $("#ringkasan").val(data.ringkasan);        
         $("#tanggal").val(data.tanggal);        
         $("#tempat").val(data.tempat);
+        $("#kategori_surat").val(data.kategori_surat);
+        
         $("#kategori_surat_masuk_id").val(data.kategori_surat_masuk_id).trigger("change"); 
     }
 
@@ -582,7 +600,9 @@ function displayPagination(response) {
             perihal: "perihal tidak boleh kosong",
             asal: "asal surat tidak boleh kosong",
             tempat: "tempat surat tidak boleh kosong",
-            kategori_surat_masuk: "nomor surat tidak boleh kosong",
+            kategori_surat_masuk: "sifat surat tidak boleh kosong",
+            kategori_surat: "kategori surat tidak boleh kosong",
+            
         },
         submitHandler: function(form) {
             let setup_ajax={type:'POST',url:'/api/surat-masuk'};
