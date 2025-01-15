@@ -340,6 +340,7 @@
         tableBody.empty();
         if(data.length>0)
             $.each(data, function(index, dt) {
+                var pembuat_surat = false;
 
                 var lampiran=`<span class="badge bg-danger">Belum terupload</span>`;
                 var labelApp=labelSetupVerifikasi(dt.is_diajukan,dt.is_diterima,dt.catatan,dt.verifikator);
@@ -347,6 +348,7 @@
                 var ada_akses = cekAksesPola(dt.pola_spesimen_id);
 
                 if(dt.user_id==vUserId){
+                    pembuat_surat=true;
                     menu_edit=` <li><a class="dropdown-item" href="javascript:;" onclick="ajukan(${dt.id})"><i class="fa-regular fa-share-from-square"></i> Ajukan</a></li>
                                 <li><a class="dropdown-item" href="javascript:;" onclick="ganti(${dt.id})"><i class="fa-solid fa-pen-to-square"></i> Ganti</a></li>
                                 <li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>`;
@@ -374,7 +376,7 @@
                         menu_detail=`<li><a class="dropdown-item" href="javascript:;" onclick="prosesdistribusi(${dt.id})"><i class="fa-regular fa-paper-plane"></i> Distribusi</a></li>`;
                 }
                 
-                if(dt.is_diterima && hakAkses==1)
+                if(dt.is_diterima && (hakAkses==1 || pembuat_surat))
                     menu_detail+=`<li><a class="dropdown-item" href="javascript:;" onclick="ganti(${dt.id})"><i class="fa-solid fa-pen-to-square"></i> Ganti</a></li>
                                   <li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>`;
 

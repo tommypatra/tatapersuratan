@@ -382,7 +382,7 @@
                 var track_disposisi=``;
                 var menu_detail=``;
                 var dt = suratMasuk;
-
+                var pembuat_surat=false;
                 var labelApp=labelSetupVerifikasi(dt.is_diajukan,dt.is_diterima,dt.catatan,dt.verifikator);
                 var menu_edit=``;
 
@@ -391,19 +391,22 @@
                                     <a href="javascript:;" class="btn btn-primary fotoLampiran" onclick="upload(${suratMasuk.id})"><i class="fa-solid fa-camera"></i></a>
                                 </div>`;
                 
-                if(dt.user_id==vUserId && dt.is_diajukan!=1){
-                    if(suratMasuk.jumlah_lampiran>0){
-                        menu_edit+=` <li><a class="dropdown-item" href="javascript:;" onclick="ajukan(${dt.id})"><i class="fa-regular fa-share-from-square"></i> Ajukan</a></li>`;
+                if(dt.user_id==vUserId){
+                    pembuat_surat=true;
+                    if(dt.is_diajukan!=1){
+                        if(suratMasuk.jumlah_lampiran>0){
+                            menu_edit+=` <li><a class="dropdown-item" href="javascript:;" onclick="ajukan(${dt.id})"><i class="fa-regular fa-share-from-square"></i> Ajukan</a></li>`;
+                        }
+                    
+                        menu_edit+=`<li><a class="dropdown-item" href="javascript:;" onclick="ganti(${dt.id})"><i class="fa-solid fa-pen-to-square"></i> Ganti</a></li>
+                                    <li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>`;
                     }
-                
-                    menu_edit+=`<li><a class="dropdown-item" href="javascript:;" onclick="ganti(${dt.id})"><i class="fa-solid fa-pen-to-square"></i> Ganti</a></li>
-                                <li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>`;
                 }
                 
                 if(dt.is_diajukan){
                     menu_edit=``;
 
-                    if(dt.is_diterima==null && hakAkses==1){
+                    if(dt.is_diterima==null && (hakAkses==1 || pembuat_surat)){
                         menu_edit=` <li><a class="dropdown-item" href="javascript:;" onclick="validasi(1,${dt.id})"><i class="fa-solid fa-envelope-circle-check"></i> Terima</a></li>
                                     <li><a class="dropdown-item" href="javascript:;" onclick="validasi(0,${dt.id})"><i class="fa-solid fa-rectangle-xmark"></i> Tolak</a></li>`;
                     }
