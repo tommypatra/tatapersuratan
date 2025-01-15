@@ -475,6 +475,7 @@
                     var dt = response.data;
                     //populasi data secara dinamis
                     CrudModule.populateEditForm(dt,fieldInit);
+                    $('#tanggal').val(dt.tanggal);
                     
                     //ubah form
                     $('#modal-label').text('Ganti '+vJudul);
