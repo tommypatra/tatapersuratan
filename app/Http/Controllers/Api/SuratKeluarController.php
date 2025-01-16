@@ -68,10 +68,13 @@ class SuratKeluarController extends Controller
                             $idAkses = $aksespola['data'];
                             // dd($idAkses);
                             $query->where(function ($query) use ($user_id, $idAkses) {
-                                $query->orWhere('user_id', $user_id)
-                                    ->orWhere(function ($query) use ($idAkses) {
-                                        $query->whereIn('pola_spesimen_id', $idAkses);
-                                    });
+                                // $query->orWhere('user_id', $user_id)
+                                // if (!izinkanAkses("admin")) {
+                                //     $query->where('user_id', auth()->user()->id);
+                                // }
+                                $query->orWhere(function ($query) use ($idAkses) {
+                                    $query->whereIn('pola_spesimen_id', $idAkses);
+                                });
                             });
                         } else {
                             // $rolesAkun = $request->input('roles_akun');
@@ -88,18 +91,26 @@ class SuratKeluarController extends Controller
                 }
             }
         }
-        $sql = $query->toSql();
-        // $bindings = $query->getBindings();
-        // dd($sql);
+
+
+        // if (!izinkanAkses("admin")) {
+        //     $query->where('user_id', auth()->user()->id);
+        // }
 
         //untuk pencarian
         $keyword = $request->input('keyword');
         if ($keyword) {
-            $query->where('perihal', 'LIKE', "%$keyword%")
-                ->orWhere('no_surat', 'LIKE', "%$keyword%")
-                ->orWhere('ringkasan', 'LIKE', "%$keyword%")
-                ->orWhere('asal', 'LIKE', "%$keyword%");
+            $query->where(function ($query) use ($keyword) {
+                $query->where('perihal', 'LIKE', "%$keyword%")
+                    ->orWhere('no_surat', 'LIKE', "%$keyword%")
+                    ->orWhere('ringkasan', 'LIKE', "%$keyword%")
+                    ->orWhere('asal', 'LIKE', "%$keyword%");
+            });
         }
+
+        $sql = $query->toSql();
+        $bindings = $query->getBindings();
+        // dd($sql);
 
         $perPage = $request->input('pet_page', env('DATA_PER_PAGE', 10));
         $page = ($perPage == 'all') ? 'all' : $request->input('page', env('DATA_PER_PAGE', 10));
@@ -172,6 +183,7 @@ class SuratKeluarController extends Controller
             foreach ($tujuan as $i => $dp) {
                 if ($gabungkan)
                     $validatedData['perihal'] = $perihal . " " . $dp;
+                $validatedData['is_diajukan'] = 1;
                 $data = SuratKeluar::create($validatedData);
 
                 // jika ada akses maka generatekan nomor suratnya

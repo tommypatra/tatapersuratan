@@ -2,6 +2,8 @@
 
 @section('scriptHead')
 <title>Tanda Tangan Elektronik</title>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/smoothness/jquery-ui.css" crossorigin="anonymous">
+
 <link href="{{ asset('js/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css') }}" rel="stylesheet">
 <link href="{{ asset('js/select2/dist/css/select2.min.css') }}" rel="stylesheet">
 <link href="{{ asset('js/select2/dist/css/select2.custom.css') }}" rel="stylesheet">
@@ -112,7 +114,7 @@
                         </div>
 						<div class="col-lg-6 mb-3">
                             <label class="form-label">Nama Pegawai</label>
-                            <input name="pejabat" id="pejabat" type="text" class="form-control" readonly required>
+                            <input name="pejabat" id="pejabat" type="text" class="form-control" required>
                         </div>
 						<div class="col-lg-6 mb-3">
                             <label class="form-label">Jabatan</label>
@@ -187,7 +189,8 @@
 <script src="{{ asset('js/select2/dist/js/select2.min.js') }}"></script>
 <script src="{{ asset('js/select2lib.js') }}"></script>
 <script src="{{ asset('js/crud.js') }}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+{{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script> --}}
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js" crossorigin="anonymous"></script>
 
 <script type="text/javascript">
     cekAkses('pengguna');
@@ -304,8 +307,8 @@
                     <tr>
                         <td>${nomor++}</td>
                         <td>
-                            ${dt.tujuan.name}
-                            <div style="font-style:italic;">${dt.tujuan.jabatan.jabatan}</div>
+                            ${dt.pejabat}
+                            <div style="font-style:italic;">${dt.jabatan}</div>
                             <div style="font-size:10px;font-style:italic;">                                
                                 (${dt.user.name}) 
                             </div>
@@ -482,7 +485,7 @@
                 success: function (response) {
                     if(response.success){
                         refresh();
-                        updateNotifWeb()
+                        InfoModule.updateNotifWeb()
                     }
                     appShowNotification(response.success, response.msg);
                 },
@@ -630,20 +633,61 @@
 
         CrudModule.setApi(vApi);
         // Load data default
+
+
+        $("#no_surat").autocomplete({
+            appendTo: "#modal-form",
+            source: function(request, response) {
+                var dateInput = $('#tanggal').val();
+                var year = new Date(dateInput).getFullYear();
+                year = (year)?year:"{{ date('Y') }}";
+                $.ajax({
+                    url: "api/surat-keluar",
+                    type: "GET",
+                    dataType: "json",
+                    data: {
+                        page: 1,
+                        filter: JSON.stringify({ kategori: 'diterima', tahun: year }),
+                        keyword: request.term                    
+                    },
+                    success: function(data) {
+                        var data_respon = data.data.map(function(item) {
+                            return {
+                                label: item.no_surat, // Teks yang akan ditampilkan dalam saran
+                                value: item.no_surat, // Nilai yang akan diisi ke input saat dipilih
+                                id: item.id,
+                                tanggal: item.tanggal,
+                                perihal: item.perihal,
+                            };
+                        });
+                        console.log(data_respon);
+                        response(data_respon);
+                    },
+                });
+            },
+            minLength: 2,
+            select: function(event, ui) {
+                $("#perihal").val(ui.item.perihal);
+                $("#tanggal").val(ui.item.tanggal);
+            }
+        });
+
         loadDataKonsep();
         InfoModule.updateNotifWeb();
 
         //load user
         $.ajax({
-            url: '/api/get-users?page=all',
+            url: '/api/get-pejabat?page=all',
             method: 'GET',
             dataType: 'json',
             success: function (response){
                 let vdata=[];
                 if(response.data.length>0){
                     $.each(response.data, function(index, dt) {
-                        var vjabatan=(dt.jabatan)?dt.jabatan.jabatan:'';
-                        vdata.push({id:dt.id,text:dt.name+' ('+dt.email+') '+vjabatan,jabatan:vjabatan,nama:dt.name});
+                        var vjabatan=dt.jabatan;
+                        if(dt.pejabat)
+                            // vdata.push({id:dt.pejabat.id,text:dt.pejabat.name+' ('+dt.pejabat.email+') '+vjabatan,jabatan:vjabatan,nama:dt.pejabat.name});
+                            vdata.push({id:dt.pejabat.id,text:vjabatan,jabatan:vjabatan,nama:''});
                     });
                 }
                 sel2_datalokal('#user_ttd_id',vdata,false,'#myForm .modal-content');
@@ -659,6 +703,8 @@
             $('#jabatan').val(data[0].jabatan);
             // console.log(data.id);
         });        
+
+
 
     });    
 

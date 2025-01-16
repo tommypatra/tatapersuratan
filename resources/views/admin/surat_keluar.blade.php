@@ -37,11 +37,11 @@
                 <div class="card-body">              
                     
                     <ul class="nav nav-tabs">
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a class="nav-link active" href="javascript:;" id="tabKonsep" onclick="setActiveTab('tabKonsep')">Konsep</a>
-                        </li>
+                        </li> --}}
                         <li class="nav-item">
-                            <a class="nav-link" href="javascript:;" id="tabAjukan" onclick="setActiveTab('tabAjukan')">Diajukan</a>
+                            <a class="nav-link active" href="javascript:;" id="tabAjukan" onclick="setActiveTab('tabAjukan')">Diajukan</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="javascript:;" id="tabTerima" onclick="setActiveTab('tabTerima')">Diterima</a>
@@ -919,7 +919,7 @@
         // Urutkan eksekusi
         initAkses(function() {
             initPola(); 
-            loadDataKonsep();
+            loadDataMasuk();
         });        
         InfoModule.updateNotifWeb();
 
