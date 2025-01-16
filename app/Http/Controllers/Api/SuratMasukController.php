@@ -87,7 +87,7 @@ class SuratMasukController extends Controller
                 ->orWhere('asal', 'LIKE', "%$keyword%");
         }
 
-        if (!izinkanAkses("admin") && $kategori !== 'konsep') {
+        if (!izinkanAkses("admin")) {
             $query->where('user_id', auth()->user()->id);
         }
 
