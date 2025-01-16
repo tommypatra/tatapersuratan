@@ -393,13 +393,12 @@
                 
                 if(dt.user_id==vUserId){
                     pembuat_surat=true;
-                    if(dt.is_diajukan!=1){
+                    if(dt.is_diajukan!=1){                    
+                        menu_edit+=`<li><a class="dropdown-item" href="javascript:;" onclick="ganti(${dt.id})"><i class="fa-solid fa-pen-to-square"></i> Ganti</a></li>
+                                    <li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>`;
                         if(suratMasuk.jumlah_lampiran>0){
                             menu_edit+=` <li><a class="dropdown-item" href="javascript:;" onclick="ajukan(${dt.id})"><i class="fa-regular fa-share-from-square"></i> Ajukan</a></li>`;
                         }
-                    
-                        menu_edit+=`<li><a class="dropdown-item" href="javascript:;" onclick="ganti(${dt.id})"><i class="fa-solid fa-pen-to-square"></i> Ganti</a></li>
-                                    <li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>`;
                     }
                 }
                 
