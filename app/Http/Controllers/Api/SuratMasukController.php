@@ -40,6 +40,7 @@ class SuratMasukController extends Controller
 
         //untuk filter lebih dari 1 kolom
         $filter = $request->input('filter');
+        $kategori = "konsep";
         if ($filter) {
             $filterArray = json_decode($filter, true);
             if (is_array($filterArray)) {
@@ -48,14 +49,18 @@ class SuratMasukController extends Controller
                         switch ($dp) {
                             case "konsep":
                                 $query->where('is_diajukan', '!=', 1);
+                                $kategori = "konsep";
                                 break;
                             case "diajukan":
                                 $query->where('is_diajukan', 1)->whereNull('is_diterima');
+                                $kategori = "diajukan";
                                 break;
                             case "diterima":
+                                $kategori = "diterima";
                                 $query->where('is_diajukan', 1)->where('is_diterima', 1);
                                 break;
                             case "ditolak":
+                                $kategori = "ditolak";
                                 $query->where('is_diajukan', 1)->where('is_diterima', 0);
                                 break;
                         }
@@ -82,7 +87,7 @@ class SuratMasukController extends Controller
                 ->orWhere('asal', 'LIKE', "%$keyword%");
         }
 
-        if (!izinkanAkses("admin")) {
+        if (!izinkanAkses("admin") && $kategori !== 'konsep') {
             $query->where('user_id', auth()->user()->id);
         }
 
