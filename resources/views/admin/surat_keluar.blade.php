@@ -379,6 +379,8 @@
                 if(dt.is_diterima && (hakAkses==1 || pembuat_surat))
                     menu_detail+=`<li><a class="dropdown-item" href="javascript:;" onclick="ganti(${dt.id})"><i class="fa-solid fa-pen-to-square"></i> Ganti</a></li>
                                   <li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>`;
+                else if(!dt.is_diterima && (hakAkses==1))
+                    menu_edit+=` <li><a class="dropdown-item" href="javascript:;" onclick="validasi(1,${dt.id})"><i class="fa-solid fa-envelope-circle-check"></i> Terima</a></li>`;
 
                 var lblaktif=(!dt.is_aktif)?`<span class="badge bg-danger">Tidak Aktif</span>`:`<span class="badge bg-success">Aktif</span>`;
                 var ringkasan=(dt.ringkasan)?dt.ringkasan:"";
