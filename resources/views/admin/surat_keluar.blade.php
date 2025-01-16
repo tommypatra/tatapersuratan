@@ -97,7 +97,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body ">
-                    <div class="row">
+                    <div class="row" id="no-surat-manual">
 						<div class="col-lg-3 mb-3">
                             <label class="form-label">Nomor Surat</label>
                             <input name="no_indeks" id="no_indeks" type="number" class="form-control" >
@@ -904,7 +904,12 @@
         
     $(document).ready(function() {
 
-
+        if (hakAkses === 1) {
+            $('#no-surat-manual').show(); // Menampilkan elemen jika nilai variabel adalah 1
+        } else {
+            $('#no-surat-manual').hide(); // Menyembunyikan elemen jika nilai variabel bukan 1
+        }
+        
         // Mengatur API untuk CrudModule
         CrudModule.setApi(vApi);
         // Load data default
