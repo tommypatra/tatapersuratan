@@ -249,15 +249,3 @@ $(document).on('click','.set-akses',function(){
     localStorage.setItem('akses', $(this).attr('data-grup_id'));
     window.location.replace(base_url+'/akun-dashboard');
 })
-
-function forceLogout(){
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('email');
-    localStorage.removeItem('hakakses');
-    localStorage.removeItem('akses');
-    localStorage.removeItem('foto');
-    localStorage.removeItem('nama');
-    localStorage.removeItem('id');
-    window.location.replace(vBaseUrl+'/akun-keluar');
-}
-
