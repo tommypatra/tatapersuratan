@@ -54,22 +54,49 @@
             display: inline-block;
             margin-right: 5px;
         }
+
         .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-top: 10px;
+        }
+
+        .footer .catatan {
+            width: 88%;
+        }
+
+        .footer .qrcode {
+            width: 12%;
+            text-align: right;
+        }
+
+        .footer .table {
+            width: 100%;
             margin-top: 10px;
         }
 
         @media print {
+            @page {
+                size: A5 portrait; /* Mengatur orientasi landscape */
+                margin: 5mm; /* Margin sesuai kebutuhan */
+            }
             body {
-                zoom: 90%; /* Mengatur zoom menjadi 70% */
-                margin: 0; /* Menghapus margin untuk hasil cetakan */
+                zoom: 60%;
+                margin: 0;
                 padding: 0;
+                display: flex;
+                justify-content: center; /* Pusatkan konten secara horizontal */
+                align-items: center; /* Pusatkan konten secara vertikal */
             }
             .container {
                 width: 100%;
-                transform: scale(0.7); /* Mengecilkan seluruh konten menjadi 70% */
-                transform-origin: top left; /* Menentukan titik awal skala */
+                max-width: 700px;
+                border: 1px solid #000; /* Opsional: Garis batas */
+                transform: scale(1); /* Tidak ada skala tambahan */
+                transform-origin: center center; /* Pastikan transformasi dari tengah */
             }
-        }        
+        }
     </style>
     <script>
         const vBaseUrl = "{{ url('/') }}";
@@ -123,7 +150,7 @@
             <tr>
                 <td>Diterima Tanggal</td>
                 <td id="tanggal_diterima"></td>
-                <td>No Agenda</td>
+                <td></td>
                 <td>
                     <div class="checkbox"><input type="checkbox"> Sangat Rahasia</div>
                     <div class="checkbox"><input type="checkbox"> Rahasia</div>
@@ -208,37 +235,43 @@
         </table>
 
         <div class="footer">
-            <h4>Catatan Rektor:</h4>
-            <table class="table" style="margin-top:50px;">
-                <tr>
-                    <td>Tindak lanjut pejabat</td>
-                    <td>Penyelesaian</td>
-                </tr>
-                <tr>
-                    <td style="height:50px;"></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Tindak lanjut pejabat</td>
-                    <td>Penyelesaian</td>
-                </tr>
-                <tr>
-                    <td style="height:50px;"></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Tindak lanjut pejabat</td>
-                    <td>Penyelesaian</td>
-                </tr>
-                <tr>
-                    <td style="height:50px;"></td>
-                    <td></td>
-                </tr>
-            </table>
+            <div class="catatan">
+                <b>Catatan Rektor:</b>
+            </div>
+            <div class="qrcode" id="qrcode_label"></div>
         </div>
+
+        <table class="table">
+            <tr>
+                <td>Tindak lanjut pejabat</td>
+                <td>Penyelesaian</td>
+            </tr>
+            <tr>
+                <td style="height:50px;"></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Tindak lanjut pejabat</td>
+                <td>Penyelesaian</td>
+            </tr>
+            <tr>
+                <td style="height:50px;"></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Tindak lanjut pejabat</td>
+                <td>Penyelesaian</td>
+            </tr>
+            <tr>
+                <td style="height:50px;"></td>
+                <td></td>
+            </tr>
+        </table>
     </div>
 </body>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
 <script src="{{ asset('js/app.js') }}"></script>
 <script>
     const id = {{ $id }};
@@ -271,6 +304,16 @@
                 $('#no_agenda').text(data.no_agenda);
                 $('#asal').text(`${data.asal} (${data.tempat})`);
                 $('#perihal').text(`${perihal}`);
+
+
+                const qr_link = `${vBaseUrl}/scan-disposisi-masuk/${data.id}`;
+                const qr_ttd = `${data.no_surat} ${data.perihal} ${qr_link}`;
+                new QRCode(document.getElementById('qrcode_label'), {
+                    text: qr_link,
+                    width: 80,
+                    height: 80
+                });                
+
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 forceLogout();
