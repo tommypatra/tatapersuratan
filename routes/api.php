@@ -82,6 +82,8 @@ Route::middleware(['auth.jwt'])->group(function () {
         Route::resource('pola-surat-keluar', PolaSuratController::class);
         Route::resource('pola-spesimen', PolaSpesimenController::class);
         Route::resource('klasifikasi-surat-keluar', KlasifikasiSuratController::class);
+
+        Route::get('cetak-lembar-disposisi/{id}', [SuratMasukController::class, 'show']);
     });
 
     Route::middleware(['auth:api', 'cek.akses:pengguna'])->group(function () {

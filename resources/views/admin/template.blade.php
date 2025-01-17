@@ -167,19 +167,7 @@
 			headers: {
 				'Authorization': 'Bearer ' + authToken
 			}
-		});
-
-		function forceLogout(){
-			localStorage.removeItem('access_token');
-			localStorage.removeItem('email');
-			localStorage.removeItem('hakakses');
-			localStorage.removeItem('akses');
-			localStorage.removeItem('foto');
-			localStorage.removeItem('nama');
-			localStorage.removeItem('id');
-			window.location.replace(vBaseUrl+'/akun-keluar');
-		}
-		
+		});		
 	</script>
 	<script src="{{ asset('js/app.js') }}"></script>
 	<script src="{{ asset('js/loading/loading.js') }}"></script>

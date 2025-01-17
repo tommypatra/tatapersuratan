@@ -187,4 +187,9 @@ class WebController extends Controller
         }
         return view('auto_login', ['url' => $url]);
     }
+
+    public function cetakLembarDisposisi($id = null)
+    {
+        return view('cetak/lembar_disposisi', ['id' => $id]);
+    }
 }

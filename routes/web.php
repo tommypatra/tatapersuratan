@@ -47,4 +47,6 @@ Route::get('/surat-keluar-detail/{id}', [WebController::class, 'suratKeluarDetai
 
 Route::get('/cek-login-eksternal/{web}', [WebController::class, 'cekLoginEksternal'])->name('cek-login-eksternal');
 
+Route::get('/cetak-lembar-disposisi/{id}', [WebController::class, 'cetakLembarDisposisi'])->name('cetak-lembar-disposisi');
+
 // });

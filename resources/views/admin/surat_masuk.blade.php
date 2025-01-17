@@ -471,8 +471,8 @@
 
                 if(suratMasuk.is_diterima && hakAkses==1)
                     menu_edit=`<li><a class="dropdown-item" href="javascript:;" onclick="ganti(${dt.id})"><i class="fa-solid fa-pen-to-square"></i> Ganti</a></li>
-                               <li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>`;
-
+                               <li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>
+                               <li><a class="dropdown-item" href="${vBaseUrl}/cetak-lembar-disposisi/${suratMasuk.id}" target="_blank"><i class="fa-solid fa-print"></i> Cetak Lembar Disposisi</a></li>`;
 
                 var row = `
                     <tr>
