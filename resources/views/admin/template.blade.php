@@ -36,6 +36,11 @@
 						</a>
 					</li>
 					<li class="sidebar-item">
+						<a class="sidebar-link" href="{{ route('scan-qrcode') }}">
+							<i class="align-middle" data-feather="mail"></i> <span class="align-middle">Scan QrCode</span>
+						</a>
+					</li>				
+					<li class="sidebar-item">
 						<a class="sidebar-link" href="{{ route('distribusi') }}">
 							<i class="align-middle" data-feather="hard-drive"></i> <span class="align-middle">Distribusi Surat</span>
 						</a>

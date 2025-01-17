@@ -192,4 +192,9 @@ class WebController extends Controller
     {
         return view('cetak/lembar_disposisi', ['id' => $id]);
     }
+
+    public function scanQrCode()
+    {
+        return view('admin/scan_qrcode');
+    }
 }

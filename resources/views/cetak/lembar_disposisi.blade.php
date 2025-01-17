@@ -278,6 +278,15 @@
     const authToken = localStorage.getItem('access_token');
     // console.log(authToken);
 
+    function prosesPerihal(perihal) {
+        const words = perihal.split(" ");   
+        if (words.length > 4) {
+            return words.slice(0, 4).join(" ") + " ...";
+        } else {
+            return perihal;
+        }
+    }    
+
     $(document).ready(function () {        
 
         // Atur header default untuk semua request AJAX
@@ -306,10 +315,13 @@
                 $('#perihal').text(`${perihal}`);
 
 
-                const qr_link = `${vBaseUrl}/scan-disposisi-masuk/${data.id}`;
-                const qr_ttd = `${data.no_surat} ${data.perihal} ${qr_link}`;
+                const qr_text = JSON.stringify({
+                    id: data.id, 
+                    api: "disposisi", 
+                });     
+                // const qr_ttd = `${data.no_surat} ${data.perihal} ${qr_link}`;
                 new QRCode(document.getElementById('qrcode_label'), {
-                    text: qr_link,
+                    text: qr_text,
                     width: 80,
                     height: 80
                 });                
