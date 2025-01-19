@@ -16,7 +16,8 @@
                         <div class="container">
                             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">                        
                                 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-                                    <li><a href="{{ route('scan-qrcode') }}" id="btnRefresh" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="refresh-cw"></i> Refresh</a></li>
+                                    <li><a href="#" id="btnRefresh" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="refresh-cw"></i> Refresh</a></li>
+                                    {{-- <li><a href="{{ route('scan-qrcode') }}" id="btnRefresh" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="refresh-cw"></i> Refresh</a></li> --}}
                                 </ul> 
                             </div>
                         </div>
@@ -25,14 +26,35 @@
                 </div>
                 <div class="card-body">
                     <div class="row"> 
-                        <div class="col-sm-12">                    
+                        <div class="col-sm-12" id="scan">
+                            <h3>Proses Scan QrCode</h3>                    
                             <div style="width: 100%" id="reader"></div>
                         </div>
-                        <div class="col-sm-12">                    
-                            <div id="qr-reader-results">
-                                <h2>Hasil QR Code:</h2>
-                                <p id="output"></p>
-                            </div>
+                        
+                        <div class="col-sm-12" id="info-surat" style="display:none">    
+                            <h3>Infomasi Surat Masuk</h3>                    
+                            <span class="badge bg-primary">Tanggal Surat : <span id="tanggal">_____</span></span>                
+                            <h3 id="kategori_surat" class="mt-2">_____</h3>
+                            <div>
+                                <i class="fas fa-quote-left fa-1x" aria-hidden="true"></i>
+                                <blockquote class="blockquote pb-2" >
+                                    <p id="perihal">
+                                        _____
+                                    </p>
+                                </blockquote>
+                                <figcaption class="blockquote-footer mb-0" >
+                                    Nomor Surat : <span id="no_surat">_____</span>
+                                </figcaption>                                   
+                            </div>     
+                            <div class="mt-2">Asal Surat : <span id="asal">_____</span></div>                       
+                            <div class="mt-2">Ringkasan : <span id="ringkasan">_____</span></div>    
+                            <div class="mt-2" id="lampiran"></div>
+                            <hr>
+                            <div class="col-sm-6 mb-3">
+                                <label class="form-label">Pejabat yang menerima surat : </label>
+                                <select name="pejabat_user_id" id="pejabat_user_id" class="form-control"></select>
+                            </div>    
+                            <button class="btn btn-success mt-2" id="btn-terima">Terima Surat Masuk</button>
                         </div>
                     </div>
                 </div>
@@ -45,8 +67,130 @@
 
 @section('scriptJs')
 <script src="{{ asset('js/html5-qrcode-master/minified/html5-qrcode.min.js') }}"></script>
-
+<script src="{{ asset('js/app.js') }}"></script>
 <script>
+    var vAksesJabatan=[];
+    var vId=null;
+    $.ajaxSetup({
+        headers: {
+            'Authorization': 'Bearer ' + authToken
+        }
+    });
+
+    function aksesDisposisi(tahun) {
+        $.ajax({
+            url: `${vBaseUrl}/api/get-akses-pola?filter={"tahun":"${tahun}"}`,
+            type: "GET",
+            success: function(response) {
+                var uniqueData = {};
+
+                if (response.data && response.data.length > 0) {
+                    $('#scan').hide();
+                    $('#info-surat').show();
+
+                    // Iterasi data dan simpan ke objek uniqueData
+                    $.each(response.data, function(i, item) {
+                        var jabatan = item.pola_spesimen.spesimen_jabatan.jabatan;
+                        if (!uniqueData[jabatan]) {
+                            uniqueData[jabatan] = {
+                                jabatan: jabatan,
+                                user_pejabat_id: item.pola_spesimen.spesimen_jabatan.user_pejabat_id
+                            };
+                        }
+                    });
+
+                    // Ubah objek uniqueData menjadi array
+                    aksesJabatan = Object.values(uniqueData);
+
+                    $('#pejabat_user_id').empty();
+                    $.each(aksesJabatan, function(i, item) {
+                        $('#pejabat_user_id').append(new Option(item.jabatan, item.user_pejabat_id));
+                    });
+
+                    // Tampilkan hasil
+                    console.log(aksesJabatan);
+                } else {
+                    alert("Akses disposisi tidak ditemukan");
+                    window.location.replace(vBaseUrl+'/akun-dashboard');
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error("Error:", textStatus, errorThrown);
+            }
+        });
+    }
+
+
+    function disposisi() {
+        $.ajax({
+            url: `${vBaseUrl}/api/tujuan`,
+            type: "POST",
+            data:{
+                surat_masuk_id:vId,
+                user_id:$('#pejabat_user_id').val(),
+            },
+            success: function(response) {
+                // Tampilkan hasil
+                appShowNotification(true,'surat masuk berhasil diterima');
+                // console.log(aksesJabatan);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                if (jqXHR.responseJSON) {
+                    appShowNotification(false, jqXHR.responseJSON.message);
+                } else {
+                    appShowNotification(false, errorThrown);
+                }
+            }
+        });
+    }
+
+    function prosesDisposisi(id){
+        // Kirim request AJAX
+        $.ajax({
+            url: `${vBaseUrl}/api/surat-masuk/${id}`,
+            type: "GET",
+            success: function(response) {
+                vAksesJabatan=[];
+                vId=id;
+                if(response.success){
+                    data=response.data;
+                    //tampilkan info surat masuk
+                    $('#tanggal').text(data.tanggal);
+                    $('#kategori_surat').text(data.kategori_surat);
+                    $('#perihal').text(data.perihal);
+                    $('#no_surat').text(data.no_surat);
+                    $('#ringkasan').text(data.ringkasan);
+                    $('#asal').text(`${data.asal} (${data.tempat})`);
+
+
+                    //lampiran
+                    var lampiran = `<span class="badge bg-danger">Belum terupload</span>`;
+                    if (data.lampiran_surat_masuk.length > 0) {
+                        lampiran = `<h4>Dokumen Surat Keluar :</h4>
+                                    <div class="row" id="list-images">`;
+                        $.each(data.lampiran_surat_masuk, function(i, dt) {
+                            let linkfile = `${vBaseUrl}/${dt.upload.path}`;
+                            lampiran += `<div class="col-lg-3 mb-3 ">`;
+                            if (is_image(dt.upload.type))
+                                lampiran += `<span class="img-preview"><img src="${linkfile}" width="100%"></span>`;
+                            else
+                                lampiran += `<i class="fa-solid fa-arrow-up-right-from-square"></i> <a href="${linkfile}" target="_blank">${dt.upload.name}</a>`;
+                            lampiran += `</div>`;
+                        });
+                        lampiran += `</div>`;
+                    }
+                    $("#lampiran").html(lampiran);
+
+
+                    aksesDisposisi(data.tanggal.substring(0, 4));
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                forceLogout();
+            }
+        });
+    }
+
     $(document).ready(function () {
         cekAkses('pengguna');
 
@@ -54,8 +198,11 @@
         const qrCodeSuccessCallback = (decodedText, decodedResult) => {
             const qrData = JSON.parse(decodedText);
             $("#output").html(qrData.id+' '+qrData.api);
+            if(qrData.api=='disposisi'){
+                prosesDisposisi(qrData.id);
+            }
 
-
+            //untuk hentikan scan
             html5QrCode.stop().then((ignore) => {
             // QR Code scanning is stopped.
             }).catch((err) => {
@@ -63,9 +210,20 @@
             });            
         };
         const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-
         // If you want to prefer front camera
         html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
+
+
+        $('#btnRefresh').click(function(){
+            prosesDisposisi(vId);
+        });
+
+        $('#btn-terima').click(function(){
+            if(confirm("yakin terima surat masuk?"))
+                disposisi();
+        });
+        
+
     });
 </script>
 

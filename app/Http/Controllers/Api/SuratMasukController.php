@@ -15,6 +15,7 @@ class SuratMasukController extends Controller
     //OKE
     public function index(Request $request)
     {
+        $user_id = auth()->user()->id;
 
         $query = SuratMasuk::orderBy('created_at', 'desc')
             ->orderBy('tanggal', 'desc')
@@ -53,20 +54,47 @@ class SuratMasukController extends Controller
                                 break;
                             case "diajukan":
                                 $query->where('is_diajukan', 1)->whereNull('is_diterima');
+                                // if (!izinkanAkses("admin")) {
+                                //     $query->where('user_id', $user_id);
+                                // }
                                 $kategori = "diajukan";
                                 break;
                             case "diterima":
                                 $kategori = "diterima";
                                 $query->where('is_diajukan', 1)->where('is_diterima', 1);
+                                // if (!izinkanAkses("admin")) {
+                                //     $query->where('user_id', $user_id);
+                                // }
+
                                 break;
                             case "ditolak":
                                 $kategori = "ditolak";
                                 $query->where('is_diajukan', 1)->where('is_diterima', 0);
+                                // if (!izinkanAkses("admin")) {
+                                //     $query->where('user_id', $user_id);
+                                // }
                                 break;
                         }
                     elseif ($i == 'tahun') {
                         $tahun_sekarang = $dp;
+                        $aksespola = getAksesPola($user_id, $tahun_sekarang);
+                        // dd($aksespola);
                         $query->whereYear('tanggal', $tahun_sekarang);
+                        if (!empty($aksespola['data'])) {
+                            $idAkses = $aksespola['data']['user_pejabat_id'];
+
+                            $query->Where(function ($query) use ($user_id, $idAkses) {
+                                $query->orWhere('user_id', $user_id);
+                                $query->orWhereHas('tujuan', function ($query) use ($idAkses) {
+                                    $query->whereIn('user_id', $idAkses);
+                                });
+                            });
+                        }
+                        // else {
+                        //     if (!izinkanAkses("admin")) {
+                        //         $query->where('user_id', auth()->user()->id);
+                        //     }
+                        // }
                     } elseif ($i == 'bulan') {
                         $bulan_sekarang = $dp;
                         $query->whereMonth('tanggal', $bulan_sekarang);
@@ -75,21 +103,25 @@ class SuratMasukController extends Controller
                 }
             }
         }
-        $sql = $query->toSql();
+
         //untuk pencarian
         $keyword = $request->input('keyword');
         if ($keyword) {
-            $query->where('perihal', 'LIKE', "%$keyword%")
-                ->orWhere('no_agenda', 'LIKE', "%$keyword%")
-                ->orWhere('no_surat', 'LIKE', "%$keyword%")
-                ->orWhere('tempat', 'LIKE', "%$keyword%")
-                ->orWhere('ringkasan', 'LIKE', "%$keyword%")
-                ->orWhere('asal', 'LIKE', "%$keyword%");
+            $query->where(function ($query) use ($keyword) {
+                $query->where('perihal', 'LIKE', "%$keyword%")
+                    ->orWhere('no_agenda', 'LIKE', "%$keyword%")
+                    ->orWhere('no_surat', 'LIKE', "%$keyword%")
+                    ->orWhere('tempat', 'LIKE', "%$keyword%")
+                    ->orWhere('ringkasan', 'LIKE', "%$keyword%")
+                    ->orWhere('asal', 'LIKE', "%$keyword%");
+            });
         }
 
-        if (!izinkanAkses("admin")) {
-            $query->where('user_id', auth()->user()->id);
-        }
+
+
+        $sql = $query->toSql();
+        $bindings = $query->getBindings();
+        // dd($sql);
 
         $perPage = $request->input('per_page', env('DATA_PER_PAGE', 10));
         $page = ($perPage == 'all') ? 'all' : $request->input('page', env('DATA_PER_PAGE', 10));
@@ -106,7 +138,7 @@ class SuratMasukController extends Controller
     //OKE 
     public function findID($id)
     {
-        $data = SuratMasuk::findOrFail($id);
+        $data = SuratMasuk::with(['lampiranSuratMasuk.upload'])->findOrFail($id);
         if (!$data) {
             return response()->json([
                 'success' => false,
@@ -226,7 +258,20 @@ class SuratMasukController extends Controller
                     'error' => 'sudah diajukan',
                 ], 500);
 
-            $data->update(['is_diajukan' => 1]);
+
+            // $data->update(['is_diajukan' => 1]);
+
+            $admin = getAdmin();
+            foreach ($admin['data'] as $i => $item) {
+                $pesanWA = "Hai, " . $item->name . " ada ajuan surat masuk/ disposisi baru oleh " . auth()->user()->name . ", ";
+                $pesanWA .= "surat berasal dari " . $data->tempat . " " . $data->asal . " tentang " . $data->perihal . ", nomor " . $data->no_surat . ", tertanggal " . $data->tanggal . " ";
+                $pesanWA .= "mohon untuk segera diproses.\n\n";
+                $pesanWA .= "silahkan cek dengan login laman https://surat.iainkendari.ac.id/";
+                if ($item->profil->hp) {
+                    kirimWA($item->profil->hp, $pesanWA);
+                }
+            }
+
 
             return response()->json([
                 'success' => true,

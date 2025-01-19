@@ -35,8 +35,14 @@
         <a class="sidebar-link" href="{{ route('pola-spesimen') }}">
             <i class="align-middle" data-feather="settings"></i> <span class="align-middle">Pola Spesimen</span>
         </a>
-    </li>    <li class="sidebar-item">
+    </li>    
+    <li class="sidebar-item">
         <a class="sidebar-link" href="{{ route('akses-pola') }}">
             <i class="align-middle" data-feather="tool"></i> <span class="align-middle">Akses Pola</span>
+        </a>
+    </li>
+    <li class="sidebar-item">
+        <a class="sidebar-link" href="{{ route('akses-surat-masuk') }}">
+            <i class="align-middle" data-feather="tool"></i> <span class="align-middle">Akses Surat Masuk</span>
         </a>
     </li>

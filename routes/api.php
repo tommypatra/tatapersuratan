@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\DistribusiController;
 use App\Http\Controllers\Api\SuratMasukController;
 use App\Http\Controllers\Api\SuratKeluarController;
 use App\Http\Controllers\Api\PolaSpesimenController;
+use App\Http\Controllers\Api\AksesSuratMasukController;
 use App\Http\Controllers\Api\SpesimenJabatanController;
 use App\Http\Controllers\Api\KlasifikasiSuratController;
 use App\Http\Controllers\Api\KategoriSuratMasukController;
@@ -77,6 +78,7 @@ Route::middleware(['auth.jwt'])->group(function () {
         Route::resource('grup-user', GrupUserController::class);
         Route::resource('grup', GrupController::class);
         Route::resource('akses-pola', AksesPolaController::class);
+        Route::resource('akses-surat-masuk', AksesSuratMasukController::class);
         Route::resource('kategori-surat-masuk', KategoriSuratMasukController::class);
         Route::resource('spesimen-jabatan', SpesimenJabatanController::class);
         Route::resource('pola-surat-keluar', PolaSuratController::class);

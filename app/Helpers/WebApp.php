@@ -10,6 +10,8 @@ use App\Models\PolaSurat;
 use App\Models\Distribusi;
 use App\Models\SuratKeluar;
 use Illuminate\Support\Str;
+use App\Jobs\SendMessageJob;
+use App\Models\PolaSpesimen;
 use App\Models\SpesimenJabatan;
 use App\Models\KlasifikasiSurat;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +20,12 @@ use Illuminate\Support\Facades\File;
 use App\Http\Resources\TujuanResource;
 use App\Http\Resources\DistribusiResource;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+
+function kirimWA($phone, $message = null)
+{
+    SendMessageJob::dispatch($phone, $message);
+    return response()->json(['message' => 'Pesan sedang diproses dalam antrian.']);
+}
 
 function d($var = [], $is_ajax = false)
 {
@@ -70,16 +78,78 @@ function getAksesPola($user_id, $tahun)
         ->orderBy('pola_spesimen_id', 'asc')
         ->get();
 
-    $aksesPolaId = [];
+    $data = [
+        'pola_spesimen_id' => [],
+        'user_pejabat_id' => [],
+    ];
     foreach ($query as $i => $dp) {
-        $aksesPolaId[] = $dp['pola_spesimen_id'];
+        $data['pola_spesimen_id'][] = $dp['pola_spesimen_id'];
+        $data['user_pejabat_id'][] = $dp['polaSpesimen']->spesimenJabatan->user_pejabat_id;
     }
-    // dd($aksesPolaId);
+
+    if (count($data['pola_spesimen_id']) > 0) {
+        $data['pola_spesimen_id'] = array_unique($data['pola_spesimen_id']);
+        $data['pola_spesimen_id'] = array_values($data['pola_spesimen_id']);
+    }
+
+    if (count($data['user_pejabat_id']) > 0) {
+        $data['user_pejabat_id'] = array_unique($data['user_pejabat_id']);
+        $data['user_pejabat_id'] = array_values($data['user_pejabat_id']);
+    }
 
     $retval = [
         "success" => true,
         "message" => "data ditemukan",
-        "data" => $aksesPolaId,
+        "data" => $data,
+    ];
+    return $retval;
+}
+
+function getAdminSpesimen($pola_spesimen_id)
+{
+    $query = AksesPola::with(
+        [
+            'user.profil'
+        ]
+    )->where('pola_spesimen_id', $pola_spesimen_id)->get();
+
+    $retval = [
+        "success" => true,
+        "message" => "data ditemukan",
+        "data" => $query,
+    ];
+    return $retval;
+}
+
+function getAdmin()
+{
+    $query = User::with([
+        'profil',
+        'grupUser.grup'
+    ])->whereHas('grupUser.grup', function ($query) {
+        $query->where('grup', 'Admin');
+    })->get();
+
+    $retval = [
+        "success" => true,
+        "message" => "data ditemukan",
+        "data" => $query,
+    ];
+    return $retval;
+}
+
+function getIdentitasUser($user_id)
+{
+    $query = User::with(
+        [
+            'profil'
+        ]
+    )->where('id', $user_id)->first();
+
+    $retval = [
+        "success" => true,
+        "message" => "data ditemukan",
+        "data" => $query,
     ];
     return $retval;
 }

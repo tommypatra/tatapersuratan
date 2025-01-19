@@ -1,7 +1,7 @@
 @extends('admin.template')
 
 @section('scriptHead')
-<title>Akses Pola</title>
+<title>Akses Jabatan</title>
 <link href="{{ asset('js/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css') }}" rel="stylesheet">
 <link href="{{ asset('js/select2/dist/css/select2.min.css') }}" rel="stylesheet">
 <link href="{{ asset('js/select2/dist/css/select2.custom.css') }}" rel="stylesheet">
@@ -9,7 +9,7 @@
 
 @section('container')
 <div class="container-fluid p-0">
-    <h1 class="h3 mb-3">Akses Pola</h1>
+    <h1 class="h3 mb-3">Akses Jabatan</h1>
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -112,7 +112,7 @@
 <script src="{{ asset('js/crud.js') }}"></script>
 <script type="text/javascript">
     var vApi='/api/akses-pola';
-    var vJudul='Akses Pola';
+    var vJudul='Akses Jabatan';
     var fieldInit={
         'id': { action: 'val' },
         'tahun': { action: 'select2' },

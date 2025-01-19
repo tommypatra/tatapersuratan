@@ -65,13 +65,10 @@ class SuratKeluarController extends Controller
                         // dd($aksespola['data']);
                         $query->whereYear('tanggal', $tahun_sekarang);
                         if (!empty($aksespola['data'])) {
-                            $idAkses = $aksespola['data'];
+                            $idAkses = $aksespola['data']['pola_spesimen_id'];
                             // dd($idAkses);
                             $query->where(function ($query) use ($user_id, $idAkses) {
-                                // $query->orWhere('user_id', $user_id)
-                                // if (!izinkanAkses("admin")) {
-                                //     $query->where('user_id', auth()->user()->id);
-                                // }
+                                $query->orWhere('user_id', $user_id);
                                 $query->orWhere(function ($query) use ($idAkses) {
                                     $query->whereIn('pola_spesimen_id', $idAkses);
                                 });
@@ -176,7 +173,7 @@ class SuratKeluarController extends Controller
             $gabungkan = isset($request['gabungkan']) ? true : false;
             $tujuan = $this->parseTujuan($validatedData['tujuan']);
             $perihal = $validatedData['perihal'];
-            $pesan = "";
+            $pesan = [];
             $responseData = [];
             // dd($tujuan);
             $jumlah_tujuan = count($tujuan);
@@ -187,7 +184,7 @@ class SuratKeluarController extends Controller
                 $data = SuratKeluar::create($validatedData);
 
                 // jika ada akses maka generatekan nomor suratnya
-                $pesan .= '<p>pengajuan pengambilan surat <i>' . $data->perihal . '</i>';
+                $tmppesan = 'Pengajuan nomor surat <i>' . $data->perihal . '</i> tanggal ' . $data->tanggal;
                 if ($this->cekAksesPola($data->tanggal, $data->pola_spesimen_id)) {
                     $generateValue = $this->updateNoSurat($data->id, $data);
                     $dataSave = [
@@ -200,24 +197,40 @@ class SuratKeluarController extends Controller
                         'no_sub_indeks' => $generateValue['no_sub_indeks'],
                         'pola' => $generateValue['pola'],
                     ];
-                    $pesan .= '  dengan nomor <b>' . $generateValue['no_surat'] . "</b>";
+                    $tmppesan .= '  dengan nomor <b>' . $generateValue['no_surat'] . "</b>";
                     $data->update($dataSave);
                 }
-                $pesan .= '  berhasil dibuat';
-                if ($i + 1 < $jumlah_tujuan)
-                    $pesan .= ', ';
-                else
-                    $pesan .= '.';
-
-                $pesan .= '</p>';
+                $tmppesan .= '  berhasil dilakukan.';
+                $pesan[] = $tmppesan;
 
                 $responseData[] = new SuratKeluarResource($data);
             }
 
+
+            // dd($data);
+            $data_admin = getAdminSpesimen($validatedData['pola_spesimen_id']);
+            foreach ($data_admin['data'] as $i => $row) {
+                // if ($row->user->profil->hp) {
+                if ($row->user->profil->hp && $row->user->id != auth()->user()->id) {
+                    $pesanWA = "Hai " . $row->user->name . ", kami informasikan bahwa " . auth()->user()->name . " beberapa saat lalu telah melakukan :\n";
+                    foreach ($pesan as $i => $item) {
+                        $pesanWA .= "\n" . $item . "\n";
+                    }
+                    $pesanWA .= "\nsilahkan cek dengan login laman https://surat.iainkendari.ac.id/";
+                    kirimWA($row->user->profil->hp, $pesanWA);
+                }
+            }
+
+            $kirimpesan = "";
+            foreach ($pesan as $i => $item) {
+                $kirimpesan .= "<p>" . $item . "</p>";
+            }
+
+
             // $data['tanggal']
             return response()->json([
                 'success' => true,
-                'message' => '<div id="salinText" onclick="salinText()">' . $pesan . '</div>',
+                'message' => '<div id="salinText" onclick="salinText()">' . $kirimpesan . '</div>',
                 'data' => $responseData,
             ], 201);
         } catch (ValidationException $e) {
@@ -372,9 +385,13 @@ class SuratKeluarController extends Controller
             ];
             $data = $this->findId($request->input('id'));
 
+
+            $identitas = getIdentitasUser($data->user_id);
+            $pesanWA = "Hai, " . $identitas['data']->name . " pengajuan nomor surat anda telah diperiksa.\n\n";
+
             //untuk filter siapa yang bisa setujui atau tolak ajuan surat
             $daftarAksesPola = getAksesPola(auth()->user()->id, substr($data->tanggal, 0, 4));
-            if (!in_array($data->pola_spesimen_id, $daftarAksesPola['data'])) {
+            if (!in_array($data->pola_spesimen_id, $daftarAksesPola['data']['pola_spesimen_id'])) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Gagal dilakukan',
@@ -396,6 +413,13 @@ class SuratKeluarController extends Controller
                 $pesan = ($request->input('catatan')) ? $pesan . ' tidak diterima karena ' . $request->input('catatan') : 'tidak diterima';
             }
             $data->update($dataSave);
+
+            $pesanWA .= $pesan;
+            $pesanWA .= "\n\nsilahkan cek dengan login laman https://surat.iainkendari.ac.id/";
+
+            if ($identitas['data']->profil->hp) {
+                kirimWA($identitas['data']->profil->hp, $pesanWA);
+            }
 
             return response()->json([
                 'success' => true,

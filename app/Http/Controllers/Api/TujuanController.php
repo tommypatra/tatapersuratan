@@ -45,12 +45,19 @@ class TujuanController extends Controller
         //untuk pencarian
         $keyword = $request->input('keyword');
         if ($keyword) {
-            $query->where('id', $keyword);
+            $query->where(function ($query) use ($keyword) {
+                $query->where('id', $keyword);
+            });
         }
 
 
         $perPage = $request->input('per_page', env('DATA_PER_PAGE', 10));
         $page = ($perPage == 'all') ? 'all' : $request->input('page', env('DATA_PER_PAGE', 10));
+
+        // echo auth()->user()->id;
+        // $sql = $query->toSql();
+        // $bindings = $query->getBindings();
+        // dd($sql);
 
         if ($page === 'all') {
             $data = $query->get();
@@ -103,10 +110,16 @@ class TujuanController extends Controller
                 'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
+            if ($e->getCode() == 23000) {
+                return response()->json([
+                    'success' => false,
+                    'message' => ['Data duplikat: surat sudah terdisposisi pada akun tujuan tersebut.'],
+                ], 400); // Status HTTP 400 atau lainnya sesuai kebutuhan
+            }
+
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to create',
-                'error' => $e->getMessage(),
+                'message' => [$e->getMessage()],
             ], 500);
         }
     }

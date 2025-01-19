@@ -63,11 +63,11 @@
         }
 
         .footer .catatan {
-            width: 88%;
+            width: 85%;
         }
 
         .footer .qrcode {
-            width: 12%;
+            width: 15%;
             text-align: right;
         }
 
@@ -295,6 +295,7 @@
                 'Authorization': 'Bearer ' + authToken
             }
         });
+        cekAkses('admin');
 
         // Kirim request AJAX
         $.ajax({
@@ -322,8 +323,8 @@
                 // const qr_ttd = `${data.no_surat} ${data.perihal} ${qr_link}`;
                 new QRCode(document.getElementById('qrcode_label'), {
                     text: qr_text,
-                    width: 80,
-                    height: 80
+                    width: 100,
+                    height: 100
                 });                
 
             },

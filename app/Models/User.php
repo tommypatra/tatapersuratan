@@ -122,4 +122,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(TtdQrcode::class, 'user_id');
     }
+
+    public function aksesSuratMasuk()
+    {
+        return $this->hasMany(AksesSuratMasuk::class);
+    }
 }

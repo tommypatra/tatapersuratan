@@ -9,7 +9,7 @@
         var vUserId = localStorage.getItem('id');
         var vAksesId = localStorage.getItem('akses');
         var vNama = localStorage.getItem('nama');
-        var vTahunApp = {{ env("APP_TAHUN") }};
+        var vTahunApp = {{ date("Y") }};
 		var vFoto = vBaseUrl+'/'+localStorage.getItem('foto');
 	</script>
 </head>

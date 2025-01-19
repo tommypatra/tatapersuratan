@@ -35,6 +35,7 @@ Route::get('/klasifikasi-surat-keluar', [WebController::class, 'klasifikasiSurat
 Route::get('/grup', [WebController::class, 'grup'])->name('grup');
 Route::get('/spesimen-jabatan', [WebController::class, 'spesimenJabatan'])->name('spesimen-jabatan');
 Route::get('/akses-pola', [WebController::class, 'aksesPola'])->name('akses-pola');
+Route::get('/akses-surat-masuk', [WebController::class, 'aksesSuratMasuk'])->name('akses-surat-masuk');
 Route::get('/pola-spesimen', [WebController::class, 'polaSpesimen'])->name('pola-spesimen');
 Route::get('/profil', [WebController::class, 'profil'])->name('profil');
 Route::get('/disposisi', [WebController::class, 'disposisi'])->name('disposisi');
@@ -49,5 +50,17 @@ Route::get('/cek-login-eksternal/{web}', [WebController::class, 'cekLoginEkstern
 
 Route::get('/cetak-lembar-disposisi/{id}', [WebController::class, 'cetakLembarDisposisi'])->name('cetak-lembar-disposisi');
 Route::get('/scan-qrcode', [WebController::class, 'scanQrCode'])->name('scan-qrcode');
+
+
+Route::get('/get-admin-spesimen/{pola_spesimen_id}', function ($pola_spesimen_id) {
+    $data = getAdminSpesimen($pola_spesimen_id);
+    foreach ($data['data'] as $i => $row) {
+        echo $row->user->name . " " . $row->user->profil->hp . "<br>";
+    }
+});
+
+Route::get('/kirim-wa/{nomor}/{pesan}', function ($nomor, $pesan) {
+    kirimWA($nomor, $pesan);
+});
 
 // });

@@ -130,6 +130,11 @@ class WebController extends Controller
         return view('admin.akses_pola');
     }
 
+    public function aksesSuratMasuk()
+    {
+        return view('admin.akses_surat_masuk');
+    }
+
     public function profil()
     {
         return view('admin.profil');

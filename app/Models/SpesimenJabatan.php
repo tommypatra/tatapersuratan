@@ -11,6 +11,11 @@ class SpesimenJabatan extends Model
 {
     protected $guarded = ['id'];
 
+    public function aksesSuratMasuk()
+    {
+        return $this->hasMany(AksesSuratMasuk::class);
+    }
+
     public function polaSpesimen()
     {
         return $this->hasMany(PolaSpesimen::class);

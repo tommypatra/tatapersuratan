@@ -79,6 +79,8 @@ class UtilityController extends Controller
                 foreach ($filterArray as $i => $dp) {
                     if ($i == 'user_id_login') {
                         $query->where("user_id", auth()->user()->id);
+                    } else if ($i == 'tahun') {
+                        $query->where("tahun", $dp)->where("user_id", auth()->user()->id);
                     } else
                         $query->where($i, $dp);
                 }
@@ -98,8 +100,8 @@ class UtilityController extends Controller
             });
         }
         $sql = $query->toSql();
-        // $bindings = $query->getBindings();
-        // dd($sql);
+        $bindings = $query->getBindings();
+        // dd($sql);?
 
         $data = $query->get();
 
