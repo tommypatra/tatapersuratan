@@ -29,6 +29,7 @@
                         <div class="col-sm-12" id="scan">
                             <h3>Proses Scan QrCode</h3>                    
                             <div style="width: 100%" id="reader"></div>
+                            <video id="preview"></video>
                         </div>
                         
                         <div class="col-sm-12" id="info-surat" style="display:none">    
@@ -66,7 +67,9 @@
 @endsection
 
 @section('scriptJs')
-<script src="{{ asset('js/html5-qrcode-master/minified/html5-qrcode.min.js') }}"></script>
+{{-- <script src="{{ asset('js/html5-qrcode-master/minified/html5-qrcode.min.js') }}"></script> --}}
+<script type="text/javascript" src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+
 <script src="{{ asset('js/app.js') }}"></script>
 <script>
     var vAksesJabatan=[];
@@ -181,37 +184,57 @@
     $(document).ready(function () {
         cekAkses('pengguna');
 
-        const html5QrCode = new Html5Qrcode("reader");
-        const qrCodeSuccessCallback = (decodedText, decodedResult) => {
-            const qrData = JSON.parse(decodedText);
-            $("#output").html(qrData.id+' '+qrData.api);
-            if(qrData.api=='disposisi'){
-                prosesDisposisi(qrData.id);
-            }
+        // const html5QrCode = new Html5Qrcode("reader");
+        // const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+        //     const qrData = JSON.parse(decodedText);
+        //     $("#output").html(qrData.id+' '+qrData.api);
+        //     if(qrData.api=='disposisi'){
+        //         prosesDisposisi(qrData.id);
+        //     }
 
-            //untuk hentikan scan
-            html5QrCode.stop().then((ignore) => {
-            // QR Code scanning is stopped.
-            }).catch((err) => {
-            // Stop failed, handle it.
-            });            
-        };
-        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-        // If you want to prefer front camera
-        html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
+        //     //untuk hentikan scan
+        //     html5QrCode.stop().then((ignore) => {
+        //     // QR Code scanning is stopped.
+        //     }).catch((err) => {
+        //     // Stop failed, handle it.
+        //     });            
+        // };
+        // const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+        // // If you want to prefer front camera
+        // html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
 
 
-        $('#btnRefresh').click(function(){
-            prosesDisposisi(vId);
-        });
+        // $('#btnRefresh').click(function(){
+        //     prosesDisposisi(vId);
+        // });
 
-        $('#btn-terima').click(function(){
-            if(confirm("yakin terima surat masuk?"))
-                disposisi();
-        });
+        // $('#btn-terima').click(function(){
+        //     if(confirm("yakin terima surat masuk?"))
+        //         disposisi();
+        // });
         
 
+        
     });
 </script>
+
+
+
+    <script type="text/javascript">
+      let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+      scanner.addListener('scan', function (content) {
+        alert(content);
+        console.log(content);
+      });
+      Instascan.Camera.getCameras().then(function (cameras) {
+        if (cameras.length > 0) {
+          scanner.start(cameras[0]);
+        } else {
+          console.error('No cameras found.');
+        }
+      }).catch(function (e) {
+        console.error(e);
+      });
+    </script>
 
 @endsection
