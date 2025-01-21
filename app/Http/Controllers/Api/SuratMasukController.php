@@ -160,12 +160,23 @@ class SuratMasukController extends Controller
         ], 200);
     }
 
+    public function generateUniqueToken()
+    {
+        do {
+            $tahun = date('Y');
+            $kodeAcak = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+            $token = $tahun . '-' . $kodeAcak;
+        } while (SuratMasuk::where('token', $token)->exists());
+        return $token;
+    }
+
     //OKE PUT application/x-www-form-urlencoded
     public function store(SuratMasukRequest $request)
     {
         try {
             $validatedData = $request->validated();
             $validatedData['user_id'] = auth()->user()->id;
+            $validatedData['token'] = $this->generateUniqueToken();
 
             $rolesAkun = $request->input('roles_akun');
             if (izinkanAkses("admin")) {
