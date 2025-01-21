@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\DistribusiController;
 use App\Http\Controllers\Api\SuratMasukController;
 use App\Http\Controllers\Api\SuratKeluarController;
 use App\Http\Controllers\Api\PolaSpesimenController;
+use App\Http\Controllers\Api\AksesDisposisiController;
 use App\Http\Controllers\Api\AksesSuratMasukController;
 use App\Http\Controllers\Api\SpesimenJabatanController;
 use App\Http\Controllers\Api\KlasifikasiSuratController;
@@ -62,6 +63,7 @@ Route::middleware(['auth.jwt'])->group(function () {
     Route::post('get-surat-masuk', [UtilityController::class, 'getSuratMasuk']);
     Route::get('get-pola-spesimen', [UtilityController::class, 'getPolaSpesimen']);
     Route::get('get-akses-pola', [UtilityController::class, 'getAksesPola']);
+    Route::get('get-akses-disposisi', [UtilityController::class, 'getAksesDisposisi']);
     Route::get('get-kategori-surat-masuk', [UtilityController::class, 'getKategoriSuratMasuk']);
     Route::get('get-users', [UtilityController::class, 'getUsers']);
     Route::get('get-pejabat', [SpesimenJabatanController::class, 'index']);
@@ -79,6 +81,7 @@ Route::middleware(['auth.jwt'])->group(function () {
         Route::resource('grup', GrupController::class);
         Route::resource('akses-pola', AksesPolaController::class);
         Route::resource('akses-surat-masuk', AksesSuratMasukController::class);
+        Route::resource('akses-disposisi', AksesDisposisiController::class);
         Route::resource('kategori-surat-masuk', KategoriSuratMasukController::class);
         Route::resource('spesimen-jabatan', SpesimenJabatanController::class);
         Route::resource('pola-surat-keluar', PolaSuratController::class);

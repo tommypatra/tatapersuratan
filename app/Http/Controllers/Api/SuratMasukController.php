@@ -77,24 +77,26 @@ class SuratMasukController extends Controller
                         }
                     elseif ($i == 'tahun') {
                         $tahun_sekarang = $dp;
-                        $aksespola = getAksesPola($user_id, $tahun_sekarang);
-                        // dd($aksespola);
-                        $query->whereYear('tanggal', $tahun_sekarang);
-                        if (!empty($aksespola['data'])) {
-                            $idAkses = $aksespola['data']['user_pejabat_id'];
+                        $akses_disposisi = getAksesDisposisi($user_id, $tahun_sekarang);
 
-                            $query->Where(function ($query) use ($user_id, $idAkses) {
+                        $user_pejabat_id = array_unique(array_column($akses_disposisi, 'user_pejabat_id'));
+                        $user_pejabat_id = array_values($user_pejabat_id);
+
+                        // dd($user_pejabat_id);
+                        $query->whereYear('tanggal', $tahun_sekarang);
+                        if (!empty($user_pejabat_id)) {
+
+                            $query->Where(function ($query) use ($user_id, $user_pejabat_id) {
                                 $query->orWhere('user_id', $user_id);
-                                $query->orWhereHas('tujuan', function ($query) use ($idAkses) {
-                                    $query->whereIn('user_id', $idAkses);
+                                $query->orWhereHas('tujuan', function ($query) use ($user_pejabat_id) {
+                                    $query->whereIn('user_id', $user_pejabat_id);
                                 });
                             });
+                        } else {
+                            // if (!izinkanAkses("admin")) {
+                            $query->where('user_id', auth()->user()->id);
+                            // }
                         }
-                        // else {
-                        //     if (!izinkanAkses("admin")) {
-                        //         $query->where('user_id', auth()->user()->id);
-                        //     }
-                        // }
                     } elseif ($i == 'bulan') {
                         $bulan_sekarang = $dp;
                         $query->whereMonth('tanggal', $bulan_sekarang);

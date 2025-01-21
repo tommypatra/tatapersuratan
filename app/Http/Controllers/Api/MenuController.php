@@ -19,7 +19,8 @@ class MenuController extends Controller
                 ['label' => 'Klasifikasi', 'route' => 'klasifikasi-surat-keluar', 'icon' => 'briefcase'],
                 ['label' => 'Spesimen', 'route' => 'spesimen-jabatan', 'icon' => 'layers'],
                 ['label' => 'Pola Spesimen', 'route' => 'pola-spesimen', 'icon' => 'settings'],
-                ['label' => 'Akses Jabatan', 'route' => 'akses-pola', 'icon' => 'tool'],
+                ['label' => 'Akses Surat Keluar', 'route' => 'akses-pola', 'icon' => 'tool'],
+                ['label' => 'Akses Disposisi', 'route' => 'akses-disposisi', 'icon' => 'tool'],
             ];
         }
 

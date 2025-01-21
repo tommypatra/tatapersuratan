@@ -8,9 +8,10 @@ use App\Helpers\WebApp;
 use App\Models\AksesPola;
 use App\Models\TtdQrcode;
 use App\Models\SuratMasuk;
+use App\Models\SuratKeluar;
 use App\Models\PolaSpesimen;
-use Illuminate\Http\Request;
 
+use Illuminate\Http\Request;
 use App\Models\KlasifikasiSurat;
 use App\Models\KategoriSuratMasuk;
 use App\Http\Controllers\Controller;
@@ -20,9 +21,9 @@ use App\Http\Resources\AksesPolaResource;
 use App\Http\Resources\TtdQrcodeResource;
 use App\Http\Resources\SuratMasukResource;
 use App\Http\Resources\PolaSpesimenResource;
+use App\Http\Resources\AksesDisposisiResource;
 use App\Http\Resources\KlasifikasiSuratResource;
 use App\Http\Resources\KategoriSuratMasukResource;
-use App\Models\SuratKeluar;
 
 class UtilityController extends Controller
 {
@@ -55,6 +56,18 @@ class UtilityController extends Controller
         $decoded = decode($encoded);
         return response()->json(['decoded' => $decoded], 200);
     }
+
+
+    public function getAksesDisposisi(Request $request)
+    {
+        //untuk filter lebih dari 1 kolom
+        $tahun = $request->input('tahun');
+
+        $data = getAksesDisposisi(auth()->user()->id, $tahun);
+
+        return response()->json(['data' => $data], 200);
+    }
+
 
     public function getAksesPola(Request $request)
     {

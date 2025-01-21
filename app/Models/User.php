@@ -127,4 +127,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(AksesSuratMasuk::class);
     }
+
+    public function aksesDisposisi()
+    {
+        return $this->hasMany(AksesDisposisi::class);
+    }
 }

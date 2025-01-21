@@ -202,4 +202,9 @@ class WebController extends Controller
     {
         return view('admin/scan_qrcode');
     }
+
+    public function aksesDisposisi()
+    {
+        return view('admin/akses_disposisi');
+    }
 }

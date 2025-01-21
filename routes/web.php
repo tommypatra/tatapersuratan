@@ -36,6 +36,7 @@ Route::get('/grup', [WebController::class, 'grup'])->name('grup');
 Route::get('/spesimen-jabatan', [WebController::class, 'spesimenJabatan'])->name('spesimen-jabatan');
 Route::get('/akses-pola', [WebController::class, 'aksesPola'])->name('akses-pola');
 Route::get('/akses-surat-masuk', [WebController::class, 'aksesSuratMasuk'])->name('akses-surat-masuk');
+Route::get('/akses-disposisi', [WebController::class, 'aksesDisposisi'])->name('akses-disposisi');
 Route::get('/pola-spesimen', [WebController::class, 'polaSpesimen'])->name('pola-spesimen');
 Route::get('/profil', [WebController::class, 'profil'])->name('profil');
 Route::get('/disposisi', [WebController::class, 'disposisi'])->name('disposisi');

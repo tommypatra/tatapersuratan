@@ -12,6 +12,7 @@ use App\Models\SuratKeluar;
 use Illuminate\Support\Str;
 use App\Jobs\SendMessageJob;
 use App\Models\PolaSpesimen;
+use App\Models\AksesDisposisi;
 use App\Models\SpesimenJabatan;
 use App\Models\KlasifikasiSurat;
 use Illuminate\Support\Facades\DB;
@@ -104,6 +105,37 @@ function getAksesPola($user_id, $tahun)
     ];
     return $retval;
 }
+
+function getAksesDisposisi($user_id, $tahun)
+{
+    $query = AksesDisposisi::with(
+        [
+            'spesimenJabatan.user',
+            'spesimenJabatan' => function ($query) {
+                $query->orderBy('id', 'ASC');
+            },
+            'user' => function ($query) {
+                $query->select('id', 'name', 'email');
+            }
+        ]
+    )
+        ->where('tahun', $tahun)
+        ->where('user_id', $user_id)
+        ->orderBy('tahun', 'desc')
+        ->orderBy('user_id', 'asc')
+        ->orderBy('spesimen_jabatan_id', 'asc')
+        ->get();
+
+    $data = [];
+    foreach ($query as $i => $dp) {
+        $data[$i]['jabatan'] = $dp['spesimenJabatan']->jabatan;
+        $data[$i]['user_pejabat_id'] = $dp['spesimenJabatan']->pejabat->id;
+        $data[$i]['nama_pejabat'] = $dp['spesimenJabatan']->pejabat->name;
+    }
+
+    return $data;
+}
+
 
 function getAdminSpesimen($pola_spesimen_id)
 {

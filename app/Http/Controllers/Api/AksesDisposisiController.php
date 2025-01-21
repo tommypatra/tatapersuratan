@@ -6,57 +6,76 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
-use App\Http\Requests\SpesimenJabatanRequest;
-use App\Http\Resources\SpesimenJabatanResource;
-use App\Models\SpesimenJabatan;
+use App\Http\Requests\AksesDisposisiRequest;
+use App\Http\Resources\AksesDisposisiResource;
+use App\Models\AksesDisposisi;
+use App\Models\User;
 
-class SpesimenJabatanController extends Controller
+class AksesDisposisiController extends Controller
 {
     //OKE
     public function index(Request $request)
     {
-        $query = SpesimenJabatan::with(['user' => function ($query) {
-            $query->select('id', 'name', 'email');
-        }, 'pejabat.profil', 'pejabat.spesimenJabatanPejabat']);
+        $query = AksesDisposisi::with(
+            [
+                'spesimenJabatan.pejabat',
+                'user' => function ($query) {
+                    $query->select('id', 'name', 'email');
+                }
+            ]
+        )
+            ->orderBy('tahun', 'desc')
+            ->orderBy('user_id', 'asc')
+            ->orderBy('spesimen_jabatan_id', 'asc');
+
 
         //untuk filter lebih dari 1 kolom
         $filter = $request->input('filter');
         if ($filter) {
             $filterArray = json_decode($filter, true);
-            if ($filterArray) {
+            if (is_array($filterArray)) {
                 foreach ($filterArray as $i => $dp) {
-                    $query->where($i, $dp);
+                    if ($i == 'tahun') {
+                        $tahun_sekarang = $dp;
+                        $query->where('tahun', $tahun_sekarang);
+                    } else
+                        $query->where($i, $dp);
                 }
+            } else {
+                // $query->whereHas('tujuan', function ($query) use ($filter) {
+                //     $query->where('user_id', $filter);
+                // });
             }
         }
 
         //untuk pencarian
         $keyword = $request->input('keyword');
         if ($keyword) {
-            $query->where('jabatan', 'LIKE', "%$keyword%");
-            $query->orWhere('kode', 'LIKE', "%$keyword%");
-            $query->orWhere('keterangan', 'LIKE', "%$keyword%");
+            $query->whereHas('user', function ($query) use ($keyword) {
+                $query->where('name', 'LIKE', "%" . $keyword . "%")
+                    ->orWhere('email', 'LIKE', "%" . $keyword . "%");
+            });
         }
 
-
-        $query->orderBy('kode', 'asc')->orderBy('jabatan', 'asc');
-
+        // echo $query->toSql();
         $perPage = $request->input('per_page', env('DATA_PER_PAGE', 10));
-        $page = ($perPage == 'all') ? 'all' : $request->input('page', env('DATA_PER_PAGE', 10));
+        $page = $request->input('page', env('DATA_PER_PAGE', 10));
+
         if ($page === 'all') {
             $data = $query->get();
         } else {
             $perPage = ($perPage == 'all') ? 20 : 20;
+
             $data = $query->paginate($perPage);
         }
 
-        return SpesimenJabatanResource::collection($data);
+        return AksesDisposisiResource::collection($data);
     }
 
     //OKE 
     public function findID($id)
     {
-        $data = SpesimenJabatan::findOrFail($id);
+        $data = AksesDisposisi::findOrFail($id);
         if (!$data) {
             return response()->json([
                 'success' => false,
@@ -77,18 +96,17 @@ class SpesimenJabatanController extends Controller
     }
 
     //OKE PUT application/x-www-form-urlencoded
-    public function store(SpesimenJabatanRequest $request)
+    public function store(AksesDisposisiRequest $request)
     {
         try {
             $validatedData = $request->validated();
-            $validatedData['user_id'] = auth()->user()->id;
 
-            $data = SpesimenJabatan::create($validatedData);
+            $data = AksesDisposisi::create($validatedData);
 
             return response()->json([
                 'success' => true,
                 'message' => 'created successfully',
-                'data' => new SpesimenJabatanResource($data),
+                'data' => new AksesDisposisiResource($data),
             ], 201);
         } catch (ValidationException $e) {
             return response()->json([
@@ -106,20 +124,18 @@ class SpesimenJabatanController extends Controller
     }
 
     //OKE PUT application/x-www-form-urlencoded
-    public function update(SpesimenJabatanRequest $request, $id)
+    public function update(AksesDisposisiRequest $request, $id)
     {
 
         try {
             $validatedData = $request->validated();
-            $validatedData['user_id'] = auth()->user()->id;
-
             $data = $this->findId($id);
             $data->update($validatedData);
 
             return response()->json([
                 'success' => true,
                 'message' => 'updated successfully',
-                'data' => new SpesimenJabatanResource($data),
+                'data' => new AksesDisposisiResource($data),
             ], 200);
         } catch (ValidationException $e) {
             return response()->json([

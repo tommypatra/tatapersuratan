@@ -16,6 +16,11 @@ class SpesimenJabatan extends Model
         return $this->hasMany(AksesSuratMasuk::class);
     }
 
+    public function aksesDisposisi()
+    {
+        return $this->hasMany(AksesDisposisi::class);
+    }
+
     public function polaSpesimen()
     {
         return $this->hasMany(PolaSpesimen::class);

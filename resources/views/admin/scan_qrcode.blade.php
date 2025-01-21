@@ -79,7 +79,7 @@
 
     function aksesDisposisi(tahun) {
         $.ajax({
-            url: `${vBaseUrl}/api/get-akses-pola?filter={"tahun":"${tahun}"}`,
+            url: `${vBaseUrl}/api/get-akses-disposisi?tahun=${tahun}`,
             type: "GET",
             success: function(response) {
                 var uniqueData = {};
@@ -89,21 +89,8 @@
                     $('#info-surat').show();
 
                     // Iterasi data dan simpan ke objek uniqueData
-                    $.each(response.data, function(i, item) {
-                        var jabatan = item.pola_spesimen.spesimen_jabatan.jabatan;
-                        if (!uniqueData[jabatan]) {
-                            uniqueData[jabatan] = {
-                                jabatan: jabatan,
-                                user_pejabat_id: item.pola_spesimen.spesimen_jabatan.user_pejabat_id
-                            };
-                        }
-                    });
-
-                    // Ubah objek uniqueData menjadi array
-                    aksesJabatan = Object.values(uniqueData);
-
                     $('#pejabat_user_id').empty();
-                    $.each(aksesJabatan, function(i, item) {
+                    $.each(response.data, function(i, item) {
                         $('#pejabat_user_id').append(new Option(item.jabatan, item.user_pejabat_id));
                     });
 
