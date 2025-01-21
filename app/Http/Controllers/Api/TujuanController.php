@@ -107,12 +107,19 @@ class TujuanController extends Controller
 
             //script kirim WA otomatis
             if ($akun['data']) {
+                $perihal = $surat_masuk['data']->perihal;
                 $pesanWA = "Hai, " . $akun['data']->name . " ada ajuan surat masuk/ disposisi, ";
-                $pesanWA .= "surat berasal dari " . $surat_masuk['data']->tempat . " " . $surat_masuk['data']->asal . " tentang " . $surat_masuk['data']->perihal . ", nomor " . $surat_masuk['data']->no_surat . ", tertanggal " . $data->tanggal . " ";
+                $pesanWA .= "surat berasal dari " . $surat_masuk['data']->tempat . " " . $surat_masuk['data']->asal . " tentang " . $perihal . ", nomor " . $surat_masuk['data']->no_surat . ", tertanggal " . $surat_masuk['data']->tanggal . " ";
                 $pesanWA .= "mohon untuk segera diproses.\n\n";
                 $pesanWA .= "silahkan cek dengan login laman https://surat.iainkendari.ac.id/";
+
                 if ($akun['data']->profil->hp) {
-                    kirimWA($item->profil->hp, $pesanWA);
+                    kirimWA($akun['data']->profil->hp, $pesanWA);
+                    // nanti kirim dokumen sekalian
+                    // if ($akun['data']->lampiranSuratMasuk)
+                    //     foreach ($akun['data']->lampiranSuratMasuk as $i => $item) {
+                    //         kirimWA($akun['data']->profil->hp, "<a href='" . url('/' . $item['link']) . "'>Dokumen " . $perihal . " " . ($i + 1) . "</a>", "document");
+                    //     }
                 }
             }
 

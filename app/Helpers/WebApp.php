@@ -23,9 +23,9 @@ use App\Http\Resources\TujuanResource;
 use App\Http\Resources\DistribusiResource;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
-function kirimWA($phone, $message = null)
+function kirimWA($phone, $message = null, $jenis = 'text')
 {
-    SendMessageJob::dispatch($phone, $message);
+    SendMessageJob::dispatch($phone, $message, $jenis);
     return response()->json(['message' => 'Pesan sedang diproses dalam antrian.']);
 }
 
@@ -156,7 +156,10 @@ function getAdminSpesimen($pola_spesimen_id)
 
 function getInfoSuratMasuk($surat_masuk_id)
 {
-    $query = SuratMasuk::where('id', $surat_masuk_id)->first();
+    $query = SuratMasuk::with([
+        'kategoriSuratMasuk',
+        'lampiranSuratMasuk.upload',
+    ])->where('id', $surat_masuk_id)->first();
 
     $retval = [
         "success" => true,

@@ -60,7 +60,8 @@ Route::get('/get-admin-spesimen/{pola_spesimen_id}', function ($pola_spesimen_id
     }
 });
 
-Route::get('/kirim-wa/{nomor}/{pesan}', function ($nomor, $pesan) {
+Route::get('/kirim-wa/{nomor}/{pesan}/{jenis}', function ($nomor, $pesan, $jenis) {
+    $pesan = ($jenis == "text") ? $pesan : '<a href="https://iainkendari.ac.id/upload/lampiran/IDUP18180454270911793.pdf">Pedoman Akademik</a>';
     kirimWA($nomor, $pesan);
 });
 

@@ -405,7 +405,7 @@
                 if(dt.is_diajukan){
                     menu_edit=``;
 
-                    if(dt.is_diterima==null && (hakAkses==1 || pembuat_surat)){
+                    if(dt.is_diterima==null && (hakAkses==1)){
                         menu_edit=` <li><a class="dropdown-item" href="javascript:;" onclick="validasi(1,${dt.id})"><i class="fa-solid fa-envelope-circle-check"></i> Terima</a></li>
                                     <li><a class="dropdown-item" href="javascript:;" onclick="validasi(0,${dt.id})"><i class="fa-solid fa-rectangle-xmark"></i> Tolak</a></li>`;
                     }

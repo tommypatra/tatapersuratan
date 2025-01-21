@@ -34,6 +34,7 @@
                         </div>
                         
                         <div class="col-sm-12" id="info-surat" style="display:none">    
+                            <hr>                    
                             <h3>Infomasi Surat Masuk</h3>                    
                             <span class="badge bg-primary">Tanggal Surat : <span id="tanggal">_____</span></span>                
                             <h3 id="kategori_surat" class="mt-2">_____</h3>
@@ -86,8 +87,7 @@
                 var uniqueData = {};
 
                 if (response.data && response.data.length > 0) {
-                    $('#scan').hide();
-                    $('#info-surat').show();
+                    // $('#scan').hide();
 
                     // Iterasi data dan simpan ke objek uniqueData
                     $('#pejabat_user_id').empty();
@@ -130,6 +130,7 @@
     }
 
     function bacaIsiSuratMasuk(data){
+
         vId=data.id;
 
         $('#tanggal').text(data.tanggal);
@@ -157,8 +158,9 @@
             lampiran += `</div>`;
         }
         $("#lampiran").html(lampiran);
-        aksesDisposisi(data.tanggal.substring(0, 4));
-
+        $('#info-surat').show();
+        alert("surat ditemukan");
+        $(document).scrollTop($(document).height());
     }
 
     function prosesDisposisi(id){
@@ -180,6 +182,7 @@
 
     $(document).ready(function () {
         cekAkses('pengguna');
+        aksesDisposisi("{{ date('Y') }}");
 
 
         let config = {
@@ -198,11 +201,11 @@
             }
 
             //untuk hentikan scan
-            html5QrcodeScanner.stop().then((ignore) => {
-            // QR Code scanning is stopped.
+            html5QrcodeScanner.stop().then(() => {
+                console.log("Scanning stopped successfully.");
             }).catch((err) => {
-            // Stop failed, handle it.
-            });            
+                console.error("Error stopping the scanner: ", err);
+            });
         };
         html5QrcodeScanner.render(qrCodeSuccessCallback);
 

@@ -212,7 +212,7 @@ class SuratKeluarController extends Controller
             foreach ($data_admin['data'] as $i => $row) {
                 // if ($row->user->profil->hp) {
                 if ($row->user->profil->hp && $row->user->id != auth()->user()->id) {
-                    $pesanWA = "Hai " . $row->user->name . ", kami informasikan bahwa " . auth()->user()->name . " beberapa saat lalu telah melakukan :\n";
+                    $pesanWA = "Hai " . $row->user->name . ", beberapa saat lalu " . auth()->user()->name . " mengajukan pengambilan nomor, yaitu :\n";
                     foreach ($pesan as $i => $item) {
                         $pesanWA .= "\n" . $item . "\n";
                     }

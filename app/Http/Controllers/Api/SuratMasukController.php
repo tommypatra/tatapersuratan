@@ -50,6 +50,7 @@ class SuratMasukController extends Controller
                         switch ($dp) {
                             case "konsep":
                                 $query->where('is_diajukan', '!=', 1);
+                                $query->where('user_id', $user_id);
                                 $kategori = "konsep";
                                 break;
                             case "diajukan":
@@ -84,7 +85,7 @@ class SuratMasukController extends Controller
 
                         // dd($user_pejabat_id);
                         $query->whereYear('tanggal', $tahun_sekarang);
-                        if (!empty($user_pejabat_id)) {
+                        if (!empty($user_pejabat_id) && !izinkanAkses("admin")) {
 
                             $query->Where(function ($query) use ($user_id, $user_pejabat_id) {
                                 $query->orWhere('user_id', $user_id);
@@ -93,9 +94,9 @@ class SuratMasukController extends Controller
                                 });
                             });
                         } else {
-                            // if (!izinkanAkses("admin")) {
-                            $query->where('user_id', auth()->user()->id);
-                            // }
+                            if (!izinkanAkses("admin")) {
+                                $query->where('user_id', auth()->user()->id);
+                            }
                         }
                     } elseif ($i == 'bulan') {
                         $bulan_sekarang = $dp;
@@ -272,19 +273,18 @@ class SuratMasukController extends Controller
                 ], 500);
 
 
-            // $data->update(['is_diajukan' => 1]);
+            $data->update(['is_diajukan' => 1]);
 
             $admin = getAdmin();
             foreach ($admin['data'] as $i => $item) {
-                $pesanWA = "Hai, " . $item->name . " ada ajuan surat masuk/ disposisi baru oleh " . auth()->user()->name . ", ";
-                $pesanWA .= "surat berasal dari " . $data->tempat . " " . $data->asal . " tentang " . $data->perihal . ", nomor " . $data->no_surat . ", tertanggal " . $data->tanggal . " ";
+                $pesanWA = "Hai, " . $item->name . " ada ajuan surat masuk untuk proses disposisi dari " . auth()->user()->name . ", ";
+                $pesanWA .= "surat berasal dari " . $data->tempat . " (" . $data->asal . ") tentang " . $data->perihal . ", nomor " . $data->no_surat . ", tertanggal " . $data->tanggal . " ";
                 $pesanWA .= "mohon untuk segera diproses.\n\n";
                 $pesanWA .= "silahkan cek dengan login laman https://surat.iainkendari.ac.id/";
                 if ($item->profil->hp) {
                     kirimWA($item->profil->hp, $pesanWA);
                 }
             }
-
 
             return response()->json([
                 'success' => true,
@@ -316,8 +316,27 @@ class SuratMasukController extends Controller
             ];
 
             $data = $this->findId($request->input('id'));
-
             $data->update($dataSave);
+
+            $akun = getInfoAkun($data->user_id);
+            if ($akun['data']) {
+
+                $perihal = $data->perihal;
+                $pesanWA = "Hai, " . $akun['data']->name . " ajuan surat tentang " . $data->perihal . " tertanggal " . $data->tanggal . " ";
+                if ($request->input('is_diterima') == 1) {
+                    $pesanWA .= "sudah diterima dan diproses disposisi.\n\n";
+                } else {
+                    $pesanWA .= "ditolak dan tidak diproses disposisi";
+                    if ($request->input('catatan'))
+                        $pesanWA .= " karena " . $request->input('catatan') . ".\n\n";
+                }
+                $pesanWA .= "silahkan cek dengan login laman https://surat.iainkendari.ac.id/";
+
+                if ($akun['data']->profil->hp) {
+                    kirimWA($akun['data']->profil->hp, $pesanWA);
+                }
+            }
+
 
             return response()->json([
                 'success' => true,
