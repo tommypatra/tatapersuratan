@@ -211,7 +211,7 @@
 };
 
 let html5QrcodeScanner = new Html5QrcodeScanner("reader", config, /* verbose= */ false);
-html5QrcodeScanner.render(onScanSuccess);
+html5QrcodeScanner.render(qrCodeSuccessCallback);
 
 
         $('#btnRefresh').click(function(){
