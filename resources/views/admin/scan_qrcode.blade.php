@@ -208,12 +208,12 @@
                 focusMode: "continuous"  // Mode fokus berkelanjutan jika didukung
             }
         };        
-
+        html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback)
+        .catch(err => console.error("Gagal memulai scan:", err));
         // const config = { fps: 10, qrbox: { width: 250, height: 250 } };
         // If you want to prefer front camera
         
-        html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
-        // html5QrCode.start({ video: { facingMode: { exact: "environment" }, width: 1280, height: 720 } }, config, qrCodeSuccessCallback);
+        // html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
 
         $('#btnRefresh').click(function(){
             prosesDisposisi(vId);
