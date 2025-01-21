@@ -199,6 +199,7 @@
 
         const config = { 
             fps: 10, 
+            facingMode: "environment",
             qrbox: { width: 300, height: 300 },
             aspectRatio: 4/3,
             videoConstraints: {
