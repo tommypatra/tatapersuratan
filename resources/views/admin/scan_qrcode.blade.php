@@ -197,21 +197,19 @@
             });            
         };
 
-        // const config = { 
-        //     fps: 10, 
-        //     qrbox: { width: 300, height: 300 },
-        //     aspectRatio: 4/3,
-        //     videoConstraints: {
-        //         width: { ideal: 640 },
-        //         height: { ideal: 480 },
-        //         focusMode: "continuous"  // Mode fokus berkelanjutan jika didukung
-        //     }
-        // };        
-        // html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback)
-        // .catch(err => console.error("Gagal memulai scan:", err));
-        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-        // If you want to prefer front camera        
-        html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
+        // const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+        // // If you want to prefer front camera        
+        // html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
+
+
+        const config = {
+            fps: 10,
+            qrbox: { width: 250, height: 250 },
+            formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+            };
+
+        const html5QrCode = new Html5Qrcode("reader");
+        html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess);
 
         $('#btnRefresh').click(function(){
             prosesDisposisi(vId);
