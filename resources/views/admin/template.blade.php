@@ -37,7 +37,7 @@
 					</li>
 					<li class="sidebar-item">
 						<a class="sidebar-link" href="{{ route('scan-qrcode') }}">
-							<i class="align-middle" data-feather="aperture"></i> <span class="align-middle">Scan QrCode</span>
+							<i class="align-middle" data-feather="aperture"></i> <span class="align-middle">Scan Surat Masuk</span>
 						</a>
 					</li>				
 					<li class="sidebar-item">

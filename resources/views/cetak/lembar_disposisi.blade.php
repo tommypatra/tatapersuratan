@@ -267,6 +267,7 @@
                 <td></td>
             </tr>
         </table>
+        <i>surat masuk id : <span class="token" id="token"></span></i>
     </div>
 </body>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -312,6 +313,7 @@
                 $('#tanggal').text(data.tanggal);
                 $('#tanggal_diterima').text(formattedDate);                
                 $('#no_agenda').text(data.no_agenda);
+                $('#token').text(data.token);
                 $('#asal').text(`${data.asal} (${data.tempat})`);
                 $('#perihal').text(`${perihal}`);
 
@@ -329,7 +331,8 @@
 
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                forceLogout();
+                alert('terjadi kesalahan');
+                // forceLogout();
                 // console.error("Error:", textStatus, errorThrown);
                 // Jika perlu, tambahkan fungsi logout atau error handling lain
             }

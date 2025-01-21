@@ -11,7 +11,6 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-
                     <header class="p-2 border-bottom">
                         <div class="container">
                             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">                        
@@ -27,6 +26,9 @@
                 <div class="card-body">
                     <div class="row"> 
                         <div class="col-sm-12" id="scan">
+                            <h3>Nomor Surat Masuk</h3>                    
+                            <input type="text" id="nomor_surat_masuk" class="form-control" value="{{ date('Y') }}-">
+                            <hr>
                             <h3>Proses Scan QrCode</h3>                    
                             <div style="width: 100%" id="reader"></div>
                         </div>
@@ -69,7 +71,6 @@
 <script src="{{ asset('js/html5-qrcode-master/minified/html5-qrcode.min.js') }}"></script>
 <script src="{{ asset('js/app.js') }}"></script>
 <script>
-    var vAksesJabatan=[];
     var vId=null;
     $.ajaxSetup({
         headers: {
@@ -94,8 +95,6 @@
                         $('#pejabat_user_id').append(new Option(item.jabatan, item.user_pejabat_id));
                     });
 
-                    // Tampilkan hasil
-                    console.log(aksesJabatan);
                 } else {
                     alert("Akses disposisi tidak ditemukan");
                     window.location.replace(vBaseUrl+'/akun-dashboard');
@@ -117,8 +116,7 @@
                 user_id:$('#pejabat_user_id').val(),
             },
             success: function(response) {
-                // Tampilkan hasil
-                appShowNotification(true,'surat masuk berhasil diterima');
+                appShowNotification(true,['surat masuk berhasil diterima']);
                 // console.log(aksesJabatan);
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -131,49 +129,51 @@
         });
     }
 
+    function bacaIsiSuratMasuk(data){
+        vId=data.id;
+
+        $('#tanggal').text(data.tanggal);
+        $('#kategori_surat').text(data.kategori_surat);
+        $('#perihal').text(data.perihal);
+        $('#no_surat').text(data.no_surat);
+        $('#ringkasan').text(data.ringkasan);
+        $('#asal').text(`${data.asal} (${data.tempat})`);
+
+
+        //lampiran
+        var lampiran = `<span class="badge bg-danger">Belum terupload</span>`;
+        if (data.lampiran_surat_masuk.length > 0) {
+            lampiran = `<h4>Dokumen Surat Keluar :</h4>
+                        <div class="row" id="list-images">`;
+            $.each(data.lampiran_surat_masuk, function(i, dt) {
+                let linkfile = `${vBaseUrl}/${dt.upload.path}`;
+                lampiran += `<div class="col-lg-3 mb-3 ">`;
+                if (is_image(dt.upload.type))
+                    lampiran += `<span class="img-preview"><img src="${linkfile}" width="100%"></span>`;
+                else
+                    lampiran += `<i class="fa-solid fa-arrow-up-right-from-square"></i> <a href="${linkfile}" target="_blank">${dt.upload.name}</a>`;
+                lampiran += `</div>`;
+            });
+            lampiran += `</div>`;
+        }
+        $("#lampiran").html(lampiran);
+        aksesDisposisi(data.tanggal.substring(0, 4));
+
+    }
+
     function prosesDisposisi(id){
         // Kirim request AJAX
         $.ajax({
             url: `${vBaseUrl}/api/surat-masuk/${id}`,
             type: "GET",
             success: function(response) {
-                vAksesJabatan=[];
-                vId=id;
                 if(response.success){
                     data=response.data;
-                    //tampilkan info surat masuk
-                    $('#tanggal').text(data.tanggal);
-                    $('#kategori_surat').text(data.kategori_surat);
-                    $('#perihal').text(data.perihal);
-                    $('#no_surat').text(data.no_surat);
-                    $('#ringkasan').text(data.ringkasan);
-                    $('#asal').text(`${data.asal} (${data.tempat})`);
-
-
-                    //lampiran
-                    var lampiran = `<span class="badge bg-danger">Belum terupload</span>`;
-                    if (data.lampiran_surat_masuk.length > 0) {
-                        lampiran = `<h4>Dokumen Surat Keluar :</h4>
-                                    <div class="row" id="list-images">`;
-                        $.each(data.lampiran_surat_masuk, function(i, dt) {
-                            let linkfile = `${vBaseUrl}/${dt.upload.path}`;
-                            lampiran += `<div class="col-lg-3 mb-3 ">`;
-                            if (is_image(dt.upload.type))
-                                lampiran += `<span class="img-preview"><img src="${linkfile}" width="100%"></span>`;
-                            else
-                                lampiran += `<i class="fa-solid fa-arrow-up-right-from-square"></i> <a href="${linkfile}" target="_blank">${dt.upload.name}</a>`;
-                            lampiran += `</div>`;
-                        });
-                        lampiran += `</div>`;
-                    }
-                    $("#lampiran").html(lampiran);
-
-
-                    aksesDisposisi(data.tanggal.substring(0, 4));
+                    bacaIsiSuratMasuk(data);   
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                forceLogout();
+                window.location.replace(vBaseUrl+'/akun-dashboard');
             }
         });
     }
@@ -181,7 +181,15 @@
     $(document).ready(function () {
         cekAkses('pengguna');
 
-        const html5QrCode = new Html5Qrcode("reader");
+
+        let config = {
+            fps: 10,
+            qrbox: {width: 100, height: 100},
+            rememberLastUsedCamera: true,
+            supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
+        };
+        let html5QrcodeScanner = new Html5QrcodeScanner("reader", config, false);
+
         const qrCodeSuccessCallback = (decodedText, decodedResult) => {
             const qrData = JSON.parse(decodedText);
             $("#output").html(qrData.id+' '+qrData.api);
@@ -190,28 +198,13 @@
             }
 
             //untuk hentikan scan
-            html5QrCode.stop().then((ignore) => {
+            html5QrcodeScanner.stop().then((ignore) => {
             // QR Code scanning is stopped.
             }).catch((err) => {
             // Stop failed, handle it.
             });            
         };
-
-        // const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-        // // If you want to prefer front camera        
-        // html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
-
-
-        let config = {
-  fps: 10,
-  qrbox: {width: 100, height: 100},
-  rememberLastUsedCamera: true,
-  // Only support camera scan type.
-  supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
-};
-
-let html5QrcodeScanner = new Html5QrcodeScanner("reader", config, /* verbose= */ false);
-html5QrcodeScanner.render(qrCodeSuccessCallback);
+        html5QrcodeScanner.render(qrCodeSuccessCallback);
 
 
         $('#btnRefresh').click(function(){
@@ -223,6 +216,33 @@ html5QrcodeScanner.render(qrCodeSuccessCallback);
                 disposisi();
         });
         
+        let isRequestInProgress = false;
+        $('#nomor_surat_masuk').on('keyup', function(event) {
+            var nomor_surat = $(this).val().trim();
+
+            if (nomor_surat.length === 11 && !isRequestInProgress) {
+                isRequestInProgress = true;
+
+                $.ajax({
+                    url: 'api/get-surat-masuk',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: { nomor_surat: nomor_surat },
+                    success: function(response) {
+                        if(response.success){
+                            data=response.data;
+                            bacaIsiSuratMasuk(data);   
+                        }
+                    },
+                    error: function(xhr) {
+                        console.log('Terjadi kesalahan:', xhr.responseText);
+                    },
+                    complete: function() {
+                        isRequestInProgress = false;
+                    }
+                });
+            }
+        });
 
     });
 </script>

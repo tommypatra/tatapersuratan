@@ -8,6 +8,7 @@ use App\Models\Tujuan;
 use App\Models\AksesPola;
 use App\Models\PolaSurat;
 use App\Models\Distribusi;
+use App\Models\SuratMasuk;
 use App\Models\SuratKeluar;
 use Illuminate\Support\Str;
 use App\Jobs\SendMessageJob;
@@ -144,6 +145,32 @@ function getAdminSpesimen($pola_spesimen_id)
             'user.profil'
         ]
     )->where('pola_spesimen_id', $pola_spesimen_id)->get();
+
+    $retval = [
+        "success" => true,
+        "message" => "data ditemukan",
+        "data" => $query,
+    ];
+    return $retval;
+}
+
+function getInfoSuratMasuk($surat_masuk_id)
+{
+    $query = SuratMasuk::where('id', $surat_masuk_id)->first();
+
+    $retval = [
+        "success" => true,
+        "message" => "data ditemukan",
+        "data" => $query,
+    ];
+    return $retval;
+}
+
+function getInfoAkun($user_id)
+{
+    $query = User::with([
+        'profil'
+    ])->where('id', $user_id)->first();
 
     $retval = [
         "success" => true,

@@ -97,7 +97,25 @@ class TujuanController extends Controller
     {
         try {
             $validatedData = $request->validated();
+
+            $surat_masuk = getInfoSuratMasuk($validatedData['surat_masuk_id']);
+            $akun = getInfoAkun($validatedData['user_id']);
+            // dd($surat_masuk['data']);
+            // dd($akun['data']);
+
             $data = Tujuan::create($validatedData);
+
+            //script kirim WA otomatis
+            if ($akun['data']) {
+                $pesanWA = "Hai, " . $akun['data']->name . " ada ajuan surat masuk/ disposisi, ";
+                $pesanWA .= "surat berasal dari " . $surat_masuk['data']->tempat . " " . $surat_masuk['data']->asal . " tentang " . $surat_masuk['data']->perihal . ", nomor " . $surat_masuk['data']->no_surat . ", tertanggal " . $data->tanggal . " ";
+                $pesanWA .= "mohon untuk segera diproses.\n\n";
+                $pesanWA .= "silahkan cek dengan login laman https://surat.iainkendari.ac.id/";
+                if ($akun['data']->profil->hp) {
+                    kirimWA($item->profil->hp, $pesanWA);
+                }
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'created successfully',

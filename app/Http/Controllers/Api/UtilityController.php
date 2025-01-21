@@ -144,8 +144,20 @@ class UtilityController extends Controller
                 },
             ]);
 
-        $query->where('id', $request->input('id'));
+        if ($request->input('id'))
+            $query->where('id', $request->input('id'));
+        elseif ($request->input('nomor_surat'))
+            $query->where('token', $request->input('nomor_surat'));
+        else
+            $query->where('id', 0);
+
         $data = $query->first();
+        if (!$data)
+            return response()->json([
+                'success' => false,
+                'message' => 'tidak ditemukan',
+                'data' => [],
+            ], 404);
 
         return response()->json([
             'success' => true,
