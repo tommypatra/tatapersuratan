@@ -196,12 +196,18 @@
             // Stop failed, handle it.
             });            
         };
+
         const config = { 
             fps: 10, 
             qrbox: { width: 300, height: 300 },
-            aspectRatio: 1.7777778,  // Sesuaikan dengan kamera HP (16:9)
-            experimentalFeatures: { useBarCodeDetectorIfSupported: true }  // Fitur terbaru untuk meningkatkan akurasi
-        };
+            aspectRatio: 4/3,
+            videoConstraints: {
+                width: { ideal: 640 },
+                height: { ideal: 480 },
+                focusMode: "continuous"  // Mode fokus berkelanjutan jika didukung
+            }
+        };        
+
         // const config = { fps: 10, qrbox: { width: 250, height: 250 } };
         // If you want to prefer front camera
         
