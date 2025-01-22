@@ -56,8 +56,8 @@ class SendMessageJob implements ShouldQueue
         $response = Http::withHeaders([
             'Authorization' => "$token.$secretKey",
         ])->post('https://kudus.wablas.com/api/send-message', [
-            'phone' => $this->phone . $this->jenis,
-            'message'  => $this->message . " " . $this->jenis,
+            'phone' => $this->phone,
+            'message'  => $this->message,
         ]);
         $this->handleResponse($response);
     }
