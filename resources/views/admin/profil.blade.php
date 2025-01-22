@@ -81,6 +81,7 @@
     var vApi='/api/profil';
     var vJudul='Profil';
     var user_id;
+    var profil_id;
     sel2_jeniskelamin("#jenis_kelamin");
     function refresh(){
         initData();
@@ -105,6 +106,7 @@
         $("#email").html(dt.email);
 
         let profil=dt.profil;
+        profil_id=profil.id;
         // $("#id").val(profil.id);
         $("#hp").val(profil.hp);
         $("#nip").val(profil.nip);
@@ -120,7 +122,7 @@
     $("#myForm").validate({
         submitHandler: function(form) {
             let setup_ajax={type:'POST',url:vApi};
-            let id=user_id;
+            let id=profil_id;
             if (id !== "")
                 setup_ajax={type:'PUT',url:vApi+'/'+id};
             simpan(setup_ajax,form)
