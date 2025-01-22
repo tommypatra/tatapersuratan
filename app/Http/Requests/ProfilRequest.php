@@ -26,6 +26,7 @@ class ProfilRequest extends FormRequest
         return [
             'jenis_kelamin' => 'required',
             'alamat' => 'required',
+            'nip' => 'required',
             'hp' => 'required',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4096',
         ];
@@ -37,6 +38,7 @@ class ProfilRequest extends FormRequest
             'jenis_kelamin' => 'jenis kelamin',
             'user_id' => 'user id',
             'foto' => 'foto',
+            'nip' => 'nip',
             'alamat' => 'alamat',
             'hp' => 'hp',
         ];
