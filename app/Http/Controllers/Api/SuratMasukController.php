@@ -17,9 +17,9 @@ class SuratMasukController extends Controller
     {
         $user_id = auth()->user()->id;
 
-        $query = SuratMasuk::orderBy('created_at', 'desc')
-            ->orderBy('tanggal', 'desc')
-            ->orderBy('perihal', 'asc')
+        $query = SuratMasuk::orderByRaw('YEAR(tanggal) DESC')
+            ->orderByRaw('CAST(no_agenda AS UNSIGNED) DESC')
+            // ->orderBy('created_at', 'desc')
             ->with([
                 'kategoriSuratMasuk',
                 'user',

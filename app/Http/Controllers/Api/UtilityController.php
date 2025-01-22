@@ -317,6 +317,15 @@ class UtilityController extends Controller
         ], 200);
     }
 
+    public function nomorAgendaTerakhir($kategori, $tahun)
+    {
+        return response()->json([
+            'success' => true,
+            'message' => 'data ditemukan',
+            'data' => getNomorAgenda($kategori, $tahun),
+        ], 200);
+    }
+
     public function getKlasifikasiSuratKeluar(Request $request)
     {
         $query = KlasifikasiSurat::orderBy('kode', 'asc')

@@ -21,13 +21,13 @@
                         <div class="container">
                             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
                         
-                                <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                                <ul class="nav col-12 col-sm-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                                     <li><a href="javascript:;" id="btnRefresh" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="refresh-cw"></i> Refresh</a></li>
                                     <li><a href="javascript:;" id="btnTambah" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="plus-circle"></i> Tambah</a></li>
                                     <li><a href="javascript:;" id="btnFilter" class="nav-link px-2 link-dark" onclick="setfilter()"><i class="align-middle" data-feather="filter"></i> Filter</a></li>
 
                                 </ul>                        
-                                <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
+                                <form class="col-12 col-sm-auto mb-3 mb-lg-0 me-lg-3">
                                     <input type="search" id="search-data" class="form-control" placeholder="Search..." aria-label="Search">
                                 </form>                        
                             </div>
@@ -97,19 +97,7 @@
                 </div>
                 <div class="modal-body ">
                     <div class="row">
-						<div class="col-lg-2 mb-3">
-                            <label class="form-label">Nomor Agenda</label>
-                            <input name="no_agenda" id="no_agenda" type="text" class="form-control" placeholder="" required>
-                        </div>
-						<div class="col-lg-7 mb-3">
-                            <label class="form-label">Nomor Surat</label>
-                            <input name="no_surat" id="no_surat" type="text" class="form-control" placeholder="" required>
-                        </div>
-						<div class="col-lg-3 mb-3">
-                            <label class="form-label">Tanggal Surat</label>
-                            <input name="tanggal" id="tanggal" type="text" class="form-control datepicker" value="{{ date("Y-m-d") }}" placeholder="" required>
-                        </div>
-						<div class="col-lg-4 mb-3">
+						<div class="col-sm-4 mb-3">
                             <label class="form-label">Kategori</label>
                             <select class="form-control" id="kategori_surat" name="kategori_surat" required>
                                 <option value="">- Pilih -</option>
@@ -118,23 +106,36 @@
                                 <option value="EKSTERNAL">EKSTERNAL</option>
                             </select>
                         </div>
-						<div class="col-lg-8 mb-3">
+						<div class="col-sm-4 mb-3">
+                            <label class="form-label">Tanggal Surat</label>
+                            <input name="tanggal" id="tanggal" type="text" class="form-control datepicker" value="{{ date("Y-m-d") }}" placeholder="" required>
+                        </div>
+
+                        <div class="col-sm-4 mb-3">
+                            <label class="form-label">Nomor Agenda</label>
+                            <input name="no_agenda" id="no_agenda" type="text" class="form-control" placeholder="" required>
+                        </div>
+						<div class="col-sm-8 mb-3">
+                            <label class="form-label">Nomor Surat</label>
+                            <input name="no_surat" id="no_surat" type="text" class="form-control" placeholder="" required>
+                        </div>
+						<div class="col-sm-4 mb-3">
                             <label class="form-label">Sifat Surat</label>
                             <select class="form-control" id="kategori_surat_masuk_id" name="kategori_surat_masuk_id" required></select>
                         </div>
-						<div class="col-lg-6 mb-3">
+						<div class="col-sm-6 mb-3">
                             <label class="form-label">Daerah Asal Surat</label>
                             <input name="asal" id="asal" type="text" class="form-control" placeholder="ex : kendari atau jakarta, dst" required>
                         </div>
-						<div class="col-lg-6 mb-3">
+						<div class="col-sm-6 mb-3">
                             <label class="form-label">Nama Institusi</label>
                             <input name="tempat" id="tempat" type="text" class="form-control" placeholder="ex : Kemenag RI, Dirjen Pendis, Gubernur Sultra" required>
                         </div>
-						<div class="col-lg-12 mb-3">
+						<div class="col-sm-12 mb-3">
                             <label class="form-label">Perihal</label>
                             <textarea name="perihal" id="perihal" class="form-control" rows="4" required></textarea>
                         </div>
-						<div class="col-lg-12 mb-3">
+						<div class="col-sm-12 mb-3">
                             <label class="form-label">Ringkasan</label>
                             <textarea name="ringkasan" id="ringkasan" class="form-control" rows="4" ></textarea>
                         </div>
@@ -160,11 +161,11 @@
             </div>
             <div class="modal-body">
                 <div class="row mb-3" style="align:center">
-                    <div class="col-lg-8">
+                    <div class="col-sm-8">
                         <button id="switch-camera" class="btn btn-primary">Switch Camera</button>
                         <video id="camera" autoplay width="100%"></video>
                     </div>                
-                    <div class="col-lg-4">
+                    <div class="col-sm-4">
                         <button type="button" class="btn btn-success" id="take-photo">Ambil Gambar</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                     </div>                
@@ -187,7 +188,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="col-lg-12 mb-3">
+                    <div class="col-sm-12 mb-3">
                         <label class="form-label">Disposisi Pertama</label>
                         {{-- <select class="form-control" id="select_user_id" name="user_id[]" required multiple="multiple"></select> --}}
                         <select class="form-control" id="select_user_id" name="user_id" required></select>
@@ -494,6 +495,7 @@
                         <td>
                             ${status_disposisi}
                             ${track_disposisi}
+                            <div style="font-size:11px;">Token : ${suratMasuk.token}</div>
                         </td>
                         <td>${suratMasuk.user.name}<div style="text-align:center;font-size:10px;">${suratMasuk.created_at}</div></td>
                         <td>
@@ -1010,6 +1012,36 @@ function displayPagination(response) {
         $('#modal-upload').on('hidden.bs.modal', function() {
             stopCamera();
         });
+
+        function cariNoAgenda(){
+            var kategori_surat = $("#kategori_surat").val();
+            var tahun = $("#tanggal").val();
+            var tanggal = $("#tanggal").val();
+            var tahun = new Date(tanggal).getFullYear();
+
+            if(!$("#id").val()){
+                $.ajax({
+                    url: `/api/nomor-agenda-terakhir/${kategori_surat}/${tahun}`,
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        $('#no_agenda').val(response.data);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+            }
+        }
+
+        $('#kategori_surat').on('change', function() {
+            cariNoAgenda();
+        });
+
+        $('#tanggal').on('change', function() {
+            cariNoAgenda();       
+        });
+        
     });
 
 </script>

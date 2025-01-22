@@ -69,6 +69,9 @@ Route::middleware(['auth.jwt'])->group(function () {
     Route::get('get-pejabat', [SpesimenJabatanController::class, 'index']);
     // Route::resource('spesimen-jabatan', SpesimenJabatanController::class);
 
+    Route::get('nomor-agenda-terakhir/{kategori}/{tahun}', [UtilityController::class, 'nomorAgendaTerakhir']);
+
+
     Route::get('get-klasifikasi-surat-keluar', [UtilityController::class, 'getKlasifikasiSuratKeluar']);
     Route::post('ganti-foto-profil', [UtilityController::class, 'gantiFotoProfil']);
     Route::get('info-akun-login', [ProfilController::class, 'infoAkunLogin']);

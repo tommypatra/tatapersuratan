@@ -622,3 +622,20 @@ if (!function_exists('izinkanAkses')) {
         return true;
     }
 }
+
+if (!function_exists('getNomorAgenda')) {
+    function getNomorAgenda($kategori, $tahun)
+    {
+        $query = SuratMasuk::selectRaw("no_agenda, CAST(no_agenda AS UNSIGNED) as num_agenda")
+            ->where('is_diterima', 1)
+            ->where('kategori_surat', $kategori)
+            ->whereYear('tanggal', $tahun)
+            ->orderByRaw('CAST(no_agenda AS UNSIGNED) DESC');
+        $data = $query->first();
+        $no_agenda = "1";
+        if ($data) {
+            $no_agenda = $data->num_agenda + 1;
+        }
+        return $no_agenda;
+    }
+}
