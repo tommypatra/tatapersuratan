@@ -521,7 +521,7 @@
             if (response.success) {
                 refresh();
                 InfoModule.updateNotifWeb();
-                // $('#modal-form').modal('hide');
+                $('#modal-form').modal('hide');
             } 
             appShowNotification(response.success,[response.message]);
         });
