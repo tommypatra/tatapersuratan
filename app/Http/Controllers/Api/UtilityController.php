@@ -501,6 +501,8 @@ class UtilityController extends Controller
 
             //untuk info surat keluar
             $aksespola = getAksesPola($user_id, $tahun_sekarang);
+            // dd($aksespola);
+
             $suratKeluar = SuratKeluar::selectRaw("
                 COUNT(CASE WHEN is_diajukan = 0 THEN 1 END) as konsep,
                 COUNT(CASE WHEN is_diajukan = 1 AND is_diterima IS NULL THEN 1 END) as diajukan,
@@ -512,8 +514,8 @@ class UtilityController extends Controller
                 ->orderBy('bulan')
                 ->groupBy('bulan');
 
-            if (!empty($aksespola['data'])) {
-                $idAkses = $aksespola['data'];
+            if (!empty($aksespola['data']['pola_spesimen_id'])) {
+                $idAkses = $aksespola['data']['pola_spesimen_id'];
                 $suratKeluar->where(function ($query) use ($user_id, $idAkses) {
                     $query->orWhere('user_id', $user_id)
                         ->orWhere(function ($query) use ($idAkses) {
