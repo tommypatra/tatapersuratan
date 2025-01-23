@@ -27,7 +27,7 @@
                     <div class="row"> 
                         <div class="col-sm-12" id="scan">
                             <h3>Nomor Surat Masuk</h3>                    
-                            <input type="text" id="nomor_surat_masuk" class="form-control" value="{{ date('Y') }}-">
+                            <input type="text" id="nomor_surat_masuk" class="form-control" value="{{ date('Y') }}-" maxlength="11">
                             <hr>
                             <h3>Proses Scan QrCode</h3>                    
                             <div style="width: 100%" id="reader"></div>
@@ -239,6 +239,7 @@
                     },
                     error: function(xhr) {
                         console.log('Terjadi kesalahan:', xhr.responseText);
+                        appShowNotification(false,['Terjadi kesalahan, surat tidak ditemukan']);
                     },
                     complete: function() {
                         isRequestInProgress = false;
