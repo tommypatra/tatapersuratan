@@ -258,7 +258,8 @@ function generateNomorKeluar($tanggal = null, $pola_spesimen_id = null, $klasifi
     $kode_klasifikasi_surat = $dt_klasifikasi_surat ? $dt_klasifikasi_surat->kode : null;
 
     $tanggalObj = Carbon::createFromFormat('Y-m-d', $tanggal);
-    $bln = bulanAngkaToRomawi($tanggalObj->format('m'));
+    // $bln = bulanAngkaToRomawi($tanggalObj->format('m'));
+    $bln = $tanggalObj->format('m');
     $thn = $tanggalObj->format('Y');
 
     if (!$no_indeks && !$id) {
