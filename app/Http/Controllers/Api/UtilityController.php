@@ -367,7 +367,7 @@ class UtilityController extends Controller
                 },
                 'user' => function ($query) {
                     $query->select('id', 'name', 'email');
-                }
+                },
             ]
         )
             ->orderBy('user_id', 'asc')

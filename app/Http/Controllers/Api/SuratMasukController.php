@@ -41,27 +41,27 @@ class SuratMasukController extends Controller
 
         //untuk filter lebih dari 1 kolom
         $filter = $request->input('filter');
-        $kategori = "konsep";
+        $status = "konsep";
         if ($filter) {
             $filterArray = json_decode($filter, true);
             if (is_array($filterArray)) {
                 foreach ($filterArray as $i => $dp) {
-                    if ($i == 'kategori')
+                    if ($i == 'status')
                         switch ($dp) {
                             case "konsep":
                                 $query->where('is_diajukan', '!=', 1);
                                 $query->where('user_id', $user_id);
-                                $kategori = "konsep";
+                                $status = "konsep";
                                 break;
                             case "diajukan":
                                 $query->where('is_diajukan', 1)->whereNull('is_diterima');
                                 // if (!izinkanAkses("admin")) {
                                 //     $query->where('user_id', $user_id);
                                 // }
-                                $kategori = "diajukan";
+                                $status = "diajukan";
                                 break;
                             case "diterima":
-                                $kategori = "diterima";
+                                $status = "diterima";
                                 $query->where('is_diajukan', 1)->where('is_diterima', 1);
                                 // if (!izinkanAkses("admin")) {
                                 //     $query->where('user_id', $user_id);
@@ -69,7 +69,7 @@ class SuratMasukController extends Controller
 
                                 break;
                             case "ditolak":
-                                $kategori = "ditolak";
+                                $status = "ditolak";
                                 $query->where('is_diajukan', 1)->where('is_diterima', 0);
                                 // if (!izinkanAkses("admin")) {
                                 //     $query->where('user_id', $user_id);
@@ -98,6 +98,9 @@ class SuratMasukController extends Controller
                                 $query->where('user_id', auth()->user()->id);
                             }
                         }
+                    } elseif ($i == 'kategori') {
+                        if ($dp != "SEMUA")
+                            $query->where('kategori_surat', $dp);
                     } elseif ($i == 'bulan') {
                         $bulan_sekarang = $dp;
                         $query->whereMonth('tanggal', $bulan_sekarang);

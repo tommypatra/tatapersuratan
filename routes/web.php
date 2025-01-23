@@ -66,3 +66,43 @@ Route::get('/kirim-wa/{nomor}/{pesan}/{jenis}', function ($nomor, $pesan, $jenis
 });
 
 // });
+
+Route::get('/kirim-wa2', function () {
+    $curl = curl_init();
+
+    $token = "uvQOIWdPSfeMZKZediZyTGMOGqK0Zn0IhcKlCRcBS5fvWwOZlD14f4MDIiOqdoDs";
+    $secret_key = "spz2bNUJ";
+
+    $payload = [
+        "data" => [
+            [
+                'phone' => '085331019999',
+                'message' => [
+                    'text' => 'WABLAS mantap sekali',
+                    'link' => 'https://iainkendari.ac.id/upload/lampiran/IDUP18180454270911793.pdf',
+                ],
+            ]
+        ]
+    ];
+
+    curl_setopt(
+        $curl,
+        CURLOPT_HTTPHEADER,
+        array(
+            "Authorization: $token.$secret_key",
+            "Content-Type: application/json"
+        )
+    );
+
+    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($payload));
+    curl_setopt($curl, CURLOPT_URL,  "https://kudus.wablas.com/api/v2/send-link");
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+
+    $result = curl_exec($curl);
+    curl_close($curl);
+    echo "<pre>";
+    print_r($result);
+});

@@ -25,9 +25,9 @@
                                     <li><a href="javascript:;" id="btnRefresh" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="refresh-cw"></i> Refresh</a></li>
                                     <li><a href="javascript:;" id="btnTambah" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="plus-circle"></i> Tambah</a></li>
                                     <li><a href="javascript:;" id="btnFilter" class="nav-link px-2 link-dark" onclick="setfilter()"><i class="align-middle" data-feather="filter"></i> Filter</a></li>
+                                </ul>                    
 
-                                </ul>                        
-                                <form class="col-12 col-sm-auto mb-3 mb-lg-0 me-lg-3">
+                                <form class="col-12 col-sm-auto mb-3 mb-lg-0 me-lg-3">                                        
                                     <input type="search" id="search-data" class="form-control" placeholder="Search..." aria-label="Search">
                                 </form>                        
                             </div>
@@ -51,9 +51,19 @@
                             <a class="nav-link" href="javascript:;" id="tabTolak" onclick="setActiveTab('tabTolak')">Ditolak</a>
                         </li>
                     </ul>
+
+                    <select class="form-control mt-2" id="filter_kategori_surat" >
+                        <option value="SEMUA">- SEMUA -</option>
+                        @php
+                            $kategori = explode(',', env('KATEGORI_SURAT_MASUK'));
+                        @endphp
+                        @foreach ($kategori as $item)
+                            <option value="{{ trim($item) }}">{{ trim($item) }}</option>
+                        @endforeach
+                    </select>
                     
                     <div class="table-responsive">
-                        <table class="table mt-3">
+                        <table class="table mt-1">
                             <thead>
                                 <tr>
                                     <th>No</th>
@@ -101,9 +111,12 @@
                             <label class="form-label">Kategori</label>
                             <select class="form-control" id="kategori_surat" name="kategori_surat" required>
                                 <option value="">- Pilih -</option>
-                                <option value="BMN">BMN</option>
-                                <option value="INTERNAL">INTERNAL</option>
-                                <option value="EKSTERNAL">EKSTERNAL</option>
+                                @php
+                                    $kategori = explode(',', env('KATEGORI_SURAT_MASUK'));
+                                @endphp
+                                @foreach ($kategori as $item)
+                                    <option value="{{ trim($item) }}">{{ trim($item) }}</option>
+                                @endforeach
                             </select>
                         </div>
 						<div class="col-sm-4 mb-3">
@@ -900,23 +913,23 @@ function displayPagination(response) {
     }
 
 
-    function loadDataKonsep(page = 1) {
-        CrudModule.setFilter('{"kategori":"konsep","tahun":'+tahunFilter+'}');
+    function loadDataKonsep(page = 1) {        
+        CrudModule.setFilter(`{"status":"konsep","tahun":"${tahunFilter}","kategori":"${$('#filter_kategori_surat').val()}"}`);
         CrudModule.fRead(page, displayData);
     }
 
     function loadDataMasuk(page = 1) {
-        CrudModule.setFilter('{"kategori":"diajukan","tahun":'+tahunFilter+'}');
+        CrudModule.setFilter(`{"status":"diajukan","tahun":"${tahunFilter}","kategori":"${$('#filter_kategori_surat').val()}"}`);
         CrudModule.fRead(page, displayData);
     }
 
     function loadDataDiterima(page = 1) {
-        CrudModule.setFilter('{"kategori":"diterima","tahun":'+tahunFilter+'}');
+        CrudModule.setFilter(`{"status":"diterima","tahun":"${tahunFilter}","kategori":"${$('#filter_kategori_surat').val()}"}`);
         CrudModule.fRead(page, displayData);
     }
 
     function loadDataDitolak(page = 1) {
-        CrudModule.setFilter('{"kategori":"ditolak","tahun":'+tahunFilter+'}');
+        CrudModule.setFilter(`{"status":"ditolak","tahun":"${tahunFilter}","kategori":"${$('#filter_kategori_surat').val()}"}`);
         CrudModule.fRead(page, displayData);
     }
 
@@ -1040,6 +1053,23 @@ function displayPagination(response) {
 
         $('#tanggal').on('change', function() {
             cariNoAgenda();       
+        });
+
+        $('#filter_kategori_surat').on('change', function() {
+            var activeTabId = $('.nav-tabs .nav-link.active').attr('id');
+            var kategori = $(this).val();
+            console.log(activeTabId,kategori)
+            
+            if(activeTabId=='tabKonsep')        
+                CrudModule.setFilter(`{"status":"konsep","tahun":"${tahunFilter}","kategori":"${kategori}"}`);
+            else if(activeTabId=='tabAjukan')         
+                CrudModule.setFilter(`{"status":"diajukan","tahun":"${tahunFilter}","kategori":"${kategori}"}`);
+            else if(activeTabId=='tabTerima')         
+                CrudModule.setFilter(`{"status":"diterima","tahun":"${tahunFilter}","kategori":"${kategori}"}`);
+            else if(activeTabId=='tabTolak')         
+                CrudModule.setFilter(`{"status":"ditolak","tahun":"${tahunFilter}","kategori":"${kategori}"}`);
+                                                    
+            CrudModule.refresh(displayData);
         });
         
     });

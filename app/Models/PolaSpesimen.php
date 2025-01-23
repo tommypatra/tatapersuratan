@@ -9,10 +9,10 @@ class PolaSpesimen extends Model
 {
     protected $guarded = ['id'];
 
-    // public function aksesPola()
-    // {
-    //     return $this->hasMany(AksesPola::class);
-    // }
+    public function aksesPola()
+    {
+        return $this->hasMany(AksesPola::class);
+    }
 
     public function polaSurat()
     {
