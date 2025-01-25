@@ -43,16 +43,23 @@ class FotoDokumen {
         this.previewContainer.appendChild(previewImage);
         this.previewContainer.style.display = 'block';
 
+        // Jika cropper sudah ada, pastikan untuk mengganti gambar
         if (this.cropper) {
-            this.cropper.destroy();
+            this.cropper.destroy();  // Hancurkan cropper lama
         }
+
+        // Gunakan replace() untuk mengganti gambar di dalam cropper
         this.cropper = new Cropper(previewImage, {
             viewMode: 2,
             autoCropArea: 0.8,
             movable: true,
             zoomable: true,
             scalable: true,
-            aspectRatio: NaN  // Bebas memilih crop area
+            aspectRatio: NaN,  // Bebas memilih crop area
+            ready: () => {
+                // Pastikan gambar siap dan cropper bekerja dengan baik
+                console.log('Cropper siap');
+            }
         });
 
         this.cropBtn.style.display = 'inline-block';
