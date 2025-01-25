@@ -48,14 +48,7 @@
 <body>
 
     <h2>Ambil Foto Dokumen</h2>
-    <div class="quality-selection">
-        <label for="quality-select">Pilih Kualitas:</label>
-        <select id="quality-select">
-            <option value="high">Tinggi</option>
-            <option value="medium" selected>Sedang</option>
-            <option value="low">Rendah</option>
-        </select>
-    </div>
+
     <video id="video" autoplay playsinline></video>
     <button id="capture-btn">Ambil Foto</button>
 
