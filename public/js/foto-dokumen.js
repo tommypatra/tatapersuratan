@@ -7,6 +7,7 @@ class FotoDokumen {
         this.canvas = document.createElement('canvas');
         this.cropper = null;
         this.qualityValue = 0.5;  // Menyimpan nilai kualitas (default sedang)
+        this.qualityCropValue = 0.1;  // Menyimpan nilai kualitas (default sedang)
     }
 
     async startCamera() {
@@ -41,21 +42,26 @@ class FotoDokumen {
                 this.qualityValue = 1.0; // Kualitas tinggi (tidak ada kompresi)
                 this.maxWidth = 1920;   // Resolusi tinggi
                 this.maxHeight = 1080;
+                this.qualityCropValue = 0.1;
                 break;
             case 'medium':
                 this.qualityValue = 0.5; // Kualitas sedang (sedikit kompresi)
                 this.maxWidth = 1280;   // Resolusi sedang
                 this.maxHeight = 720;
+                this.qualityCropValue = 0.05;
+
                 break;
             case 'low':
                 this.qualityValue = 0.2; // Kualitas rendah (lebih kompresi)
                 this.maxWidth = 640;    // Resolusi rendah
                 this.maxHeight = 360;
+                this.qualityCropValue = 0.02;
                 break;
             default:
                 this.qualityValue = 0.5; // Default kualitas sedang
                 this.maxWidth = 1280;
                 this.maxHeight = 720;
+                this.qualityCropValue = 0.05;
         }
     
         // Tentukan ukuran gambar untuk resolusi sesuai kualitas
@@ -128,7 +134,7 @@ class FotoDokumen {
     
                 // Kembali ke tampilan kamera setelah penyimpanan
                 this.resetToCamera();
-            }, 'image/jpeg', this.qualityValue);  // Gunakan qualityValue untuk kompresi
+            }, 'image/jpeg', this.qualityCropValue);  // Gunakan qualityValue untuk kompresi
         }
     }
 
