@@ -53,11 +53,8 @@ Route::get('/cetak-lembar-disposisi/{id}', [WebController::class, 'cetakLembarDi
 Route::get('/scan-qrcode', [WebController::class, 'scanQrCode'])->name('scan-qrcode');
 
 
-Route::get('/get-admin-spesimen/{pola_spesimen_id}', function ($pola_spesimen_id) {
-    $data = getAdminSpesimen($pola_spesimen_id);
-    foreach ($data['data'] as $i => $row) {
-        echo $row->user->name . " " . $row->user->profil->hp . "<br>";
-    }
+Route::get('/ujicoba', function () {
+    return view('admin.test');
 });
 
 Route::get('/kirim-wa/{nomor}/{pesan}/{jenis}', function ($nomor, $pesan, $jenis) {

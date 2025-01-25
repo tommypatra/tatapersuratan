@@ -44,7 +44,7 @@ class SuratKeluarController extends Controller
             $filterArray = json_decode($filter, true);
             if (is_array($filterArray)) {
                 foreach ($filterArray as $i => $dp) {
-                    if ($i == 'kategori')
+                    if ($i == 'status')
                         switch ($dp) {
                             case "konsep":
                                 $query->where('is_diajukan', '!=', 1);
@@ -79,6 +79,11 @@ class SuratKeluarController extends Controller
                                 $query->where('user_id', auth()->user()->id);
                             }
                         }
+                    } elseif ($i == 'kategori') {
+                        if ($dp != "SEMUA")
+                            $query->whereHas('polaSpesimen', function ($query) use ($dp) {
+                                $query->where('pola_surat_id', $dp);
+                            });
                     } elseif ($i == 'bulan') {
                         $bulan_sekarang = $dp;
                         $query->whereMonth('tanggal', $bulan_sekarang);

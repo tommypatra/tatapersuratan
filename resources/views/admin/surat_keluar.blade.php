@@ -50,7 +50,10 @@
                             <a class="nav-link" href="javascript:;" id="tabTolak" onclick="setActiveTab('tabTolak')">Ditolak</a>
                         </li>
                     </ul>
-                    
+
+                    <select class="form-control mt-2" id="filter_kategori_surat" >
+                    </select>                    
+
                     <div class="table-responsive">
                         <table class="table mt-3">
                             <thead>
@@ -236,6 +239,7 @@
     var tahunFilter = '{{ date("Y") }}';
     var vsurat_masuk_id;
     var vPolaAkses={};
+    var vPolaSurat={};
     // console.log(hakAkses);
     var hakAkses = vAksesId;
     // if(hakAkses>1)
@@ -650,36 +654,28 @@
         }
     }
 
-    // function initSpesimen(){
-    //     //load spesimen
-    //     $('#spesimen_jabatan_id').empty();
-    //     let id=$("#pola_surat_id").val();
-    //     if(id){
-    //         let dataCari = {pola_spesimen_id:id};
-    //         let keywordString = encodeURIComponent(JSON.stringify(dataCari));
-    //         $.ajax({
-    //             url: '/api/akses-spesimen?keyword='+keywordString,
-    //             method: 'GET',
-    //             dataType: 'json',
-    //             success: function (response){
-    //                 let vdata=[];
-    //                 vdata.push({id:'',text:'-pilih-'});
-    //                 if(response.data.length>0){
-    //                     $.each(response.data, function(index, dt) {
-    //                         vdata.push({id:dt.spesimen_jabatan.id,text:dt.spesimen_jabatan.jabatan});
-    //                     });
-    //                 }
-    //                 // sel2_datalokal('#spesimen_jabatan_id',vdata,false,'#myForm .modal-content');
-
-    //             },
-    //             error: function(xhr, status, error) {
-    //                 console.error(error);
-    //             }
-    //         });
-    //     }
-
-    // }
-    //-------------------------
+    function initPolaSurat(){
+        vPolaSurat = {};
+        $.ajax({
+            url: '/api/pola-surat-keluar?page=all',
+            method: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                let $select = $('#filter_kategori_surat');
+                $select.empty();
+                $select.append('<option value="SEMUA">- SEMUA -</option>');
+                if (response.data.length > 0) {
+                    response.data.forEach(function(item) {
+                        $select.append('<option value="' + item.id + '">' + item.kategori + '</option>');
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                alert(error);
+            }
+        });
+    }
 
     var image = new Image();
     $(document).on('click','.imgprev',function() {
@@ -882,27 +878,29 @@
         } 
     }
 
-    function loadDataKonsep(page = 1) {
-        CrudModule.setFilter('{"kategori":"konsep","tahun":'+tahunFilter+'}');
+    function loadDataKonsep(page = 1) {        
+        CrudModule.setFilter(`{"status":"konsep","tahun":"${tahunFilter}","kategori":"${$('#filter_kategori_surat').val()}"}`);
         CrudModule.fRead(page, displayData);
     }
 
     function loadDataMasuk(page = 1) {
-        CrudModule.setFilter('{"kategori":"diajukan","tahun":'+tahunFilter+'}');
+        CrudModule.setFilter(`{"status":"diajukan","tahun":"${tahunFilter}","kategori":"${$('#filter_kategori_surat').val()}"}`);
         CrudModule.fRead(page, displayData);
     }
 
     function loadDataDiterima(page = 1) {
-        CrudModule.setFilter('{"kategori":"diterima","tahun":'+tahunFilter+'}');
+        CrudModule.setFilter(`{"status":"diterima","tahun":"${tahunFilter}","kategori":"${$('#filter_kategori_surat').val()}"}`);
         CrudModule.fRead(page, displayData);
     }
 
     function loadDataDitolak(page = 1) {
-        CrudModule.setFilter('{"kategori":"ditolak","tahun":'+tahunFilter+'}');
+        CrudModule.setFilter(`{"status":"ditolak","tahun":"${tahunFilter}","kategori":"${$('#filter_kategori_surat').val()}"}`);
         CrudModule.fRead(page, displayData);
     }
         
     $(document).ready(function() {
+
+        initPolaSurat();
 
         if (hakAkses === 1) {
             $('#no-surat-manual').show(); // Menampilkan elemen jika nilai variabel adalah 1
@@ -1016,6 +1014,27 @@
         $('#modal-upload').on('hidden.bs.modal', function() {
             stopCamera();
         });
+
+
+
+        $('#filter_kategori_surat').on('change', function() {
+            var activeTabId = $('.nav-tabs .nav-link.active').attr('id');
+            var kategori = $(this).val();
+            console.log(activeTabId,kategori)
+            
+            if(activeTabId=='tabKonsep')        
+                CrudModule.setFilter(`{"status":"konsep","tahun":"${tahunFilter}","kategori":"${kategori}"}`);
+            else if(activeTabId=='tabAjukan')         
+                CrudModule.setFilter(`{"status":"diajukan","tahun":"${tahunFilter}","kategori":"${kategori}"}`);
+            else if(activeTabId=='tabTerima')         
+                CrudModule.setFilter(`{"status":"diterima","tahun":"${tahunFilter}","kategori":"${kategori}"}`);
+            else if(activeTabId=='tabTolak')         
+                CrudModule.setFilter(`{"status":"ditolak","tahun":"${tahunFilter}","kategori":"${kategori}"}`);
+                                                    
+            CrudModule.refresh(displayData);
+        });
+        
+
     });
 
 
