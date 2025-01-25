@@ -1,11 +1,12 @@
 class FotoDokumen {
-    constructor(videoElementId, previewContainerId, captureBtnId, cropBtnId) {
+    constructor(videoElementId, previewContainerId, captureBtnId, cropBtnId, areaVideoId) {
         this.videoElement = document.getElementById(videoElementId);
         this.previewContainer = document.getElementById(previewContainerId);
         this.captureBtn = document.getElementById(captureBtnId);
         this.cropBtn = document.getElementById(cropBtnId);
         this.canvas = document.createElement('canvas');
         this.cropper = null;
+        this.areaVideoId = document.getElementById(areaVideoId);
     }
 
     async startCamera() {
@@ -26,14 +27,13 @@ class FotoDokumen {
 
     capturePhoto() {
         // Hentikan video saat pengambilan foto
-        this.videoElement.style.display = 'none';
-        this.captureBtn.style.display = 'none';
+        this.areaVideoId.style.display = 'none';
         this.previewContainer.innerHTML = 'on proses ...';  // Bersihkan preview sebelumnya
 
         this.videoElement.pause();
     
         // Menonaktifkan tombol ambil foto sementara
-        this.captureBtn.disabled = true;
+        // this.captureBtn.disabled = true;
         
         // Ambil foto setelah video dipause
         const context = this.canvas.getContext('2d');
@@ -47,9 +47,6 @@ class FotoDokumen {
         previewImage.id = 'crop-image';
         previewImage.src = imageDataURL;
     
-        // Sembunyikan video dan tampilkan crop area saja
-        this.videoElement.style.display = 'none';
-        this.captureBtn.style.display = 'none';
         this.previewContainer.innerHTML = '';  // Bersihkan preview sebelumnya
         this.previewContainer.appendChild(previewImage);
         this.previewContainer.style.display = 'block';
@@ -94,8 +91,7 @@ class FotoDokumen {
 
     resetToCamera() {
         // Tampilkan kembali video dan tombol capture, sembunyikan crop area
-        this.videoElement.style.display = 'block';
-        this.captureBtn.style.display = 'inline-block';
+        this.areaVideoId.style.display = 'block';
         this.previewContainer.style.display = 'none';
         this.cropBtn.style.display = 'none';
     }
@@ -106,6 +102,6 @@ class FotoDokumen {
         this.cropBtn.addEventListener('click', () => this.saveCroppedImage());
 
         // Menambahkan event listener pada video element untuk menangani klik
-        this.videoElement.addEventListener('click', () => this.capturePhoto());
+        this.areaVideoId.addEventListener('click', () => this.capturePhoto());
     }
 }

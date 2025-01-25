@@ -48,9 +48,11 @@
 <body>
 
     <h2>Ambil Foto Dokumen</h2>
-
-    <video id="video" autoplay playsinline></video>
-    <button id="capture-btn">Ambil Foto</button>
+    
+    <div id="area-video">
+        <video id="video" autoplay playsinline></video>
+        <button id="capture-btn">Ambil Foto</button>
+    </div>
 
     <div id="preview-container"></div>
     <button id="crop-btn" style="display:none;">Simpan Gambar</button>
@@ -61,7 +63,7 @@
 
     <script>
         // Inisialisasi dan gunakan library
-        const fotoDokumen = new FotoDokumen('video', 'preview-container', 'capture-btn', 'crop-btn');
+        const fotoDokumen = new FotoDokumen('video', 'preview-container', 'capture-btn', 'crop-btn','area-video');
         fotoDokumen.init();
     </script>
 
