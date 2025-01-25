@@ -87,7 +87,7 @@
             const canvas = document.getElementById('canvas');
             const context = canvas.getContext('2d');
 
-            // Set ukuran canvas sesuai dengan video untuk kualitas maksimal
+            // Ambil foto penuh tanpa batasan area
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -97,18 +97,18 @@
             document.getElementById('crop-image').src = imageDataURL;
             document.getElementById('preview-container').style.display = 'block';
 
-            // Inisialisasi cropper
+            // Inisialisasi cropper dengan bebas memilih area tanpa batasan rasio
             if (cropper) {
                 cropper.destroy(); // Hapus jika sebelumnya sudah ada
             }
             cropper = new Cropper(document.getElementById('crop-image'), {
-                aspectRatio: 210 / 297,  // Rasio A4 (210x297 mm)
                 viewMode: 2,  // Fit ke area crop
-                autoCropArea: 0.8,  // Otomatis crop area 80% dari gambar
+                autoCropArea: 0.8,  // Default area crop 80% dari gambar
                 movable: true,
                 zoomable: true,
                 scalable: true,
-                rotatable: false
+                rotatable: false,
+                aspectRatio: NaN  // Bebas, tidak ada batasan rasio
             });
         });
 
