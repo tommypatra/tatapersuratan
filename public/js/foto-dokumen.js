@@ -104,5 +104,8 @@ class FotoDokumen {
         this.startCamera();
         this.captureBtn.addEventListener('click', () => this.capturePhoto());
         this.cropBtn.addEventListener('click', () => this.saveCroppedImage());
+
+        // Menambahkan event listener pada video element untuk menangani klik
+        this.videoElement.addEventListener('click', () => this.capturePhoto());
     }
 }
