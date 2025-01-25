@@ -24,7 +24,7 @@ class FotoDokumen {
         }
     }
 
-   // Menambahkan pengambilan kualitas gambar dari dropdown
+    // Menambahkan pengambilan kualitas gambar dari dropdown
     capturePhoto() {
         // Hentikan video saat pengambilan foto
         this.videoElement.pause();
@@ -35,8 +35,10 @@ class FotoDokumen {
         // Ambil pilihan kualitas gambar
         const quality = document.getElementById('quality-select').value;
 
+        // Deklarasikan qualityValue sesuai pilihan pengguna
+        let qualityValue;  // Deklarasi variabel untuk kualitas gambar
+
         // Tentukan kualitas berdasarkan pilihan
-        let qualityValue;
         switch (quality) {
             case 'high':
                 qualityValue = 1.0; // Kualitas tinggi (tidak ada kompresi)
@@ -90,7 +92,6 @@ class FotoDokumen {
         // Aktifkan kembali tombol ambil foto setelah crop selesai
         this.captureBtn.disabled = false;
     }
-
 
     saveCroppedImage() {
         if (this.cropper) {
