@@ -59,20 +59,24 @@ class FotoDokumen {
             ready: () => {
                 console.log('Cropper siap');
 
-                // Pastikan crop area sesuai dengan ukuran gambar
+                // Ambil dimensi gambar
                 const imageHeight = previewImage.naturalHeight;
                 const imageWidth = previewImage.naturalWidth;
 
-                // Sesuaikan ukuran container agar cocok dengan gambar
-                this.previewContainer.style.height = `${imageHeight}px`;
-                this.previewContainer.style.width = `${imageWidth}px`;
+                // Tentukan ukuran maksimal crop area berdasarkan ukuran layar
+                const maxHeight = window.innerHeight * 0.8;  // Maksimal 80% dari tinggi layar
+                const maxWidth = window.innerWidth * 0.8;    // Maksimal 80% dari lebar layar
+
+                // Sesuaikan ukuran container agar cocok dengan gambar dan crop area
+                this.previewContainer.style.height = `${Math.min(imageHeight, maxHeight)}px`;
+                this.previewContainer.style.width = `${Math.min(imageWidth, maxWidth)}px`;
 
                 // Setelah gambar terload, pastikan posisi crop area sudah benar
                 this.cropper.setCropBoxData({
                     left: 0,
                     top: 0,
-                    width: imageWidth * 0.8,
-                    height: imageHeight * 0.8
+                    width: Math.min(imageWidth, maxWidth) * 0.8, // 80% dari ukuran gambar
+                    height: Math.min(imageHeight, maxHeight) * 0.8 // 80% dari ukuran gambar
                 });
             }
         });
