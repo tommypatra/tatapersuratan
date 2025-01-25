@@ -327,9 +327,9 @@ class SuratMasukController extends Controller
                 $perihal = $data->perihal;
                 $pesanWA = "Hai, " . $akun['data']->name . " ajuan surat tentang " . $data->perihal . " tertanggal " . $data->tanggal . " ";
                 if ($request->input('is_diterima') == 1) {
-                    $pesanWA .= "sudah diterima dan diproses disposisi.\n\n";
+                    $pesanWA .= "sudah diterima dan dalam proses disposisi.\n\n";
                 } else {
-                    $pesanWA .= "ditolak dan tidak diproses disposisi";
+                    $pesanWA .= "ditolak dan tidak diproses disposisinya";
                     if ($request->input('catatan'))
                         $pesanWA .= " karena " . $request->input('catatan') . ".\n\n";
                 }
@@ -340,6 +340,52 @@ class SuratMasukController extends Controller
                 }
             }
 
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Update data sukses dilakukan',
+                'data' => $dataSave,
+            ], 200);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
+    public function kembalikanSuratMasuk(Request $request, $id)
+    {
+        try {
+            $dataSave = [
+                'catatan' => $request->input('catatan'),
+                'is_diajukan' => 0,
+                'is_diterima' => null,
+            ];
+
+            $data = $this->findId($id);
+            $data->update($dataSave);
+
+            $akun = getInfoAkun($data->user_id);
+            if ($akun['data']) {
+
+                $perihal = $data->perihal;
+                $pesanWA = "Hai, " . $akun['data']->name . " ajuan surat masuk tentang " . $data->perihal . " tertanggal " . $data->tanggal . " ";
+                $pesanWA .= "telah dikemblikan, silahkan perbaiki sesuai catatan dan ajukan kembali.\n\n";
+                $pesanWA .= "silahkan cek dengan login laman https://surat.iainkendari.ac.id/";
+
+                if ($akun['data']->profil->hp) {
+                    kirimWA($akun['data']->profil->hp, $pesanWA);
+                }
+            }
 
             return response()->json([
                 'success' => true,

@@ -75,6 +75,14 @@
 				<div class="navbar-collapse collapse">
 					<ul class="navbar-nav navbar-align">
 						<li class="nav-item dropdown">
+							<div id="navbar-loading" style="display:none;">
+								<img height="30" src="{{ url('images/loading2.gif') }}" alt="Loading..." > Loading...
+							</div>
+						</li>
+
+						<li class="nav-item dropdown">
+			
+			
 							<a class="nav-icon dropdown-toggle" href="#" id="alertsDropdown" data-bs-toggle="dropdown">
 								<div class="position-relative">
 									<i class="align-middle" data-feather="bell"></i>
@@ -132,6 +140,7 @@
 			</nav>
 
 			<main class="content">
+
 				@yield('container')
 			</main>
 
@@ -173,6 +182,14 @@
 				'Authorization': 'Bearer ' + authToken
 			}
 		});		
+
+		$(document).ajaxStart(function() {
+			$('#navbar-loading').show();
+			$('button[type="submit"], input[type="submit"]').prop('disabled', true);
+		}).ajaxStop(function() {
+			$('#navbar-loading').hide();
+			$('button[type="submit"], input[type="submit"]').prop('disabled', false);
+		});
 
 		function forceLogout(){
 			localStorage.removeItem('access_token');

@@ -85,6 +85,13 @@
 	}
 
 	$(document).ready(function() {
+
+		$(document).ajaxStart(function() {
+			$('button[type="submit"], input[type="submit"]').prop('disabled', true);
+		}).ajaxStop(function() {
+			$('button[type="submit"], input[type="submit"]').prop('disabled', false);
+		});
+
 		var myModalAkses = new bootstrap.Modal(document.getElementById('modal-pilih-akses'), {
 			backdrop: 'static', // nda bisa klik diluar modal
 			keyboard: false     // tombol esc tidak berfungsi untuk tutup modal  

@@ -421,8 +421,11 @@
 
                     if(dt.is_diterima==null && (hakAkses==1)){
                         menu_edit=` <li><a class="dropdown-item" href="javascript:;" onclick="validasi(1,${dt.id})"><i class="fa-solid fa-envelope-circle-check"></i> Terima</a></li>
-                                    <li><a class="dropdown-item" href="javascript:;" onclick="validasi(0,${dt.id})"><i class="fa-solid fa-rectangle-xmark"></i> Tolak</a></li>`;
+                                    <li><a class="dropdown-item" href="javascript:;" onclick="validasi(0,${dt.id})"><i class="fa-solid fa-rectangle-xmark"></i> Tolak</a></li>
+                                    <li><a class="dropdown-item" href="javascript:;" onclick="kembalikan(${dt.id})"><i class="fas fa-arrow-left"></i> Kembalikan Ke Arsip</a></li>`;
+
                     }
+                    menu_edit+=`<li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>`;
                 }
 
                 if(suratMasuk.is_diterima && hakAkses!=1){
@@ -487,6 +490,9 @@
                     menu_edit=`<li><a class="dropdown-item" href="javascript:;" onclick="ganti(${dt.id})"><i class="fa-solid fa-pen-to-square"></i> Ganti</a></li>
                                <li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>
                                <li><a class="dropdown-item" href="${vBaseUrl}/cetak-lembar-disposisi/${suratMasuk.id}" target="_blank"><i class="fa-solid fa-print"></i> Cetak Lembar Disposisi</a></li>`;
+                else if(suratMasuk.is_diterima==0 && hakAkses==1)
+                    menu_edit=`<li><a class="dropdown-item" href="javascript:;" onclick="kembalikan(${dt.id})"><i class="fas fa-arrow-left"></i> Kembalikan Ke Arsip</a></li>
+                               <li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>`;
 
                 var row = `
                     <tr>
@@ -592,6 +598,33 @@ function displayPagination(response) {
                     appShowNotification(false,[error]);
                 }
             });
+        }
+    }
+
+    function kembalikan(id) {
+        if(confirm("apakah anda yakin kembalikan surat ini ?")){
+            catatan = prompt("Tuliskan alasan sederhana mengapa dikembalikan?");
+            if(catatan){
+                $.ajax({
+                    url: `/api/kembalikan-surat-masuk/${id}`,
+                    type: "PUT",
+                    data: {
+                        'catatan':catatan,
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        if(response.success){
+                            appShowNotification(true, [response.message]);
+                            refresh();
+                            InfoModule.updateNotifWeb();
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        appShowNotification(false, ["Something went wrong. Please try again later."]);
+                    }
+                });                
+            }else 
+                alert('wajib ada catatan');
         }
     }
 
@@ -846,7 +879,7 @@ function displayPagination(response) {
 
         if(confirm('apakah anda yakin '+label+' usulan ini?')){
             if(!is_diterima)
-                catatan = prompt("Tuliskan alasan mengapa usulan ini ditolak?");
+                catatan = prompt("Tuliskan alasan sederhana mengapa ditolak?");
 
             $.ajax({
                 url: "/api/proses-ajuan-surat-masuk",
