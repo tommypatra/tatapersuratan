@@ -33,12 +33,12 @@ class FotoDokumen {
         
         // Ambil foto setelah video dipause
         const context = this.canvas.getContext('2d');
-        this.canvas.width = this.videoElement.videoWidth;
-        this.canvas.height = this.videoElement.videoHeight;
+        this.canvas.width = this.videoElement.videoWidth / 2; // Menurunkan resolusi 50%
+        this.canvas.height = this.videoElement.videoHeight / 2; // Menurunkan resolusi 50%
         context.drawImage(this.videoElement, 0, 0, this.canvas.width, this.canvas.height);
     
-        // Konversi ke gambar
-        const imageDataURL = this.canvas.toDataURL('image/jpeg', 0.5);
+        // Konversi ke gambar dengan kualitas sedang (0.5) dan ukuran resolusi lebih kecil
+        const imageDataURL = this.canvas.toDataURL('image/jpeg', 0.5); // Kualitas sedang (0.5)
         const previewImage = document.createElement('img');
         previewImage.id = 'crop-image';
         previewImage.src = imageDataURL;
@@ -70,7 +70,6 @@ class FotoDokumen {
         // Aktifkan kembali tombol ambil foto setelah crop selesai
         this.captureBtn.disabled = false;
     }
-    
 
     saveCroppedImage() {
         if (this.cropper) {
@@ -84,7 +83,7 @@ class FotoDokumen {
                 URL.revokeObjectURL(url);
     
                 this.resetToCamera();
-            }, 'image/jpeg', 0.5);  
+            }, 'image/jpeg', 0.5);  // Gunakan kualitas 0.5 untuk gambar cropped
         }
     }
 
