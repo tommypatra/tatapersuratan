@@ -13,8 +13,8 @@ class FotoDokumen {
             const stream = await navigator.mediaDevices.getUserMedia({
                 video: {
                     facingMode: 'environment', // Pakai kamera belakang
-                    width: { ideal: 1280 },  // Resolusi tinggi
-                    height: { ideal: 720 }
+                    width: { ideal: 4096 },  // Resolusi tinggi
+                    height: { ideal: 2160 }
                 }
             });
             this.videoElement.srcObject = stream;
@@ -33,12 +33,12 @@ class FotoDokumen {
         
         // Ambil foto setelah video dipause
         const context = this.canvas.getContext('2d');
-        this.canvas.width = this.videoElement.videoWidth / 2; // Menurunkan resolusi 50%
-        this.canvas.height = this.videoElement.videoHeight / 2; // Menurunkan resolusi 50%
+        this.canvas.width = this.videoElement.videoWidth;
+        this.canvas.height = this.videoElement.videoHeight;
         context.drawImage(this.videoElement, 0, 0, this.canvas.width, this.canvas.height);
     
-        // Konversi ke gambar dengan kualitas sedang (0.5) dan ukuran resolusi lebih kecil
-        const imageDataURL = this.canvas.toDataURL('image/jpeg', 0.5); // Kualitas sedang (0.5)
+        // Konversi ke gambar
+        const imageDataURL = this.canvas.toDataURL('image/jpeg', 1.0);
         const previewImage = document.createElement('img');
         previewImage.id = 'crop-image';
         previewImage.src = imageDataURL;
@@ -70,20 +70,32 @@ class FotoDokumen {
         // Aktifkan kembali tombol ambil foto setelah crop selesai
         this.captureBtn.disabled = false;
     }
+    
 
     saveCroppedImage() {
         if (this.cropper) {
             const croppedCanvas = this.cropper.getCroppedCanvas();
             croppedCanvas.toBlob((blob) => {
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'foto-dokumen.jpg';
-                a.click();
-                URL.revokeObjectURL(url);
+                // Gunakan Compress.js untuk mengompresi file gambar lebih lanjut
+                const compress = new Compress();
+                compress.compress([blob], {
+                    size: 2,  // Ukuran target (4MB)
+                    quality: 0.6, // Kualitas gambar
+                    maxWidth: 800, // Lebar maksimal gambar
+                    maxHeight: 800, // Tinggi maksimal gambar
+                    resize: true
+                }).then((results) => {
+                    const compressedFile = results[0];
+                    const url = URL.createObjectURL(compressedFile);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'foto-dokumen.jpg';
+                    a.click();
+                    URL.revokeObjectURL(url);
     
-                this.resetToCamera();
-            }, 'image/jpeg', 0.5);  // Gunakan kualitas 0.5 untuk gambar cropped
+                    this.resetToCamera();
+                });
+            }, 'image/jpeg', 0.5);  // Gunakan kualitas 0.6 untuk gambar cropped
         }
     }
 
