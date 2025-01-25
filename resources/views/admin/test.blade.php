@@ -19,8 +19,16 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
         #preview-container {
-            display: none;
-            margin-top: 20px;
+            width: 100%;
+            height: 60vh;  /* 60% dari tinggi layar */
+            max-height: 100vh;  /* Maksimum sesuai tinggi layar */
+            overflow: hidden;  /* Menyembunyikan bagian yang berlebih */
+            position: relative;  /* Agar crop area bisa diposisikan relatif */
+        }
+
+        #preview-container img {
+            width: 100%;  /* Gambar menyesuaikan lebar container */
+            height: auto;  /* Menjaga rasio gambar */
         }
         #capture-btn, #crop-btn {
             margin-top: 20px;
