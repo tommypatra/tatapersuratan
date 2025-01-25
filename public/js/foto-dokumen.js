@@ -38,7 +38,7 @@ class FotoDokumen {
         context.drawImage(this.videoElement, 0, 0, this.canvas.width, this.canvas.height);
     
         // Konversi ke gambar
-        const imageDataURL = this.canvas.toDataURL('image/jpeg', 1.0);
+        const imageDataURL = this.canvas.toDataURL('image/jpeg', 0.5);
         const previewImage = document.createElement('img');
         previewImage.id = 'crop-image';
         previewImage.src = imageDataURL;
@@ -83,9 +83,8 @@ class FotoDokumen {
                 a.click();
                 URL.revokeObjectURL(url);
     
-                // Kembali ke tampilan kamera setelah penyimpanan
                 this.resetToCamera();
-            }, 'image/jpeg', 1.0);  // Gunakan qualityValue untuk kompresi
+            }, 'image/jpeg', 0.5);  
         }
     }
 
