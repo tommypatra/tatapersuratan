@@ -3,39 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Foto Dokumen</title>
+    <title>Foto Dokumen A4</title>
     <style>
-        #video {
-            width: 100%;
-            max-width: 800px;
-            border: 2px solid #000;
-            position: relative;
+        body {
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
         }
 
-        /* Area crop A4 overlay */
+        #video-container {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            max-width: 400px; /* Ukuran maksimal tampilan kamera */
+        }
+
+        #video {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Overlay untuk area crop A4 portrait */
         .overlay {
             position: absolute;
-            width: 70%;
-            height: 100%;
-            border: 2px dashed red;
-            top: 0;
+            width: 70%;  /* Sesuaikan proporsi dengan layar */
+            height: 90%;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translate(-50%, -50%);
+            border: 2px dashed red;
             pointer-events: none;
+            border-radius: 5px;
+        }
+
+        #capture-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
         }
 
         #canvas {
             display: none;
         }
-
-        #capture-btn {
-            margin-top: 10px;
-        }
     </style>
 </head>
 <body>
-    <video id="video" autoplay playsinline></video>
-    <div class="overlay"></div>
+
+    <div id="video-container">
+        <video id="video" autoplay playsinline></video>
+        <div class="overlay"></div>
+    </div>
+
     <button id="capture-btn">Ambil Foto</button>
     <canvas id="canvas"></canvas>
 
@@ -45,9 +71,9 @@
                 // Akses kamera belakang dengan resolusi tinggi
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: {
-                        facingMode: 'environment', // Kamera belakang
-                        width: { ideal: 1920 },   // Resolusi tinggi
-                        height: { ideal: 1080 }   // Resolusi tinggi
+                        facingMode: 'environment',  // Gunakan kamera belakang
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
                     }
                 });
 
@@ -64,18 +90,16 @@
             const canvas = document.getElementById('canvas');
             const context = canvas.getContext('2d');
 
-            // Atur ukuran canvas sesuai video untuk kualitas maksimal
+            // Sesuaikan ukuran canvas sesuai dengan ukuran video untuk kualitas maksimal
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
-            
-            // Gambar video ke canvas
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Ambil area A4 dalam video (70% lebar, penuh tinggi)
-            const cropX = canvas.width * 0.15; // Ambil area 70% di tengah
-            const cropY = 0;
-            const cropWidth = canvas.width * 0.70;
-            const cropHeight = canvas.height;
+            // Hitung area crop sesuai dengan overlay (portrait A4)
+            const cropX = canvas.width * 0.15; // 15% dari kiri
+            const cropY = canvas.height * 0.05; // 5% dari atas
+            const cropWidth = canvas.width * 0.70;  // 70% lebar
+            const cropHeight = canvas.height * 0.90; // 90% tinggi
 
             // Potong sesuai area overlay A4
             const croppedImage = context.getImageData(cropX, cropY, cropWidth, cropHeight);
@@ -86,7 +110,7 @@
             croppedCanvas.height = cropHeight;
             croppedCanvas.getContext('2d').putImageData(croppedImage, 0, 0);
 
-            // Konversi hasil cropping ke gambar dan download
+            // Konversi hasil cropping ke gambar dan download otomatis
             croppedCanvas.toBlob((blob) => {
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -94,11 +118,12 @@
                 a.download = 'foto-dokumen.jpg';
                 a.click();
                 URL.revokeObjectURL(url);
-            }, 'image/jpeg', 1.0);  // Simpan dalam format JPEG dengan kualitas tinggi (1.0)
+            }, 'image/jpeg', 1.0);  // Simpan dalam kualitas tinggi (JPEG 1.0)
         });
 
-        // Mulai kamera saat halaman dimuat
+        // Jalankan kamera saat halaman dimuat
         startCamera();
     </script>
+
 </body>
 </html>
