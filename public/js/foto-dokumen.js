@@ -24,37 +24,57 @@ class FotoDokumen {
         }
     }
 
+   // Menambahkan pengambilan kualitas gambar dari dropdown
     capturePhoto() {
         // Hentikan video saat pengambilan foto
         this.videoElement.pause();
-    
+
         // Menonaktifkan tombol ambil foto sementara
         this.captureBtn.disabled = true;
-        
+
+        // Ambil pilihan kualitas gambar
+        const quality = document.getElementById('quality-select').value;
+
+        // Tentukan kualitas berdasarkan pilihan
+        let qualityValue;
+        switch (quality) {
+            case 'high':
+                qualityValue = 1.0; // Kualitas tinggi (tidak ada kompresi)
+                break;
+            case 'medium':
+                qualityValue = 0.7; // Kualitas sedang (sedikit kompresi)
+                break;
+            case 'low':
+                qualityValue = 0.5; // Kualitas rendah (lebih kompresi)
+                break;
+            default:
+                qualityValue = 0.7; // Default kualitas sedang
+        }
+
         // Ambil foto setelah video dipause
         const context = this.canvas.getContext('2d');
         this.canvas.width = this.videoElement.videoWidth;
         this.canvas.height = this.videoElement.videoHeight;
         context.drawImage(this.videoElement, 0, 0, this.canvas.width, this.canvas.height);
-    
-        // Konversi ke gambar
-        const imageDataURL = this.canvas.toDataURL('image/jpeg', 1.0);
+
+        // Konversi ke gambar dengan kualitas sesuai pilihan
+        const imageDataURL = this.canvas.toDataURL('image/jpeg', qualityValue);
         const previewImage = document.createElement('img');
         previewImage.id = 'crop-image';
         previewImage.src = imageDataURL;
-    
+
         // Sembunyikan video dan tampilkan crop area saja
         this.videoElement.style.display = 'none';
         this.captureBtn.style.display = 'none';
         this.previewContainer.innerHTML = '';  // Bersihkan preview sebelumnya
         this.previewContainer.appendChild(previewImage);
         this.previewContainer.style.display = 'block';
-    
+
         // Jika cropper sudah ada, pastikan untuk mengganti gambar
         if (this.cropper) {
             this.cropper.destroy();  // Hancurkan cropper lama
         }
-    
+
         // Gunakan replace() untuk mengganti gambar di dalam cropper
         this.cropper = new Cropper(previewImage, {
             viewMode: 2,
@@ -64,12 +84,13 @@ class FotoDokumen {
             scalable: true,
             aspectRatio: NaN,  // Bebas memilih crop area
         });
-    
+
         this.cropBtn.style.display = 'inline-block';
-    
+
         // Aktifkan kembali tombol ambil foto setelah crop selesai
         this.captureBtn.disabled = false;
     }
+
 
     saveCroppedImage() {
         if (this.cropper) {
