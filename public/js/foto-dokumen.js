@@ -43,8 +43,9 @@ class FotoDokumen {
         this.previewContainer.appendChild(previewImage);
         this.previewContainer.style.display = 'block';
 
-        // Sesuaikan tinggi preview container agar tidak lebih tinggi dari 80% layar
-        this.previewContainer.style.maxHeight = `${window.innerHeight * 0.8}px`;
+        // Sesuaikan tinggi preview container agar sesuai dengan ukuran layar
+        this.previewContainer.style.height = `${window.innerHeight * 0.6}px`; // 60% dari tinggi layar
+        this.previewContainer.style.maxHeight = 'none';  // Tidak ada batasan tinggi
         this.previewContainer.style.overflow = 'hidden'; // Cegah overflow jika gambar lebih tinggi dari container
 
         // Jika cropper sudah ada, pastikan untuk mengganti gambar
