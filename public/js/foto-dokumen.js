@@ -44,13 +44,13 @@ class FotoDokumen {
                 qualityValue = 1.0; // Kualitas tinggi (tidak ada kompresi)
                 break;
             case 'medium':
-                qualityValue = 0.7; // Kualitas sedang (sedikit kompresi)
+                qualityValue = 0.4; // Kualitas sedang (sedikit kompresi)
                 break;
             case 'low':
-                qualityValue = 0.5; // Kualitas rendah (lebih kompresi)
+                qualityValue = 0.2; // Kualitas rendah (lebih kompresi)
                 break;
             default:
-                qualityValue = 0.7; // Default kualitas sedang
+                qualityValue = 0.4; // Default kualitas sedang
         }
 
         // Ambil foto setelah video dipause
