@@ -26,6 +26,10 @@ class FotoDokumen {
 
     capturePhoto() {
         // Hentikan video saat pengambilan foto
+        this.videoElement.style.display = 'none';
+        this.captureBtn.style.display = 'none';
+        this.previewContainer.innerHTML = 'on proses ...';  // Bersihkan preview sebelumnya
+
         this.videoElement.pause();
     
         // Menonaktifkan tombol ambil foto sementara
@@ -76,26 +80,15 @@ class FotoDokumen {
         if (this.cropper) {
             const croppedCanvas = this.cropper.getCroppedCanvas();
             croppedCanvas.toBlob((blob) => {
-                // Gunakan Compress.js untuk mengompresi file gambar lebih lanjut
-                const compress = new Compress();
-                compress.compress([blob], {
-                    size: 2,  // Ukuran target (4MB)
-                    quality: 0.6, // Kualitas gambar
-                    maxWidth: 800, // Lebar maksimal gambar
-                    maxHeight: 800, // Tinggi maksimal gambar
-                    resize: true
-                }).then((results) => {
-                    const compressedFile = results[0];
-                    const url = URL.createObjectURL(compressedFile);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'foto-dokumen.jpg';
-                    a.click();
-                    URL.revokeObjectURL(url);
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'foto-dokumen.jpg';
+                a.click();
+                URL.revokeObjectURL(url);
     
-                    this.resetToCamera();
-                });
-            }, 'image/jpeg', 0.5);  // Gunakan kualitas 0.6 untuk gambar cropped
+                this.resetToCamera();
+            }, 'image/jpeg', 1.0);  
         }
     }
 
