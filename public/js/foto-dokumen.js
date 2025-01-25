@@ -6,8 +6,6 @@ class FotoDokumen {
         this.cropBtn = document.getElementById(cropBtnId);
         this.canvas = document.createElement('canvas');
         this.cropper = null;
-        this.qualityValue = 0.5;  // Menyimpan nilai kualitas (default sedang)
-        this.qualityCropValue = 0.1;  // Menyimpan nilai kualitas (default sedang)
     }
 
     async startCamera() {
@@ -32,63 +30,15 @@ class FotoDokumen {
     
         // Menonaktifkan tombol ambil foto sementara
         this.captureBtn.disabled = true;
-    
-        // Ambil pilihan kualitas gambar
-        const quality = document.getElementById('quality-select').value;
-    
-        // Tentukan kualitas dan resolusi berdasarkan pilihan pengguna
-        switch (quality) {
-            case 'high':
-                this.qualityValue = 1.0; // Kualitas tinggi (tidak ada kompresi)
-                this.maxWidth = 1920;   // Resolusi tinggi
-                this.maxHeight = 1080;
-                this.qualityCropValue = 0.1;
-                break;
-            case 'medium':
-                this.qualityValue = 0.5; // Kualitas sedang (sedikit kompresi)
-                this.maxWidth = 1280;   // Resolusi sedang
-                this.maxHeight = 720;
-                this.qualityCropValue = 0.05;
-
-                break;
-            case 'low':
-                this.qualityValue = 0.2; // Kualitas rendah (lebih kompresi)
-                this.maxWidth = 640;    // Resolusi rendah
-                this.maxHeight = 360;
-                this.qualityCropValue = 0.02;
-                break;
-            default:
-                this.qualityValue = 0.5; // Default kualitas sedang
-                this.maxWidth = 1280;
-                this.maxHeight = 720;
-                this.qualityCropValue = 0.05;
-        }
-    
-        // Tentukan ukuran gambar untuk resolusi sesuai kualitas
-        let width = this.videoElement.videoWidth;
-        let height = this.videoElement.videoHeight;
-    
-        // Menjaga rasio aspek gambar
-        if (width > height) {
-            if (width > this.maxWidth) {
-                height *= this.maxWidth / width;
-                width = this.maxWidth;
-            }
-        } else {
-            if (height > this.maxHeight) {
-                width *= this.maxHeight / height;
-                height = this.maxHeight;
-            }
-        }
-    
+        
         // Ambil foto setelah video dipause
         const context = this.canvas.getContext('2d');
-        this.canvas.width = width;
-        this.canvas.height = height;
-        context.drawImage(this.videoElement, 0, 0, width, height);
+        this.canvas.width = this.videoElement.videoWidth;
+        this.canvas.height = this.videoElement.videoHeight;
+        context.drawImage(this.videoElement, 0, 0, this.canvas.width, this.canvas.height);
     
-        // Konversi ke gambar dengan kualitas sesuai pilihan
-        const imageDataURL = this.canvas.toDataURL('image/jpeg', this.qualityValue);
+        // Konversi ke gambar
+        const imageDataURL = this.canvas.toDataURL('image/jpeg', 1.0);
         const previewImage = document.createElement('img');
         previewImage.id = 'crop-image';
         previewImage.src = imageDataURL;
@@ -120,6 +70,7 @@ class FotoDokumen {
         // Aktifkan kembali tombol ambil foto setelah crop selesai
         this.captureBtn.disabled = false;
     }
+    
 
     saveCroppedImage() {
         if (this.cropper) {
@@ -134,7 +85,7 @@ class FotoDokumen {
     
                 // Kembali ke tampilan kamera setelah penyimpanan
                 this.resetToCamera();
-            }, 'image/jpeg', this.qualityCropValue);  // Gunakan qualityValue untuk kompresi
+            }, 'image/jpeg', 1.0);  // Gunakan qualityValue untuk kompresi
         }
     }
 
