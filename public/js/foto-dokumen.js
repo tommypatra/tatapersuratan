@@ -57,8 +57,23 @@ class FotoDokumen {
             scalable: true,
             aspectRatio: NaN,  // Bebas memilih crop area
             ready: () => {
-                // Pastikan gambar siap dan cropper bekerja dengan baik
                 console.log('Cropper siap');
+
+                // Pastikan crop area sesuai dengan ukuran gambar
+                const imageHeight = previewImage.naturalHeight;
+                const imageWidth = previewImage.naturalWidth;
+
+                // Sesuaikan ukuran container agar cocok dengan gambar
+                this.previewContainer.style.height = `${imageHeight}px`;
+                this.previewContainer.style.width = `${imageWidth}px`;
+
+                // Setelah gambar terload, pastikan posisi crop area sudah benar
+                this.cropper.setCropBoxData({
+                    left: 0,
+                    top: 0,
+                    width: imageWidth * 0.8,
+                    height: imageHeight * 0.8
+                });
             }
         });
 
