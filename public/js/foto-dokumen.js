@@ -43,6 +43,10 @@ class FotoDokumen {
         this.previewContainer.appendChild(previewImage);
         this.previewContainer.style.display = 'block';
 
+        // Sesuaikan tinggi preview container agar tidak lebih tinggi dari 80% layar
+        this.previewContainer.style.maxHeight = `${window.innerHeight * 0.8}px`;
+        this.previewContainer.style.overflow = 'hidden'; // Cegah overflow jika gambar lebih tinggi dari container
+
         // Jika cropper sudah ada, pastikan untuk mengganti gambar
         if (this.cropper) {
             this.cropper.destroy();  // Hancurkan cropper lama
@@ -58,25 +62,12 @@ class FotoDokumen {
             aspectRatio: NaN,  // Bebas memilih crop area
             ready: () => {
                 console.log('Cropper siap');
-
-                // Ambil dimensi gambar
-                const imageHeight = previewImage.naturalHeight;
-                const imageWidth = previewImage.naturalWidth;
-
-                // Tentukan ukuran maksimal crop area berdasarkan ukuran layar
-                const maxHeight = window.innerHeight * 0.8;  // Maksimal 80% dari tinggi layar
-                const maxWidth = window.innerWidth * 0.8;    // Maksimal 80% dari lebar layar
-
-                // Sesuaikan ukuran container agar cocok dengan gambar dan crop area
-                this.previewContainer.style.height = `${Math.min(imageHeight, maxHeight)}px`;
-                this.previewContainer.style.width = `${Math.min(imageWidth, maxWidth)}px`;
-
                 // Setelah gambar terload, pastikan posisi crop area sudah benar
                 this.cropper.setCropBoxData({
                     left: 0,
                     top: 0,
-                    width: Math.min(imageWidth, maxWidth) * 0.8, // 80% dari ukuran gambar
-                    height: Math.min(imageHeight, maxHeight) * 0.8 // 80% dari ukuran gambar
+                    width: previewImage.naturalWidth * 0.8, // 80% dari ukuran gambar
+                    height: previewImage.naturalHeight * 0.8 // 80% dari ukuran gambar
                 });
             }
         });
