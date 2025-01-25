@@ -62,7 +62,7 @@
 
     <script>
         // Inisialisasi dan gunakan library
-        const fotoDokumen = new FotoDokumen('video', 'preview-container', 'capture-btn', 'crop-btn','area-video');
+        const fotoDokumen = new FotoDokumen('video', 'preview-container', 'capture-btn', 'crop-btn');
         fotoDokumen.init();
     </script>
 
