@@ -14,8 +14,8 @@ class FotoDokumen {
             const stream = await navigator.mediaDevices.getUserMedia({
                 video: {
                     facingMode: 'environment', // Pakai kamera belakang
-                    width: { ideal: 2048 },  // Resolusi tinggi
-                    height: { ideal: 1080 }
+                    width: { ideal: 1280 },  // Resolusi tinggi
+                    height: { ideal: 720 }
                 }
             });
             this.videoElement.srcObject = stream;
