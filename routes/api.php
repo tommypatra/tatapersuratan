@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\PolaSpesimenController;
 use App\Http\Controllers\Api\AksesDisposisiController;
 use App\Http\Controllers\Api\AksesSuratMasukController;
 use App\Http\Controllers\Api\SpesimenJabatanController;
+use App\Http\Controllers\Api\TerimaDisposisiController;
 use App\Http\Controllers\Api\KlasifikasiSuratController;
 use App\Http\Controllers\Api\KategoriSuratMasukController;
 use App\Http\Controllers\Api\LampiranSuratMasukController;
@@ -67,7 +68,7 @@ Route::middleware(['auth.jwt'])->group(function () {
     Route::get('get-kategori-surat-masuk', [UtilityController::class, 'getKategoriSuratMasuk']);
     Route::get('get-users', [UtilityController::class, 'getUsers']);
     Route::get('get-pejabat', [SpesimenJabatanController::class, 'index']);
-    Route::PUT('kembalikan-surat-masuk/{id}', [SuratMasukController::class, 'kembalikanSuratMasuk']);
+    Route::post('kembalikan-surat-masuk/{id}', [SuratMasukController::class, 'kembalikanSuratMasuk']);
     // Route::resource('spesimen-jabatan', SpesimenJabatanController::class);
 
     Route::get('nomor-agenda-terakhir/{kategori}/{tahun}', [UtilityController::class, 'nomorAgendaTerakhir']);
@@ -78,6 +79,8 @@ Route::middleware(['auth.jwt'])->group(function () {
     Route::get('info-akun-login', [ProfilController::class, 'infoAkunLogin']);
     Route::post('ajukan-ttd-elektronik', [TtdQrcodeController::class, 'ajukan']);
     Route::post('verifikasi-ttd-elektronik', [TtdQrcodeController::class, 'verifikasi']);
+    Route::resource('terima-disposisi', TerimaDisposisiController::class);
+
 
     Route::middleware(['auth:api', 'cek.akses:admin'])->group(function () {
         Route::resource('user-app', UserAppController::class);

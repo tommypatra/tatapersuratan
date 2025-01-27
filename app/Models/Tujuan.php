@@ -13,6 +13,11 @@ class Tujuan extends Model
         return $this->belongsTo(SuratMasuk::class);
     }
 
+    public function terimaDisposisi()
+    {
+        return $this->belongsTo(TerimaDisposisi::class);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

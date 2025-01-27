@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
-use App\Http\Requests\TujuanRequest;
-use App\Http\Resources\TujuanResource;
 use App\Models\Tujuan;
+use Illuminate\Http\Request;
+use App\Models\TerimaDisposisi;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\TujuanRequest;
+use Illuminate\Support\Facades\Hash;
+use App\Http\Resources\TujuanResource;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\DB;
 
 class TujuanController extends Controller
 {
@@ -95,6 +97,7 @@ class TujuanController extends Controller
     //OKE PUT application/x-www-form-urlencoded
     public function store(TujuanRequest $request)
     {
+        DB::beginTransaction();
         try {
             $validatedData = $request->validated();
 
@@ -104,6 +107,13 @@ class TujuanController extends Controller
             // dd($akun['data']);
 
             $data = Tujuan::create($validatedData);
+
+            $data_terima_disposisi = [
+                'user_id' => auth()->user()->id,
+                'tujuan_id' => $data->id,
+            ];
+            $data = TerimaDisposisi::create($data_terima_disposisi);
+
 
             //script kirim WA otomatis
             if ($akun['data']) {
@@ -122,19 +132,21 @@ class TujuanController extends Controller
                     //     }
                 }
             }
-
+            DB::commit();
             return response()->json([
                 'success' => true,
                 'message' => 'created successfully',
                 'data' => new TujuanResource($data),
             ], 201);
         } catch (ValidationException $e) {
+            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed',
                 'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
+            DB::rollBack();
             if ($e->getCode() == 23000) {
                 return response()->json([
                     'success' => false,

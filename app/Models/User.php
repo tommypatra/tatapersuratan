@@ -132,4 +132,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(AksesDisposisi::class);
     }
+
+    public function terimaDisposisi()
+    {
+        return $this->hasMany(TerimaDisposisi::class);
+    }
 }

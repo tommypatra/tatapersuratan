@@ -6,40 +6,7 @@
 <link href="{{ asset('js/select2/dist/css/select2.min.css') }}" rel="stylesheet">
 <link href="{{ asset('js/select2/dist/css/select2.custom.css') }}" rel="stylesheet">
 <link href="{{ asset('js/img-viewer/viewer.min.css') }}" rel="stylesheet">
-<style>
-    #video {
-        width: 100%;
-        max-width: 400px;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    }
-   
-    #preview-container {
-    width: 100%;
-    height: auto;  /* Sesuaikan tinggi berdasarkan konten */
-    max-height: 60vh;  /* Maksimum 60% dari tinggi layar */
-    overflow: hidden;
-    position: relative;
-}
 
-    #preview-container img {
-        width: 100%;  /* Gambar menyesuaikan lebar container */
-        height: auto;  /* Menjaga rasio gambar */
-    }
-    #capture-btn, #crop-btn {
-        margin-top: 20px;
-        padding: 10px 20px;
-        font-size: 18px;
-        border: none;
-        border-radius: 5px;
-        background-color: #28a745;
-        color: white;
-        cursor: pointer;
-    }
-    #crop-btn {
-        background-color: #007bff;
-    }
-</style>
 @endsection
 
 @section('container')
@@ -206,17 +173,16 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div id="area-video">
-                    <video id="video" autoplay playsinline></video>
-                </div>
-                <div id="preview-container"></div>
-            </div>
-            <div class="modal-footer">
-                <button id="capture-btn">Ambil Foto</button>
-                <button id="crop-btn" style="display:none;">Simpan Gambar</button>
-                {{-- <button id="take-photo" class="btn btn-primary">Ambil Gambar</button>
-                <button id="crop-btn" class="btn btn-success" style="display:none;">Crop & Upload</button> --}}
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                <div class="row mb-3" style="align:center">
+                    <div class="col-sm-8">
+                        <button id="switch-camera" class="btn btn-primary">Switch Camera</button>
+                        <video id="camera" autoplay width="100%"></video>
+                    </div>                
+                    <div class="col-sm-4">
+                        <button type="button" class="btn btn-success" id="take-photo">Ambil Gambar</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    </div>                
+                </div>                
             </div>
         </div>
     </div>
@@ -261,8 +227,6 @@
 <script src="{{ asset('js/select2lib.js') }}"></script>
 <script src="{{ asset('js/crud.js') }}"></script>
 <script src="{{ asset('js/img-viewer/viewer.min.js') }}"></script>
-<script src="{{ asset('js/foto-dokumen.js')}}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
 <script type="text/javascript">
     cekAkses('pengguna');
@@ -273,7 +237,6 @@
 
     var hakAkses = vAksesId;
     var tahunFilter = '{{ date("Y") }}';
-    const fotoDokumen = new FotoDokumen('video', 'preview-container', 'capture-btn', 'crop-btn');
 
     function setfilter(){
         tahunFilter = prompt('Masukkan tahun:');
@@ -953,7 +916,6 @@ function displayPagination(response) {
     function upload(id){
         // $("#uploadForm")[0].reset();
         // $("#surat_masuk_id").val(id);
-        fotoDokumen.setParameters(id,'surat-masuk');
         vsurat_masuk_id=id;
         let myModalUpload = new bootstrap.Modal(document.getElementById('modal-upload'), {
             backdrop: 'static',
@@ -1016,34 +978,91 @@ function displayPagination(response) {
         loadDataKonsep();        
         InfoModule.updateNotifWeb();
         // Ambil referensi elemen
+        const cameraElement = document.getElementById("camera");
+        const takePhotoButton = document.getElementById("take-photo");
+        const switchCameraButton = document.getElementById("switch-camera"); // Tambahkan ini
 
         let isUploading = false;
+        let stream; // Tambahkan ini untuk menyimpan referensi stream kamera
 
-        // let videoElement = document.getElementById('video');
-        // let previewContainer = document.getElementById('preview-container');
-        // let captureBtn = document.getElementById('capture-btn');
-        // let cropBtn = document.getElementById('crop-btn');
-        // let fotoDokumen = new FotoDokumen('video', 'preview-container', 'capture-btn', 'crop-btn');
+        function stopCamera() {
+            if (stream) {
+                const tracks = stream.getTracks();
+                tracks.forEach(function(track) {
+                    track.stop();
+                });
+                cameraElement.srcObject = null;
+            }
+        }
 
+        // Tambahkan fungsi untuk switch kamera
+        function switchCamera() {
+            stopCamera();
 
+            const videoConstraints = {
+                video: {
+                    facingMode: (stream.getVideoTracks()[0].getSettings().facingMode === 'user') ? 'environment' : 'user'
+                }
+            };
 
-        // Event ketika modal ditampilkan
-        $('#modal-upload').on('shown.bs.modal', function () {
-            // fotoDokumen.setParameters(123, 'foto-dokumen');
-            
-            // Mulai kamera lagi dan siapkan tampilan baru
-            fotoDokumen.startCamera();
+            navigator.mediaDevices.getUserMedia(videoConstraints)
+                .then(function(newStream) {
+                    stream = newStream;
+                    cameraElement.srcObject = newStream;
+                })
+                .catch(function(error) {
+                    console.error("Error switching camera:", error);
+                });
+        }
+
+        // Ketika modal upload ditampilkan
+        $('#modal-upload').on('shown.bs.modal', function() {
+            // Pastikan akses langsung ke kamera belakang
+            const videoConstraints = {
+                video: {
+                    facingMode: 'environment' // Kamera belakang
+                }
+            };
+
+            navigator.mediaDevices.getUserMedia(videoConstraints)
+                .then(function(initialStream) {
+                    stream = initialStream; // Simpan referensi stream
+                    cameraElement.srcObject = initialStream; // Tampilkan stream di elemen video
+                })
+                .catch(function(error) {
+                    console.error("Error accessing camera:", error);
+                    alert("Gagal mengakses kamera. Pastikan Anda memberi izin.");
+                });
+
+            // Tambahkan event listener untuk tombol switch kamera
+            switchCameraButton.addEventListener("click", switchCamera);
+
+            // Tambahkan event listener untuk tombol ambil foto
+            takePhotoButton.addEventListener("click", function() {
+                if (!isUploading) {
+                    isUploading = true;
+                    takePhotoButton.disabled = true;
+
+                    const canvas = document.createElement("canvas");
+                    const context = canvas.getContext("2d");
+                    const scaleFactor = 1.5;
+                    canvas.width = cameraElement.videoWidth * scaleFactor;
+                    canvas.height = cameraElement.videoHeight * scaleFactor;
+
+                    context.drawImage(cameraElement, 0, 0, canvas.width, canvas.height);
+                    canvas.toBlob(function(blob) {
+                        if (blob) {
+                            uploadFile(vsurat_masuk_id, blob, 'capture.jpg');
+                        }
+                        isUploading = false;
+                        takePhotoButton.disabled = false;
+                    }, "image/jpeg", 1);
+                }
+            });
         });
 
-        // Event ketika modal ditutup
-        $('#modal-upload').on('hidden.bs.modal', function () {
-            fotoDokumen.stopCamera();  // Stop kamera
-            fotoDokumen.resetToCamera();  // Reset ke tampilan kamera, hapus preview   
-            
-            // if (fotoDokumen.cropper) {
-            //     fotoDokumen.cropper.destroy();
-            //     fotoDokumen.cropper = null;  // Pastikan cropper di-reset
-            // }            
+        $('#modal-upload').on('hidden.bs.modal', function() {
+            stopCamera();
         });
 
         function cariNoAgenda(){

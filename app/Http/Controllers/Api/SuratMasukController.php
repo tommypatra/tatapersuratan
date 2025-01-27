@@ -9,6 +9,7 @@ use Illuminate\Validation\ValidationException;
 use App\Http\Requests\SuratMasukRequest;
 use App\Http\Resources\SuratMasukResource;
 use App\Models\SuratMasuk;
+use Carbon\Carbon;
 
 class SuratMasukController extends Controller
 {
@@ -187,6 +188,10 @@ class SuratMasukController extends Controller
                 $validatedData['is_diajukan'] = 1;
                 $validatedData['is_diterima'] = 1;
                 $validatedData['verifikator'] = auth()->user()->name;
+
+                $tanggal = $validatedData['tanggal'];
+                $tahun = Carbon::parse($tanggal)->year;
+                $validatedData['no_agenda'] = getNomorAgenda($validatedData['kategori_surat'], $tahun);
             }
 
             $validatedData['waktu_buat'] = date("Y-m-d H:i:s");
@@ -319,6 +324,10 @@ class SuratMasukController extends Controller
             ];
 
             $data = $this->findId($request->input('id'));
+            if ($request->input('is_diterima') == 1) {
+                $tahun = Carbon::parse($data->tanggal);
+                $dataSave['no_agenda'] = getNomorAgenda($data->kategori_surat, $tahun);
+            }
             $data->update($dataSave);
 
             $akun = getInfoAkun($data->user_id);

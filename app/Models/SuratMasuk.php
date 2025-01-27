@@ -23,6 +23,11 @@ class SuratMasuk extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function pejabat()
+    {
+        return $this->belongsTo(User::class, 'user_pejabat_id');
+    }
+
     public function kategoriSuratMasuk()
     {
         return $this->belongsTo(KategoriSuratMasuk::class);

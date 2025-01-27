@@ -4,66 +4,99 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ambil Foto Dokumen</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
-    <style>
-        body {
-            text-align: center;
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            padding: 20px;
-        }
-        #video {
-            width: 100%;
-            max-width: 400px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-        #preview-container {
-            width: 100%;
-            height: 60vh;  /* 60% dari tinggi layar */
-            max-height: 100vh;  /* Maksimum sesuai tinggi layar */
-            overflow: hidden;  /* Menyembunyikan bagian yang berlebih */
-            position: relative;  /* Agar crop area bisa diposisikan relatif */
-        }
 
-        #preview-container img {
-            width: 100%;  /* Gambar menyesuaikan lebar container */
-            height: auto;  /* Menjaga rasio gambar */
-        }
-        #capture-btn, #crop-btn {
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 18px;
-            border: none;
-            border-radius: 5px;
-            background-color: #28a745;
-            color: white;
-            cursor: pointer;
-        }
-        #crop-btn {
-            background-color: #007bff;
-        }
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+
+    <style>
+   #video {
+    width: 100%;
+    max-width: 100%; /* Sesuaikan lebar maksimum dengan parent container */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    aspect-ratio: 16 / 9; /* Pastikan video mempertahankan aspek rasio */
+    display: block;
+    margin: 0 auto; /* Pusatkan video dalam modal */
+}
+
+#preview-container {
+    width: 100%;
+    max-width: 400px; /* Batasi ukuran maksimum agar tidak memenuhi layar */
+    height: auto; /* Sesuaikan tinggi otomatis */
+    max-height: 80vh; /* Hindari memenuhi layar sepenuhnya */
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto; /* Pusatkan preview */
+}
+
+#preview-container img {
+    width: 100%;
+    height: auto;
+    max-height: 100%;
+    object-fit: contain; /* Pastikan gambar tidak terdistorsi */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
     </style>
 </head>
 <body>
 
-    <h2>Ambil Foto Dokumen</h2>
-    
-    <div id="area-video">
-        <video id="video" autoplay playsinline></video>
-        <button id="capture-btn">Ambil Foto</button>
+    <div class="container text-center mt-5">
+        <h2>Ambil Foto Dokumen</h2>
+        <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#fotoModal">
+            Buka Kamera
+        </button>
     </div>
 
-    <div id="preview-container"></div>
-    <button id="crop-btn" style="display:none;">Simpan Gambar</button>
+    <!-- Modal Bootstrap -->
+    <div class="modal fade" id="fotoModal" tabindex="-1" aria-labelledby="fotoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="fotoModalLabel">Ambil Foto Dokumen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div id="area-video" class="mb-3">
+                        <video id="video" autoplay playsinline class="img-fluid"></video>
+                    </div>
+                    <div id="preview-container" class="mb-3"></div>
+                </div>
+                <div class="modal-footer">
+                    <button id="capture-btn" class="btn btn-success">Ambil Foto</button>
+                    <button id="crop-btn" class="btn btn-primary" style="display:none;">Simpan Gambar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Bootstrap, jQuery, dan CropperJS -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url('js/foto-dokumen.js')}}"></script>
 
     <script>
-        // Inisialisasi dan gunakan library
-        const fotoDokumen = new FotoDokumen('video', 'preview-container', 'capture-btn', 'crop-btn');
-        fotoDokumen.init();
+        $(document).ready(function() {
+            const fotoDokumen = new FotoDokumen('video', 'preview-container', 'capture-btn', 'crop-btn');
+
+            // Inisialisasi kamera saat modal dibuka
+            $('#fotoModal').on('shown.bs.modal', function () {
+                fotoDokumen.init();
+                fotoDokumen.startCamera();
+            });
+
+            // Hentikan kamera saat modal ditutup
+            $('#fotoModal').on('hidden.bs.modal', function () {
+                fotoDokumen.stopCamera();
+            });
+        });
     </script>
 
 </body>

@@ -7,16 +7,16 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            font-size: 15px;
+            font-size: 16px;
             margin: 0;
-            padding: 6px;
+            padding: 7px;
         }
         .container {
             width: 100%;
-            max-width: 700px;
+            max-width: 750px;
             margin: 0 auto;
             border: 1px solid #000;
-            padding: 6px;
+            padding: 7px;
         }
         .header {
             display: flex;
@@ -24,11 +24,11 @@
             justify-content: flex-start; /* Membuat elemen dimulai dari kiri */
             width: 100%; /* Menjamin lebar header penuh */
             border: 1px solid #000; /* Opsional: menambahkan garis pada header */
-            padding: 10px; /* Memberikan jarak dalam header */
+            padding: 11px; /* Memberikan jarak dalam header */
             box-sizing: border-box; /* Menghitung padding dalam lebar total */
         }
         .header img {
-            height: 70px;
+            height: 71px;
             margin-right: 10px; /* Memberikan jarak antara logo dan teks */
         }
         .header-text {
@@ -44,7 +44,7 @@
             margin-top: 5px;
         }
         .table th, .table td {
-            padding: 2px;
+            padding: 3px;
             text-align: left;
         }
         .table th {
@@ -82,7 +82,7 @@
                 margin: 5mm; /* Margin sesuai kebutuhan */
             }
             body {
-                zoom: 60%;
+                zoom: 65%;
                 margin: 0;
                 padding: 0;
                 display: flex;
@@ -91,7 +91,7 @@
             }
             .container {
                 width: 100%;
-                max-width: 700px;
+                max-width: 750px;
                 border: 1px solid #000; /* Opsional: Garis batas */
                 transform: scale(1); /* Tidak ada skala tambahan */
                 transform-origin: center center; /* Pastikan transformasi dari tengah */
@@ -235,10 +235,15 @@
         </table>
 
         <div class="footer">
-            <div class="catatan">
-                <b>Catatan Rektor:</b>
-            </div>
-            <div class="qrcode" id="qrcode_label"></div>
+            <table style="width:100%">
+                <tr>
+                    <td style="width:90%;" valign="top"><b>Catatan Rektor:</b></td>
+                    <td style="width:10%" valign="top">
+                        <div class="qrcode mb-2" id="qrcode_label"></div>
+                        <div class="token mt-1" id="token"></div>
+                    </td>
+                </tr>
+            </table>
         </div>
 
         <table class="table">
@@ -267,7 +272,7 @@
                 <td></td>
             </tr>
         </table>
-        <i>surat masuk id : <span class="token" id="token"></span></i>
+        
     </div>
 </body>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

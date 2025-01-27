@@ -50,6 +50,7 @@
 										<div class="mb-3">
 											<label class="form-label">HP</label>
 											<input class="form-control form-control-lg" type="hp" name="hp" placeholder="Enter your hp" required />
+											gunakan nomor WA anda yang aktif.
 										</div>
 										<div class="mb-3">
 											<label class="form-label">Password</label>

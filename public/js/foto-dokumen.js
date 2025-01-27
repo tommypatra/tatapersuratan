@@ -6,75 +6,81 @@ class FotoDokumen {
         this.cropBtn = document.getElementById(cropBtnId);
         this.canvas = document.createElement('canvas');
         this.cropper = null;
+        this.id = null;
+        this.grup = null;
+        this.stream = null;
+    }
+
+    capturePhoto($id=null,$grup=null) {
+        this.id = $id;
+        this.grup = $grup;
     }
 
     async startCamera() {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({
+            this.stream = await navigator.mediaDevices.getUserMedia({
                 video: {
-                    facingMode: 'environment', // Pakai kamera belakang
-                    width: { ideal: 4096 },  // Resolusi tinggi
+                    facingMode: 'environment',
+                    width: { ideal: 4096 },
                     height: { ideal: 2160 }
                 }
             });
-            this.videoElement.srcObject = stream;
+            this.videoElement.srcObject = this.stream;
         } catch (error) {
             console.error('Gagal mengakses kamera:', error);
             alert('Tidak dapat mengakses kamera. Pastikan izin sudah diberikan.');
         }
     }
 
+    stopCamera() {
+        if (this.stream) {
+            this.stream.getTracks().forEach(track => track.stop());
+            this.videoElement.srcObject = null;
+        }
+    }
+
     capturePhoto() {
-        // Hentikan video saat pengambilan foto
         this.videoElement.style.display = 'none';
         this.captureBtn.style.display = 'none';
-        this.previewContainer.innerHTML = 'on proses';  // Bersihkan preview sebelumnya
+        this.previewContainer.innerHTML = 'on proses';
 
         this.videoElement.pause();
     
-        // Menonaktifkan tombol ambil foto sementara
         this.captureBtn.disabled = true;
         
-        // Ambil foto setelah video dipause
         const context = this.canvas.getContext('2d');
         this.canvas.width = this.videoElement.videoWidth;
         this.canvas.height = this.videoElement.videoHeight;
         context.drawImage(this.videoElement, 0, 0, this.canvas.width, this.canvas.height);
     
-        // Konversi ke gambar
         const imageDataURL = this.canvas.toDataURL('image/jpeg', 1.0);
         const previewImage = document.createElement('img');
         previewImage.id = 'crop-image';
         previewImage.src = imageDataURL;
     
-        // Sembunyikan video dan tampilkan crop area saja
         this.videoElement.style.display = 'none';
         this.captureBtn.style.display = 'none';
-        this.previewContainer.innerHTML = '';  // Bersihkan preview sebelumnya
+        this.previewContainer.innerHTML = '';
         this.previewContainer.appendChild(previewImage);
         this.previewContainer.style.display = 'block';
     
-        // Jika cropper sudah ada, pastikan untuk mengganti gambar
         if (this.cropper) {
-            this.cropper.destroy();  // Hancurkan cropper lama
+            this.cropper.destroy();
         }
     
-        // Gunakan replace() untuk mengganti gambar di dalam cropper
         this.cropper = new Cropper(previewImage, {
             viewMode: 2,
             autoCropArea: 0.8,
             movable: true,
             zoomable: true,
             scalable: true,
-            aspectRatio: NaN,  // Bebas memilih crop area
+            aspectRatio: NaN,
         });
     
         this.cropBtn.style.display = 'inline-block';
     
-        // Aktifkan kembali tombol ambil foto setelah crop selesai
         this.captureBtn.disabled = false;
     }
-    
 
     saveCroppedImage() {
         if (this.cropper) {
@@ -93,7 +99,6 @@ class FotoDokumen {
     }
 
     resetToCamera() {
-        // Tampilkan kembali video dan tombol capture, sembunyikan crop area
         this.videoElement.style.display = 'block';
         this.captureBtn.style.display = 'inline-block';
         this.previewContainer.style.display = 'none';
@@ -101,7 +106,6 @@ class FotoDokumen {
     }
 
     init() {
-        this.startCamera();
         this.captureBtn.addEventListener('click', () => this.capturePhoto());
         this.cropBtn.addEventListener('click', () => this.saveCroppedImage());
     }
