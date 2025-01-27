@@ -22,9 +22,8 @@
 
 #preview-container {
     width: 100%;
-    max-width: 400px; /* Batasi ukuran maksimum agar tidak memenuhi layar */
     height: auto; /* Sesuaikan tinggi otomatis */
-    max-height: 80vh; /* Hindari memenuhi layar sepenuhnya */
+    /* max-height: 100vh; Hindari memenuhi layar sepenuhnya */
     overflow: hidden;
     position: relative;
     display: flex;
