@@ -834,6 +834,7 @@
     function upload(id){
         vsurat_keluar_id=id;
         fotoDokumen.setValues(id,'surat-keluar');
+        alert(id);
         let myModalUpload = new bootstrap.Modal(document.getElementById('modal-upload'), {
             backdrop: 'static',
             keyboard: false,
