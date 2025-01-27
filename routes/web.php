@@ -15,7 +15,11 @@ use App\Http\Controllers\Api\AuthController;
 |
 */
 
+Route::get('auth/google', [AuthController::class, 'redirectToGoogle'])->name('google.login');
+Route::get('auth/callback', [AuthController::class, 'handleGoogleCallback']);
+
 Route::get('/', [WebController::class, 'masuk'])->name('akun-masuk')->middleware('guest');
+Route::get('/login', [WebController::class, 'masuk'])->name('login')->middleware('guest');
 Route::get('/akun-daftar', [WebController::class, 'mendaftar'])->name('akun-daftar')->middleware('guest');
 
 Route::post('/akun-set-session', [WebController::class, 'setSession'])->name('akun-set-session');

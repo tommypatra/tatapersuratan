@@ -12,7 +12,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\AuthResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redirect;
+use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Validation\ValidationException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -43,7 +46,7 @@ class AuthController extends Controller
             if ($user->profil) {
                 $foto = ($user->profil->foto) ? ($user->profil->foto) : 'foto/user-avatar.png';
             }
-            $daftarAksesData = $this->daftarAkses($request)->getData();
+            $daftarAksesData = $this->daftarAkses($request->input('email'))->getData();
 
             $hakakses = $daftarAksesData->data->hakakses;
             // dd($daftarAksesData->data->grup);
@@ -112,10 +115,10 @@ class AuthController extends Controller
     // }
 
 
-    public function daftarAkses(Request $request)
+    public function daftarAkses($email)
     {
         try {
-            $getAkses = User::with('grupUser.grup')->where('email', $request->email);
+            $getAkses = User::with('grupUser.grup')->where('email', $email);
             if (!$getAkses->first()) {
                 return response()->json([
                     'success' => false,
@@ -126,7 +129,6 @@ class AuthController extends Controller
             $akses = null;
             $grup = [];
             foreach ($dtAkses->grupUser as $i => $grp) {
-                // dd($grp->grup->grup);
                 $grup[] = $grp->grup->grup;
                 if (!$akses)
                     $akses = $grp->grup_id;
@@ -210,6 +212,54 @@ class AuthController extends Controller
                 'message' => 'Failed to create',
                 'error' => $e->getMessage(),
             ], 500);
+        }
+    }
+
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+
+    public function handleGoogleCallback()
+    {
+        try {
+            $googleUser = Socialite::driver('google')->user();
+            $email = $googleUser->getEmail();
+            $user = User::with('profil')->where('email', $email)->first();
+            if (!$user)
+                return redirect::to('login')->with('error', 'Login gagal, ' . $email . ' belum terdaftar');
+
+            // Auth::login($user);
+
+            $token = JWTAuth::fromUser($user);
+
+            if (!$token) {
+                return redirect()->to('login')->with('error', 'Tidak bisa membuat token.');
+            }
+            $profil = Profil::where("user_id", $user->id)->first();
+
+            $foto = 'foto/user-avatar.png';
+            if ($user->profil) {
+                $foto = ($user->profil->foto) ? ($user->profil->foto) : 'foto/user-avatar.png';
+            }
+            $daftarAksesData = $this->daftarAkses($email)->getData();
+            $hakakses = $daftarAksesData->data->hakakses;
+            $akses = $daftarAksesData->data->akses;
+            $respon_data = [
+                'success' => true,
+                'message' => 'user ditemukan',
+                'data' => [
+                    'akun' => $user,
+                    'foto' => $foto,
+                    'access_token' => $token,
+                    'hakakses' => $hakakses,
+                    'akses' => $akses,
+                ]
+            ];
+            // dd($respon_data);
+            return redirect::to('/login')->with('respon_google_login', $respon_data);
+        } catch (\Exception $e) {
+            return Redirect::to('login')->with('error', 'Login failed, please try again. ' . $e->getMessage());
         }
     }
 }

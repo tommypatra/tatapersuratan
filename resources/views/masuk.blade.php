@@ -24,6 +24,12 @@
 								<div class="card-body">
 									<div class="m-sm-3">
 										<form>
+											@if(session('error'))
+												<div class="alert alert-danger">
+													{{ session('error') }}
+												</div>
+											@endif                    
+		
 											<div class="mb-3">
 												<label class="form-label">Email</label>
 												<input class="form-control form-control-lg" type="email" name="email" id="email" required data-rule-email="true" placeholder="Enter your email" />
@@ -40,6 +46,8 @@
 											</div>
 											<div class="d-grid gap-2 mt-3">
 												<button type="submit" class="btn btn-lg btn-primary">Masuk</button>
+												<div style="text-align: center">- atau -</div>
+												<a href="{{ route('google.login') }}" class="btn btn-danger"><i class="fab fa-google"></i> Masuk dengan Google</a>
 											</div>
 										</form>
 									</div>
@@ -112,13 +120,14 @@
 		});
 
 		function setSession(param){
+			// console.log(param)
 			localStorage.setItem('access_token', param.access_token);
-			localStorage.setItem('email', param.akun.email);
-			localStorage.setItem('hakakses', JSON.stringify(param.hakakses));
 			localStorage.setItem('akses', param.akses);
+			localStorage.setItem('email', param.akun.email);
 			localStorage.setItem('foto', param.foto);
-			localStorage.setItem('nama', param.akun.name);
+			localStorage.setItem('hakakses', JSON.stringify(param.hakakses));
 			localStorage.setItem('id', param.akun.id);
+			localStorage.setItem('nama', param.akun.name);
 			showModalAkses();
 		}	
 
@@ -128,6 +137,7 @@
 			var daftar_akses = localStorage.getItem('hakakses');
 			var nama = localStorage.getItem('nama');
 			daftar_akses = JSON.parse(daftar_akses);
+			// console.log(daftar_akses);
 			if (daftar_akses && daftar_akses.length > 1) {
 				showAkses();
 				myModalAkses.show();
@@ -187,6 +197,14 @@
 				}
 			})
 		}
+
+		@if(session('respon_google_login'))
+			const response = @json(session('respon_google_login'));
+			if (response.success) {
+				setSession(response.data);
+			}
+		@endif
+
 
 	});
 	</script>

@@ -162,7 +162,7 @@
 									<h5 class="card-title mb-0">Data Aktifitas Persuratan</h5>
 								</div>
 								<div class="card-body d-flex">
-									<div class="align-self-center w-100">
+									<div class="align-self-center w-100 table-responsive">
 										<table class="table table-hover my-0" id="aktifitas-persuratan">
                                             <thead>
                                                 <tr>

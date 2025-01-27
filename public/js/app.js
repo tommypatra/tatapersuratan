@@ -233,6 +233,7 @@ function showAkses(id_attr='#daftar-akses') {
     var daftar_akses = localStorage.getItem('hakakses');
     var nama = localStorage.getItem('nama');
     daftar_akses = JSON.parse(daftar_akses);
+    console.log(daftar_akses);
     if (daftar_akses && daftar_akses.length > 1) {
         var htmlOptions = `<div>Hi ${nama}, pilih akses anda:</div>`;
         htmlOptions += '<ul>';
