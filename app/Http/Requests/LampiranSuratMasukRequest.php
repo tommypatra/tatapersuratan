@@ -24,7 +24,7 @@ class LampiranSuratMasukRequest extends FormRequest
     public function rules()
     {
         return [
-            'upload_id' => 'required',
+            'file' => 'required|file|mimes:heif,jpeg,jpg,png,pdf,doc,docx,ppt,pptx,xls,xlsx|max:8000', // Maksimal 2MB
             'surat_masuk_id' => 'required',
         ];
     }
@@ -32,7 +32,7 @@ class LampiranSuratMasukRequest extends FormRequest
     public function attributes()
     {
         return [
-            'upload_id' => 'file upload',
+            'file' => 'file upload',
             'surat_masuk_id' => 'surat masuk',
         ];
     }

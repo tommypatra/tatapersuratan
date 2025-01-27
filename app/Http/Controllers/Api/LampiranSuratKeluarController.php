@@ -83,10 +83,43 @@ class LampiranSuratKeluarController extends Controller
     //OKE PUT application/x-www-form-urlencoded
     public function store(LampiranSuratKeluarRequest $request)
     {
+        DB::beginTransaction();
         try {
             $validatedData = $request->validated();
 
-            $data = LampiranSuratKeluar::create($validatedData);
+            $validatedData['user_id'] = auth()->user()->id;
+            $uploadedFile = $request->file('file');
+
+            $originalFileName = $uploadedFile->getClientOriginalName();
+            $ukuranFile = $uploadedFile->getSize();
+            $tipeFile = $uploadedFile->getMimeType();
+
+            $storagePath = 'uploads/' . date('Y') . '/' . date('m') . '/' . date('d');
+
+            if (!File::isDirectory(public_path($storagePath))) {
+                File::makeDirectory(public_path($storagePath), 0755, true);
+            }
+
+            $fileName = generateUniqueFileName($originalFileName);
+            // $fileName = time() . '_' . $uploadedFile->getClientOriginalName();
+            $uploadedFile->move(public_path($storagePath), $fileName);
+
+            $data = new Upload([
+                'path' => $storagePath . '/' . $fileName,
+                'name' => $originalFileName,
+                'size' => $ukuranFile,
+                'type' => $tipeFile,
+                'user_id' => auth()->user()->id,
+            ]);
+            $data->save();
+
+            $data_lampiran = [
+                'upload_id' => $data->id,
+                'surat_keluar_id' => $request->input('surat_keluar_id'),
+            ];
+
+            $data = LampiranSuratKeluar::create($data_lampiran);
+            DB::commit();
 
             // $data['tanggal']
             return response()->json([
@@ -94,13 +127,9 @@ class LampiranSuratKeluarController extends Controller
                 'message' => 'created successfully',
                 'data' => new LampiranSuratKeluarResource($data),
             ], 201);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors(),
-            ], 422);
         } catch (\Exception $e) {
+            DB::rollBack();
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create',

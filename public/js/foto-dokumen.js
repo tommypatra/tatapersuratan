@@ -11,10 +11,41 @@ class FotoDokumen {
         this.stream = null;
     }
 
-    capturePhoto($id=null,$grup=null) {
+    setValues($id=null,$grup=null) {
         this.id = $id;
         this.grup = $grup;
     }
+
+    uploadFile(file, fileName, callback) {
+        const formData = new FormData();
+        let endpoint;
+        formData.append("file", file, fileName);
+        if(this.grup=='surat-masuk'){
+            formData.append("surat_masuk_id", this.id);
+            endpoint='api/lampiran-surat-masuk';
+        }else if(this.grup=='surat-keluar'){
+            formData.append("surat_keluar_id", this.id);
+            endpoint='api/lampiran-surat-keluar';
+        }
+        if(endpoint){
+            $.ajax({
+                url: endpoint,
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    // Panggil callback dengan respons dari server
+                    callback({ success: true, message: 'berhasil terupload.' });
+                },
+                error: function (xhr, status, error) {
+                    // Panggil callback dengan respons error
+                    callback({ success: false, message: 'gagal terupload.' });
+                }
+            });
+        }else
+            callback({ success: false, message: 'gagal terupload.' });
+    }    
 
     async startCamera() {
         try {
@@ -82,18 +113,29 @@ class FotoDokumen {
         this.captureBtn.disabled = false;
     }
 
-    saveCroppedImage() {
+    saveCroppedImage(callback) {
         if (this.cropper) {
             const croppedCanvas = this.cropper.getCroppedCanvas();
             croppedCanvas.toBlob((blob) => {
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'foto-dokumen.jpg';
-                a.click();
-                URL.revokeObjectURL(url);
-    
-                this.resetToCamera();
+                const now = new Date();
+                const formattedDate = 
+                    now.getFullYear().toString().slice(2) + 
+                    ('0' + (now.getMonth() + 1)).slice(-2) + 
+                    ('0' + now.getDate()).slice(-2) + '-' +  
+                    ('0' + now.getHours()).slice(-2) +       
+                    ('0' + now.getMinutes()).slice(-2) +     
+                    ('0' + now.getSeconds()).slice(-2);      
+                
+                const fileName = `${this.grup}-${formattedDate}.jpg`;                this.uploadFile(blob, fileName, (response) => {
+                    if (response.success) {
+                        console.log('Berhasil upload');
+                        callback(true);
+                    } else {
+                        console.log('Gagal upload: ' + response.message);
+                        callback(false);
+                    }
+                    this.resetToCamera();
+                });                    
             }, 'image/jpeg', 1.0);  
         }
     }
@@ -107,6 +149,6 @@ class FotoDokumen {
 
     init() {
         this.captureBtn.addEventListener('click', () => this.capturePhoto());
-        this.cropBtn.addEventListener('click', () => this.saveCroppedImage());
+        // this.cropBtn.addEventListener('click', () => this.saveCroppedImage());
     }
 }

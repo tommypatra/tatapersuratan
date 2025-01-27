@@ -6,38 +6,28 @@
 <link href="{{ asset('js/select2/dist/css/select2.min.css') }}" rel="stylesheet">
 <link href="{{ asset('js/select2/dist/css/select2.custom.css') }}" rel="stylesheet">
 <link href="{{ asset('js/img-viewer/viewer.min.css') }}" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
 <style>
-    #video {
-        width: 100%;
-        max-width: 400px;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    }
-   
+
     #preview-container {
-    width: 100%;
-    height: auto;  /* Sesuaikan tinggi berdasarkan konten */
-    max-height: 60vh;  /* Maksimum 60% dari tinggi layar */
-    overflow: hidden;
-    position: relative;
-}
+        width: 100%;
+        height: auto; /* Sesuaikan tinggi otomatis */
+        max-height: 80vh; 
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto; /* Pusatkan preview */
+    }
 
     #preview-container img {
-        width: 100%;  /* Gambar menyesuaikan lebar container */
-        height: auto;  /* Menjaga rasio gambar */
-    }
-    #capture-btn, #crop-btn {
-        margin-top: 20px;
-        padding: 10px 20px;
-        font-size: 18px;
-        border: none;
-        border-radius: 5px;
-        background-color: #28a745;
-        color: white;
-        cursor: pointer;
-    }
-    #crop-btn {
-        background-color: #007bff;
+        width: 100%;
+        height: auto;
+        max-height: 100%;
+        object-fit: contain; /* Pastikan gambar tidak terdistorsi */
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     }
 </style>
 @endsection
@@ -207,17 +197,16 @@
             </div>
             <div class="modal-body">
                 <div id="area-video">
-                    <video id="video" autoplay playsinline></video>
+                    <video id="video" autoplay playsinline class="img-fluid"></video>
                 </div>
-                <div id="preview-container"></div>
+                <div id="preview-container"></div>                   
             </div>
             <div class="modal-footer">
-                <button id="capture-btn">Ambil Foto</button>
-                <button id="crop-btn" style="display:none;">Simpan Gambar</button>
-                {{-- <button id="take-photo" class="btn btn-primary">Ambil Gambar</button>
-                <button id="crop-btn" class="btn btn-success" style="display:none;">Crop & Upload</button> --}}
+                <button id="capture-btn" class="btn btn-success">Ambil Foto</button>
+                <button id="crop-btn" class="btn btn-primary" style="display:none;">Simpan Gambar</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
             </div>
+
         </div>
     </div>
 </div>
@@ -261,8 +250,8 @@
 <script src="{{ asset('js/select2lib.js') }}"></script>
 <script src="{{ asset('js/crud.js') }}"></script>
 <script src="{{ asset('js/img-viewer/viewer.min.js') }}"></script>
-<script src="{{ asset('js/foto-dokumen.js')}}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+<script src="{{ url('js/foto-dokumen.js')}}"></script>
 
 <script type="text/javascript">
     cekAkses('pengguna');
@@ -274,6 +263,7 @@
     var hakAkses = vAksesId;
     var tahunFilter = '{{ date("Y") }}';
     const fotoDokumen = new FotoDokumen('video', 'preview-container', 'capture-btn', 'crop-btn');
+
 
     function setfilter(){
         tahunFilter = prompt('Masukkan tahun:');
@@ -951,10 +941,8 @@ function displayPagination(response) {
 
     //modal untuk ambil dari kamera
     function upload(id){
-        // $("#uploadForm")[0].reset();
-        // $("#surat_masuk_id").val(id);
-        fotoDokumen.setParameters(id,'surat-masuk');
         vsurat_masuk_id=id;
+        fotoDokumen.setValues(id,'surat-masuk');
         let myModalUpload = new bootstrap.Modal(document.getElementById('modal-upload'), {
             backdrop: 'static',
             keyboard: false,
@@ -1015,36 +1003,32 @@ function displayPagination(response) {
         // Load data default
         loadDataKonsep();        
         InfoModule.updateNotifWeb();
-        // Ambil referensi elemen
 
-        let isUploading = false;
+        //start upload with crop
 
-        // let videoElement = document.getElementById('video');
-        // let previewContainer = document.getElementById('preview-container');
-        // let captureBtn = document.getElementById('capture-btn');
-        // let cropBtn = document.getElementById('crop-btn');
-        // let fotoDokumen = new FotoDokumen('video', 'preview-container', 'capture-btn', 'crop-btn');
-
-
-
-        // Event ketika modal ditampilkan
+        fotoDokumen.init();
         $('#modal-upload').on('shown.bs.modal', function () {
-            // fotoDokumen.setParameters(123, 'foto-dokumen');
-            
-            // Mulai kamera lagi dan siapkan tampilan baru
             fotoDokumen.startCamera();
+        }); 
+
+        // Hentikan kamera saat modal ditutup
+        $('#modal-upload').on('hidden.bs.modal', function () {
+            fotoDokumen.stopCamera();
+            fotoDokumen.resetToCamera();
         });
 
-        // Event ketika modal ditutup
-        $('#modal-upload').on('hidden.bs.modal', function () {
-            fotoDokumen.stopCamera();  // Stop kamera
-            fotoDokumen.resetToCamera();  // Reset ke tampilan kamera, hapus preview   
-            
-            // if (fotoDokumen.cropper) {
-            //     fotoDokumen.cropper.destroy();
-            //     fotoDokumen.cropper = null;  // Pastikan cropper di-reset
-            // }            
+        $('#crop-btn').on('click', () => {
+            fotoDokumen.saveCroppedImage((response) => {
+                $('#modal-upload').modal('hide');
+                if (response) {
+                    refresh();
+                } else {
+                    alert('Terjadi kesalahan');
+                }
+            });
         });
+
+        //end upload with crop
 
         function cariNoAgenda(){
             var kategori_surat = $("#kategori_surat").val();

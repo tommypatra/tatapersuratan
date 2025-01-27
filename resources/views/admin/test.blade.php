@@ -84,6 +84,7 @@
             // Hentikan kamera saat modal ditutup
             $('#fotoModal').on('hidden.bs.modal', function () {
                 fotoDokumen.stopCamera();
+                fotoDokumen.resetToCamera();
             });
         });
     </script>
