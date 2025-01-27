@@ -126,7 +126,8 @@ class FotoDokumen {
                     ('0' + now.getMinutes()).slice(-2) +     
                     ('0' + now.getSeconds()).slice(-2);      
                 
-                const fileName = `${this.grup}-${formattedDate}.jpg`;                this.uploadFile(blob, fileName, (response) => {
+                const fileName = `${this.grup}-${formattedDate}.jpg`;                
+                this.uploadFile(blob, fileName, (response) => {
                     if (response.success) {
                         console.log('Berhasil upload');
                         callback(true);

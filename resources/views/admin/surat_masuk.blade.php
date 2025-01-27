@@ -203,7 +203,7 @@
             </div>
             <div class="modal-footer">
                 <button id="capture-btn" class="btn btn-success">Ambil Foto</button>
-                <button id="crop-btn" class="btn btn-primary" style="display:none;">Simpan Gambar</button>
+                <button type="submit" id="crop-btn" class="btn btn-primary" style="display:none;">Simpan Gambar</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
             </div>
 
