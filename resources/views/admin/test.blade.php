@@ -10,37 +10,27 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
 
     <style>
-   #video {
-    width: 100%;
-    max-width: 100%; /* Sesuaikan lebar maksimum dengan parent container */
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    aspect-ratio: 16 / 9; /* Pastikan video mempertahankan aspek rasio */
-    display: block;
-    margin: 0 auto; /* Pusatkan video dalam modal */
-}
 
-#preview-container {
-    width: 100%;
-    height: auto; /* Sesuaikan tinggi otomatis */
-    /* max-height: 100vh; Hindari memenuhi layar sepenuhnya */
-    overflow: hidden;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto; /* Pusatkan preview */
-}
+        #preview-container {
+            width: 100%;
+            height: auto; /* Sesuaikan tinggi otomatis */
+            max-height: 80vh; 
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto; /* Pusatkan preview */
+        }
 
-#preview-container img {
-    width: 100%;
-    height: auto;
-    max-height: 100%;
-    object-fit: contain; /* Pastikan gambar tidak terdistorsi */
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
-
+        #preview-container img {
+            width: 100%;
+            height: auto;
+            max-height: 100%;
+            object-fit: contain; /* Pastikan gambar tidak terdistorsi */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
     </style>
 </head>
 <body>
