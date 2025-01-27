@@ -429,7 +429,7 @@
 
                 var btnUpload=` <div class="btn-group-sm mt-1">
                                     <a href="javascript:;" class="btn btn-primary uploadLampiran" data-surat_masuk_id="${suratMasuk.id}"><i class="fa-solid fa-upload"></i></a>
-                                    <a href="javascript:;" class="btn btn-primary fotoLampiran" onclick="upload(${suratMasuk.id})"><i class="fa-solid fa-camera"></i></a>
+                                    <a href="javascript:;" class="btn btn-primary fotoLampiran" data-surat_masuk_id="${suratMasuk.id}"><i class="fa-solid fa-camera"></i></a>
                                 </div>`;
                 
                 if(dt.user_id==vUserId){
@@ -857,6 +857,18 @@ function displayPagination(response) {
             }
         });
     });
+
+    $(document).on("click", ".fotoLampiran", function () {
+        vsurat_masuk_id = $(this).data("surat_masuk_id");
+        fotoDokumen.setValues(vsurat_masuk_id,'surat-masuk');
+        // alert(id);
+        let myModalUpload = new bootstrap.Modal(document.getElementById('modal-upload'), {
+            backdrop: 'static',
+            keyboard: false,
+        });
+        myModalUpload.toggle();
+    });
+    
 
     function uploadFile(surat_masuk_id, file, fileName) {
         const formData = new FormData();

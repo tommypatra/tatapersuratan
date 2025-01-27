@@ -440,7 +440,7 @@
                             <i class="fa-solid fa-users"></i> ${dt.jumlah_distribusi}
                             <div class="btn-group-sm">
                                 <a href="javascript:;" class="btn btn-primary uploadLampiran" data-surat_keluar_id="${dt.id}"><i class="fa-solid fa-upload"></i></a>
-                                <a href="javascript:;" class="btn btn-primary fotoLampiran" onclick="upload(${dt.id})"><i class="fa-solid fa-camera"></i></a>
+                                <a href="javascript:;" class="btn btn-primary fotoLampiran" data-surat_keluar_id="${dt.id}"><i class="fa-solid fa-camera"></i></a>
                             </div>
                             ${lampiran}                        
                         </td>
@@ -830,17 +830,16 @@
         });
     }  
 
-
-    function upload(id){
-        vsurat_keluar_id=id;
-        fotoDokumen.setValues(id,'surat-keluar');
-        alert(id);
+    $(document).on("click", ".fotoLampiran", function () {
+        vsurat_keluar_id = $(this).data("surat_keluar_id");
+        fotoDokumen.setValues(vsurat_keluar_id,'surat-keluar');
+        // alert(id);
         let myModalUpload = new bootstrap.Modal(document.getElementById('modal-upload'), {
             backdrop: 'static',
             keyboard: false,
         });
         myModalUpload.toggle();
-    }
+    });
 
 
     sel2_cariUser(3, '#select_user_id', '#form-distribusi .modal-content');
