@@ -103,8 +103,14 @@ class SuratMasukController extends Controller
                         if ($dp != "SEMUA")
                             $query->where('kategori_surat', $dp);
                     } elseif ($i == 'bulan') {
-                        $bulan_sekarang = $dp;
-                        $query->whereMonth('tanggal', $bulan_sekarang);
+                        if ($dp != "SEMUA") {
+                            $query->whereMonth('tanggal', $dp);
+                        }
+                    } elseif ($i == 'tanggal') {
+                        if ($dp != "SEMUA") {
+                            $bulan_sekarang = $dp;
+                            $query->whereDay('tanggal', $dp);
+                        }
                     } else
                         $query->where($i, $dp);
                 }
@@ -287,7 +293,7 @@ class SuratMasukController extends Controller
             foreach ($admin['data'] as $i => $item) {
                 $pesanWA = "Hai, " . $item->name . " ada ajuan surat masuk untuk proses disposisi dari " . auth()->user()->name . ", ";
                 $pesanWA .= "surat berasal dari " . $data->tempat . " (" . $data->asal . ") tentang " . $data->perihal . ", nomor " . $data->no_surat . ", tertanggal " . $data->tanggal . " ";
-                $pesanWA .= "mohon untuk segera diproses.\n\n";
+                $pesanWA .= "mohon untuk diproses.\n\n";
                 $pesanWA .= "silahkan cek dengan login laman https://surat.iainkendari.ac.id/";
                 if ($item->profil->hp) {
                     kirimWA($item->profil->hp, $pesanWA);

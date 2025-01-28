@@ -47,7 +47,8 @@
                                 <ul class="nav col-12 col-sm-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                                     <li><a href="javascript:;" id="btnRefresh" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="refresh-cw"></i> Refresh</a></li>
                                     <li><a href="javascript:;" id="btnTambah" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="plus-circle"></i> Tambah</a></li>
-                                    <li><a href="javascript:;" id="btnFilter" class="nav-link px-2 link-dark" onclick="setfilter()"><i class="align-middle" data-feather="filter"></i> Filter</a></li>
+                                    <li><a href="javascript:;" id="btnFilter" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="filter"></i> Filter</a></li>
+                                    <li><a href="javascript:;" id="btnCetak" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="printer"></i> Cetak</a></li>
                                 </ul>                    
 
                                 <form class="col-12 col-sm-auto mb-3 mb-lg-0 me-lg-3">                                        
@@ -74,19 +75,9 @@
                             <a class="nav-link" href="javascript:;" id="tabTolak" onclick="setActiveTab('tabTolak')">Ditolak</a>
                         </li>
                     </ul>
-
-                    <select class="form-control mt-2" id="filter_kategori_surat" >
-                        <option value="SEMUA">- SEMUA -</option>
-                        @php
-                            $kategori = explode(',', env('KATEGORI_SURAT_MASUK'));
-                        @endphp
-                        @foreach ($kategori as $item)
-                            <option value="{{ trim($item) }}">{{ trim($item) }}</option>
-                        @endforeach
-                    </select>
                     
                     <div class="table-responsive">
-                        <table class="table mt-1">
+                        <table class="table">
                             <thead>
                                 <tr>
                                     <th>No</th>
@@ -213,6 +204,75 @@
 <!-- AKHIR MODAL -->
 
 {{-- Modal Upload --}}
+<div class="modal fade " id="modal-filter" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-filter-label">Filter</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-4 mb-3">
+                        <label class="form-label">Tanggal</label>
+                        <select class="form-control" id="filter_tanggal" name="filter_tanggal">
+                            <option value="SEMUA">SEMUA</option>
+                            @for ($i = 1; $i <= 31; $i++)
+                                <option value="{{ $i }}">{{ $i }}</option>
+                            @endfor
+                        </select>
+                    </div>
+
+                    <div class="col-sm-4 mb-3">
+                        <label class="form-label">Bulan</label>
+                        <select class="form-control" id="filter_bulan" name="filter_bulan">
+                            <option value="SEMUA">SEMUA</option>
+                            @php
+                                $bulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','November','Desember'];
+                            @endphp
+                            @foreach ($bulan as $i => $item)
+                                <option value="{{ $i+1 }}">{{ $item }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-sm-4 mb-3">
+                        <label class="form-label">Tahun</label>
+                        <select class="form-control" id="filter_tahun" name="filter_tahun">
+                            @php
+                                $tahun_awal = 2024;
+                                $tahun_sekarang = (int)date('Y');
+                            @endphp
+                            @for ($i = $tahun_sekarang; $i >= $tahun_awal; $i--)
+                                <option value="{{ $i }}">{{ $i }}</option>
+                            @endfor
+                        </select>
+                    </div>
+                    <div class="col-sm-12 mb-3">
+                        <label class="form-label">Kategori</label>
+                        <select class="form-control mt-2" id="filter_kategori" >
+                            <option value="SEMUA">SEMUA</option>
+                            @php
+                                $kategori = explode(',', env('KATEGORI_SURAT_MASUK'));
+                            @endphp
+                            @foreach ($kategori as $item)
+                                <option value="{{ trim($item) }}">{{ trim($item) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="terapkan-filter" class="btn btn-primary">Terapkan</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- AKHIR MODAL -->
+
+{{-- Modal Upload --}}
 <div class="modal fade" id="modal-disposisi" role="dialog">
     <div class="modal-dialog">
         <form id="form-disposisi">
@@ -265,14 +325,14 @@
     const fotoDokumen = new FotoDokumen('video', 'preview-container', 'capture-btn', 'crop-btn');
 
 
-    function setfilter(){
-        tahunFilter = prompt('Masukkan tahun:');
-        if (!isValidTahun(tahunFilter)) {
-            appShowNotification(false,['Tahun yang dimasukkan tidak valid. Mohon masukkan tahun yang benar.']);
-        }else{
-            refresh();
-        }
-    }
+    // function setfilter(){
+        // tahunFilter = prompt('Masukkan tahun:');
+        // if (!isValidTahun(tahunFilter)) {
+        //     appShowNotification(false,['Tahun yang dimasukkan tidak valid. Mohon masukkan tahun yang benar.']);
+        // }else{
+        //     refresh();
+        // }
+    // }
 
     function isValidTahun(input) {
         const regex = /^\d{4}$/;
@@ -285,23 +345,7 @@
         $('.nav-link').removeClass('active'); 
         $('#' + tabId).addClass('active');
         console.log(tabId);
-        switch (tabId) {
-            case 'tabKonsep':
-                loadDataKonsep();
-                break;
-            case 'tabAjukan':
-                loadDataMasuk();
-                break;
-            case 'tabTerima':
-                loadDataDiterima();
-                break;
-            case 'tabTolak':
-                loadDataDitolak();
-                break;
-            default:
-                loadDataMasuk();
-                break;
-        }    
+        loadDataTab();
     }
 
     $('.datepicker').bootstrapMaterialDatePicker({
@@ -381,10 +425,8 @@
     //pencarian data
     $('#search-data').on('input', function() {
         var keyword = $(this).val();
-        var filter='';
-        if(hakAkses>1)
-            filter=`{"user_id":"${vUserId}"}`;
-
+        var filter=filterData();
+        
         if (keyword.length == 0 || keyword.length >= 3) {
             $.ajax({
                 url: '/api/surat-masuk?page=1&keyword=' + keyword + '&filter=' + filter,
@@ -401,13 +443,8 @@
         }
     });    
 
-    function refreshData(){
-        $('#search-data').val("");
-        CrudModule.refresh(displayData);
-    }
-
     $('#btnRefresh').on('click', function() {
-        refreshData()
+        refresh();
     });
 
     //read showdata
@@ -470,8 +507,8 @@
                         else
                             lampiran +=`<a href="${dt.upload.path}" target="_blank">${dt.upload.name}</a>`;
 
-                        if(!suratMasuk.is_diterima)
-                            lampiran +=` <a href="javascript:;" onclick="hapusLampiranSuratMasuk(${dt.id},${dt.upload.id})"><i class="fa-regular fa-trash-can"></i></a>`;
+                        // if(!suratMasuk.is_diterima)
+                        lampiran +=` <a href="javascript:;" onclick="hapusLampiranSuratMasuk(${dt.id},${dt.upload.id})"><i class="fa-regular fa-trash-can"></i></a>`;
 
                         lampiran +=` </li>`;
 
@@ -760,7 +797,7 @@ function displayPagination(response) {
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
-                    refreshData();
+                    refresh();
                     InfoModule.updateNotifWeb();
                     $('#modal-form').modal('hide');
                 } 
@@ -952,15 +989,15 @@ function displayPagination(response) {
     sel2_cariUser(3,'#select_user_id','#form-disposisi .modal-content');
 
     //modal untuk ambil dari kamera
-    function upload(id){
-        vsurat_masuk_id=id;
-        fotoDokumen.setValues(id,'surat-masuk');
-        let myModalUpload = new bootstrap.Modal(document.getElementById('modal-upload'), {
-            backdrop: 'static',
-            keyboard: false,
-        });
-        myModalUpload.toggle();
-    }
+    // function upload(id){
+    //     vsurat_masuk_id=id;
+    //     fotoDokumen.setValues(id,'surat-masuk');
+    //     let myModalUpload = new bootstrap.Modal(document.getElementById('modal-upload'), {
+    //         backdrop: 'static',
+    //         keyboard: false,
+    //     });
+    //     myModalUpload.toggle();
+    // }
 
     // $(document).on('click','#btn-save',function () {
     //     var selectedUsers = $('#select-users').val();
@@ -985,35 +1022,44 @@ function displayPagination(response) {
     //     });
     // });
     //refresh
-    function refresh(){
-        CrudModule.refresh(displayData);
+
+    function filterData(){
+        var activeTabId = $('.nav-tabs .nav-link.active').attr('id');
+        var kategori = $('#filter_kategori').val();
+        var tahun=$('#filter_tahun').val();
+        var bulan=$('#filter_bulan').val();
+        var tanggal=$('#filter_tanggal').val();
+        var keyword=$('#search-data').val();
+                
+        status='konsep';
+        if(activeTabId=='tabAjukan')         
+            status='diajukan';
+        else if(activeTabId=='tabTerima')         
+            status='diterima';
+        else if(activeTabId=='tabTolak')         
+            status='ditolak';
+
+        return `{"status":"${status}","tahun":"${tahun}","bulan":"${bulan}","tanggal":"${tanggal}","kategori":"${kategori}"}`;
+    }
+
+    function refresh(page=null){
+        CrudModule.setFilter(filterData());
+        if(page)
+            CrudModule.fRead(page, displayData);
+        else
+            CrudModule.refresh(displayData);
     }
 
 
-    function loadDataKonsep(page = 1) {        
-        CrudModule.setFilter(`{"status":"konsep","tahun":"${tahunFilter}","kategori":"${$('#filter_kategori_surat').val()}"}`);
-        CrudModule.fRead(page, displayData);
+    function loadDataTab(page = 1) {        
+        refresh(page);
     }
 
-    function loadDataMasuk(page = 1) {
-        CrudModule.setFilter(`{"status":"diajukan","tahun":"${tahunFilter}","kategori":"${$('#filter_kategori_surat').val()}"}`);
-        CrudModule.fRead(page, displayData);
-    }
-
-    function loadDataDiterima(page = 1) {
-        CrudModule.setFilter(`{"status":"diterima","tahun":"${tahunFilter}","kategori":"${$('#filter_kategori_surat').val()}"}`);
-        CrudModule.fRead(page, displayData);
-    }
-
-    function loadDataDitolak(page = 1) {
-        CrudModule.setFilter(`{"status":"ditolak","tahun":"${tahunFilter}","kategori":"${$('#filter_kategori_surat').val()}"}`);
-        CrudModule.fRead(page, displayData);
-    }
 
     $(document).ready(function() {
         CrudModule.setApi(vApi);
         // Load data default
-        loadDataKonsep();        
+        loadDataTab();        
         InfoModule.updateNotifWeb();
 
         //start upload with crop
@@ -1063,30 +1109,18 @@ function displayPagination(response) {
             // }
         }
 
-        $('#kategori_surat').on('change', function() {
-            // cariNoAgenda();
+        $('#btnFilter').click(function () {
+            let myModalFilter = new bootstrap.Modal(document.getElementById('modal-filter'), {
+                backdrop: 'static',
+                keyboard: false,
+            });
+            myModalFilter.toggle();
         });
 
-        $('#tanggal').on('change', function() {
-            // cariNoAgenda();       
+        $('#terapkan-filter').click(function(){   
+            refresh(1);
         });
 
-        $('#filter_kategori_surat').on('change', function() {
-            var activeTabId = $('.nav-tabs .nav-link.active').attr('id');
-            var kategori = $(this).val();
-            console.log(activeTabId,kategori)
-            
-            if(activeTabId=='tabKonsep')        
-                CrudModule.setFilter(`{"status":"konsep","tahun":"${tahunFilter}","kategori":"${kategori}"}`);
-            else if(activeTabId=='tabAjukan')         
-                CrudModule.setFilter(`{"status":"diajukan","tahun":"${tahunFilter}","kategori":"${kategori}"}`);
-            else if(activeTabId=='tabTerima')         
-                CrudModule.setFilter(`{"status":"diterima","tahun":"${tahunFilter}","kategori":"${kategori}"}`);
-            else if(activeTabId=='tabTolak')         
-                CrudModule.setFilter(`{"status":"ditolak","tahun":"${tahunFilter}","kategori":"${kategori}"}`);
-                                                    
-            CrudModule.refresh(displayData);
-        });
         
     });
 
