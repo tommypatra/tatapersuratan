@@ -239,8 +239,8 @@
                 <tr>
                     <td style="width:90%;" valign="top"><b>Catatan Rektor:</b></td>
                     <td style="width:10%" valign="top">
-                        <div class="qrcode mb-2" id="qrcode_label"></div>
-                        <div class="token mt-1" id="token"></div>
+                        <div class="qrcode" id="qrcode_label"></div>
+                        <div class="token" style="margin-top: 10px;" id="token"></div>
                     </td>
                 </tr>
             </table>
