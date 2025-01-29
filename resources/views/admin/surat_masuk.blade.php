@@ -203,7 +203,7 @@
 </div>
 <!-- AKHIR MODAL -->
 
-{{-- Modal Upload --}}
+{{-- Modal Filter --}}
 <div class="modal fade " id="modal-filter" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -424,22 +424,11 @@
 
     //pencarian data
     $('#search-data').on('input', function() {
-        var keyword = $(this).val();
-        var filter=filterData();
-        
+        var keyword = $(this).val();        
         if (keyword.length == 0 || keyword.length >= 3) {
-            $.ajax({
-                url: '/api/surat-masuk?page=1&keyword=' + keyword + '&filter=' + filter,
-                method: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    displayData(response);
-                    displayPagination(response);
-                },
-                error: function(xhr, status, error) {
-                    console.error(error);
-                }
-            });
+            CrudModule.setKeyword(keyword);
+            CrudModule.setFilter(filterData());
+            CrudModule.fRead(1, displayData);
         }
     });    
 
@@ -1029,7 +1018,7 @@ function displayPagination(response) {
         var tahun=$('#filter_tahun').val();
         var bulan=$('#filter_bulan').val();
         var tanggal=$('#filter_tanggal').val();
-        var keyword=$('#search-data').val();
+        // var keyword=$('#search-data').val();
                 
         status='konsep';
         if(activeTabId=='tabAjukan')         
@@ -1116,6 +1105,14 @@ function displayPagination(response) {
             });
             myModalFilter.toggle();
         });
+
+        $('#btnCetak').click(function () {
+            var keyword = $(this).val();
+            var filter = filterData();
+            var url = vBaseUrl+`/cetak-surat-masuk?keyword=${keyword}&filter=${filter}`;
+            window.open(url, '_blank');
+        });       
+
 
         $('#terapkan-filter').click(function(){   
             refresh(1);

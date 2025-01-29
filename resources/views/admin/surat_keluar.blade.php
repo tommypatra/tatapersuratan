@@ -48,7 +48,8 @@
                                 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                                     <li><a href="javascript:;" id="btnRefresh" onclick="refresh()" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="refresh-cw"></i> Refresh</a></li>
                                     <li><a href="javascript:;" id="btnTambah" onclick="tambah()" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="plus-circle"></i> Tambah</a></li>
-                                    <li><a href="#" class="nav-link px-2 link-dark" onclick="setfilter()"><i class="align-middle" data-feather="filter"></i> Filter</a></li>
+                                    <li><a href="javascript:;" id="btnFilter" class="nav-link px-2 link-dark" ><i class="align-middle" data-feather="filter"></i> Filter</a></li>
+                                    <li><a href="javascript:;" id="btnCetak" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="printer"></i> Cetak</a></li>
                                 </ul>        
                                 <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
                                     <input type="search" id="search-data" class="form-control" placeholder="Search..." aria-label="Search">
@@ -74,9 +75,6 @@
                             <a class="nav-link" href="javascript:;" id="tabTolak" onclick="setActiveTab('tabTolak')">Ditolak</a>
                         </li>
                     </ul>
-
-                    <select class="form-control mt-2" id="filter_kategori_surat" >
-                    </select>                    
 
                     <div class="table-responsive">
                         <table class="table mt-3">
@@ -219,6 +217,72 @@
 </div>
 <!-- AKHIR MODAL -->
 
+{{-- Modal Filter --}}
+<div class="modal fade " id="modal-filter" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-filter-label">Filter</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-4 mb-3">
+                        <label class="form-label">Tanggal</label>
+                        <select class="form-control" id="filter_tanggal" name="filter_tanggal">
+                            <option value="SEMUA">SEMUA</option>
+                            @for ($i = 1; $i <= 31; $i++)
+                                <option value="{{ $i }}">{{ $i }}</option>
+                            @endfor
+                        </select>
+                    </div>
+
+                    <div class="col-sm-4 mb-3">
+                        <label class="form-label">Bulan</label>
+                        <select class="form-control" id="filter_bulan" name="filter_bulan">
+                            <option value="SEMUA">SEMUA</option>
+                            @php
+                                $bulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','November','Desember'];
+                            @endphp
+                            @foreach ($bulan as $i => $item)
+                                <option value="{{ $i+1 }}">{{ $item }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-sm-4 mb-3">
+                        <label class="form-label">Tahun</label>
+                        <select class="form-control" id="filter_tahun" name="filter_tahun">
+                            @php
+                                $tahun_awal = 2024;
+                                $tahun_sekarang = (int)date('Y');
+                            @endphp
+                            @for ($i = $tahun_sekarang; $i >= $tahun_awal; $i--)
+                                <option value="{{ $i }}">{{ $i }}</option>
+                            @endfor
+                        </select>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">Kategori</label>
+                        <select class="form-control mt-2" id="filter_kategori" >
+                        </select>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <label class="form-label">Jabatan</label>
+                        <select class="form-control mt-2" id="filter_jabatan" >
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="terapkan-filter" class="btn btn-primary">Terapkan</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- AKHIR MODAL -->
 
 {{-- Modal Upload --}}
 <div class="modal fade modal-lg" id="modal-upload" role="dialog">
@@ -265,7 +329,6 @@
     var tahunFilter = '{{ date("Y") }}';
     var vsurat_masuk_id;
     var vPolaAkses={};
-    var vPolaSurat={};
     // console.log(hakAkses);
     var hakAkses = vAksesId;
     // if(hakAkses>1)
@@ -294,15 +357,6 @@
         time: false,
     });
 
-    
-    function setfilter(){
-        tahunFilter = prompt('Masukkan tahun:');
-        if (!isValidTahun(tahunFilter)) {
-            appShowNotification(false,['Tahun yang dimasukkan tidak valid. Mohon masukkan tahun yang benar.']);
-        }else{
-            loadData();
-        }
-    }
 
     function isValidTahun(input) {
         const regex = /^\d{4}$/;
@@ -314,28 +368,16 @@
         $('.nav-link').removeClass('active'); 
         $('#' + tabId).addClass('active');
         console.log(tabId);
-        switch (tabId) {
-            case 'tabKonsep':
-                loadDataKonsep();
-                break;
-            case 'tabAjukan':
-                loadDataMasuk();
-                break;
-            case 'tabTerima':
-                loadDataDiterima();
-                break;
-            case 'tabTolak':
-                loadDataDitolak();
-                break;
-            default:
-                loadDataMasuk();
-                break;
-        }    
+        loadDataTab();
     }
     
     //refresh
-    function refresh(){
-        CrudModule.refresh(displayData);
+    function refresh(page=null){
+        CrudModule.setFilter(filterData());
+        if(page)
+            CrudModule.fRead(page, displayData);
+        else
+            CrudModule.refresh(displayData);
     }
     
     
@@ -345,6 +387,7 @@
         var keyword = $(this).val();
         if (keyword.length == 0 || keyword.length >= 3) {
             CrudModule.setKeyword(keyword);
+            CrudModule.setFilter(filterData());
             CrudModule.fRead(1, displayData);
         }
     });    
@@ -634,8 +677,6 @@
         });
     }
 
-   
-
     $("#el-klasifikasi").hide();
     $('#pola_spesimen_id').on('change', function() {
         // initSpesimen();
@@ -683,19 +724,40 @@
     }
 
     function initPolaSurat(){
-        vPolaSurat = {};
         $.ajax({
             url: '/api/pola-surat-keluar?page=all',
             method: 'GET',
             dataType: 'json',
             success: function(response) {
                 console.log(response);
-                let $select = $('#filter_kategori_surat');
+                let $select = $('#filter_kategori');
                 $select.empty();
-                $select.append('<option value="SEMUA">- SEMUA -</option>');
+                $select.append('<option value="SEMUA">SEMUA</option>');
                 if (response.data.length > 0) {
                     response.data.forEach(function(item) {
                         $select.append('<option value="' + item.id + '">' + item.kategori + '</option>');
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                alert(error);
+            }
+        });
+    }
+
+    function initJabatan(){
+        $.ajax({
+            url: '/api/spesimen-jabatan?page=all',
+            method: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                let $select = $('#filter_jabatan');
+                $select.empty();
+                $select.append('<option value="SEMUA">SEMUA</option>');
+                if (response.data.length > 0) {
+                    response.data.forEach(function(item) {
+                        $select.append('<option value="' + item.id + '">' + item.jabatan + '</option>');
                     });
                 }
             },
@@ -907,29 +969,35 @@
         } 
     }
 
-    function loadDataKonsep(page = 1) {        
-        CrudModule.setFilter(`{"status":"konsep","tahun":"${tahunFilter}","kategori":"${$('#filter_kategori_surat').val()}"}`);
-        CrudModule.fRead(page, displayData);
+    function filterData(){
+        var activeTabId = $('.nav-tabs .nav-link.active').attr('id');
+        var kategori = $('#filter_kategori').val();
+        var jabatan = $('#filter_jabatan').val();
+        var tahun=$('#filter_tahun').val();
+        var bulan=$('#filter_bulan').val();
+        var tanggal=$('#filter_tanggal').val();
+        // var keyword=$('#search-data').val();
+                
+        status='konsep';
+        if(activeTabId=='tabAjukan')         
+            status='diajukan';
+        else if(activeTabId=='tabTerima')         
+            status='diterima';
+        else if(activeTabId=='tabTolak')         
+            status='ditolak';
+
+        return `{"status":"${status}","tahun":"${tahun}","bulan":"${bulan}","tanggal":"${tanggal}","kategori":"${kategori}","jabatan":"${jabatan}"}`;
+    }    
+
+    function loadDataTab(page = 1) {        
+        refresh(page);
     }
 
-    function loadDataMasuk(page = 1) {
-        CrudModule.setFilter(`{"status":"diajukan","tahun":"${tahunFilter}","kategori":"${$('#filter_kategori_surat').val()}"}`);
-        CrudModule.fRead(page, displayData);
-    }
-
-    function loadDataDiterima(page = 1) {
-        CrudModule.setFilter(`{"status":"diterima","tahun":"${tahunFilter}","kategori":"${$('#filter_kategori_surat').val()}"}`);
-        CrudModule.fRead(page, displayData);
-    }
-
-    function loadDataDitolak(page = 1) {
-        CrudModule.setFilter(`{"status":"ditolak","tahun":"${tahunFilter}","kategori":"${$('#filter_kategori_surat').val()}"}`);
-        CrudModule.fRead(page, displayData);
-    }
         
     $(document).ready(function() {
 
         initPolaSurat();
+        initJabatan();
 
         if (hakAkses === 1) {
             $('#no-surat-manual').show(); // Menampilkan elemen jika nilai variabel adalah 1
@@ -944,14 +1012,14 @@
         // Urutkan eksekusi
         initAkses(function() {
             initPola(); 
-            loadDataMasuk();
+            loadDataTab();
         });        
         InfoModule.updateNotifWeb();
 
 
-//start upload with crop
+        //start upload with crop
 
-fotoDokumen.init();
+        fotoDokumen.init();
         $('#modal-upload').on('shown.bs.modal', function () {
             fotoDokumen.startCamera();
         }); 
@@ -975,23 +1043,24 @@ fotoDokumen.init();
 
         //end upload with crop
 
-        $('#filter_kategori_surat').on('change', function() {
-            var activeTabId = $('.nav-tabs .nav-link.active').attr('id');
-            var kategori = $(this).val();
-            console.log(activeTabId,kategori)
-            
-            if(activeTabId=='tabKonsep')        
-                CrudModule.setFilter(`{"status":"konsep","tahun":"${tahunFilter}","kategori":"${kategori}"}`);
-            else if(activeTabId=='tabAjukan')         
-                CrudModule.setFilter(`{"status":"diajukan","tahun":"${tahunFilter}","kategori":"${kategori}"}`);
-            else if(activeTabId=='tabTerima')         
-                CrudModule.setFilter(`{"status":"diterima","tahun":"${tahunFilter}","kategori":"${kategori}"}`);
-            else if(activeTabId=='tabTolak')         
-                CrudModule.setFilter(`{"status":"ditolak","tahun":"${tahunFilter}","kategori":"${kategori}"}`);
-                                                    
-            CrudModule.refresh(displayData);
+        $('#btnFilter').click(function () {
+            let myModalFilter = new bootstrap.Modal(document.getElementById('modal-filter'), {
+                backdrop: 'static',
+                keyboard: false,
+            });
+            myModalFilter.toggle();
         });
+
+        $('#btnCetak').click(function () {
+            var keyword = $(this).val();
+            var filter = filterData();
+            var url = vBaseUrl+`/cetak-surat-keluar?keyword=${keyword}&filter=${filter}`;
+            window.open(url, '_blank');
+        });       
         
+        $('#terapkan-filter').click(function(){   
+            refresh(1);
+        });
 
     });
 

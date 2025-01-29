@@ -81,8 +81,10 @@ Route::middleware(['auth.jwt'])->group(function () {
     Route::post('verifikasi-ttd-elektronik', [TtdQrcodeController::class, 'verifikasi']);
     Route::resource('terima-disposisi', TerimaDisposisiController::class);
 
+    Route::get('spesimen-jabatan', [SpesimenJabatanController::class, 'index']);
 
     Route::middleware(['auth:api', 'cek.akses:admin'])->group(function () {
+        Route::resource('spesimen-jabatan', SpesimenJabatanController::class)->except(['index']);
         Route::resource('user-app', UserAppController::class);
         Route::resource('grup-user', GrupUserController::class);
         Route::resource('grup', GrupController::class);
@@ -90,7 +92,6 @@ Route::middleware(['auth.jwt'])->group(function () {
         Route::resource('akses-surat-masuk', AksesSuratMasukController::class);
         Route::resource('akses-disposisi', AksesDisposisiController::class);
         Route::resource('kategori-surat-masuk', KategoriSuratMasukController::class);
-        Route::resource('spesimen-jabatan', SpesimenJabatanController::class);
         Route::resource('pola-surat-keluar', PolaSuratController::class);
         Route::resource('pola-spesimen', PolaSpesimenController::class);
         Route::resource('klasifikasi-surat-keluar', KlasifikasiSuratController::class);

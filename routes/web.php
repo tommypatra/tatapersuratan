@@ -54,6 +54,8 @@ Route::get('/surat-keluar-detail/{id}', [WebController::class, 'suratKeluarDetai
 Route::get('/cek-login-eksternal/{web}', [WebController::class, 'cekLoginEksternal'])->name('cek-login-eksternal');
 
 Route::get('/cetak-lembar-disposisi/{id}', [WebController::class, 'cetakLembarDisposisi'])->name('cetak-lembar-disposisi');
+Route::get('/cetak-surat-keluar', [WebController::class, 'cetakSuratKeluar'])->name('cetak-surat-keluar');
+Route::get('/cetak-surat-masuk', [WebController::class, 'cetakSuratMasuk'])->name('cetak-surat-masuk');
 Route::get('/scan-qrcode', [WebController::class, 'scanQrCode'])->name('scan-qrcode');
 
 

@@ -195,7 +195,17 @@ class WebController extends Controller
 
     public function cetakLembarDisposisi($id = null)
     {
-        return view('cetak/lembar_disposisi', ['id' => $id]);
+        return view('cetak/cetak_lembar_disposisi', ['id' => $id]);
+    }
+
+    public function cetakSuratKeluar(Request $request)
+    {
+        return view('cetak/cetak_surat_keluar');
+    }
+
+    public function cetakSuratMasuk(Request $request)
+    {
+        return view('cetak/cetak_surat_masuk');
     }
 
     public function scanQrCode()

@@ -108,7 +108,6 @@ class SuratMasukController extends Controller
                         }
                     } elseif ($i == 'tanggal') {
                         if ($dp != "SEMUA") {
-                            $bulan_sekarang = $dp;
                             $query->whereDay('tanggal', $dp);
                         }
                     } else

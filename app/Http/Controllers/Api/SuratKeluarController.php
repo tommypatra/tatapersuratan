@@ -84,9 +84,17 @@ class SuratKeluarController extends Controller
                             $query->whereHas('polaSpesimen', function ($query) use ($dp) {
                                 $query->where('pola_surat_id', $dp);
                             });
+                    } elseif ($i == 'jabatan') {
+                        if ($dp != "SEMUA")
+                            $query->whereHas('polaSpesimen', function ($query) use ($dp) {
+                                $query->where('spesimen_jabatan_id', $dp);
+                            });
                     } elseif ($i == 'bulan') {
-                        $bulan_sekarang = $dp;
-                        $query->whereMonth('tanggal', $bulan_sekarang);
+                        if ($dp != "SEMUA")
+                            $query->whereMonth('tanggal', $dp);
+                    } elseif ($i == 'tanggal') {
+                        if ($dp != "SEMUA")
+                            $query->whereDay('tanggal', $dp);
                     } else {
                         $query->where($i, $dp);
                     }
