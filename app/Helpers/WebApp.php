@@ -216,6 +216,42 @@ function getIdentitasUser($user_id)
     return $retval;
 }
 
+function getRelasiPolaSpesimen($id)
+{
+    // Ambil semua data pola spesimen
+    $allPolaSpesimen = PolaSpesimen::all();
+
+    // Buat array untuk menyimpan hasil ID yang terkait
+    $relatedIds = [];
+
+    // Rekursi untuk mencari semua ID terkait
+    $findRelated = function ($targetId) use ($allPolaSpesimen, &$relatedIds, &$findRelated) {
+        foreach ($allPolaSpesimen as $item) {
+            if ($item->id == $targetId || $item->parent_id == $targetId) {
+                if (!in_array($item->id, $relatedIds)) {
+                    $relatedIds[] = $item->id;
+                    $findRelated($item->id); // Cari anak-anaknya juga
+                }
+            }
+        }
+    };
+
+    // Pertama, cari parent jika ada
+    $target = $allPolaSpesimen->firstWhere('id', $id);
+    if ($target) {
+        $findRelated($target->id);
+
+        // Jika item ini adalah anak dari suatu parent, tambahkan parent-nya juga
+        if ($target->parent_id !== null && !in_array($target->parent_id, $relatedIds)) {
+            $relatedIds[] = $target->parent_id;
+            $findRelated($target->parent_id); // Ambil saudara-saudaranya juga
+        }
+    }
+
+    return $relatedIds;
+}
+
+
 function generateNomorKeluar($tanggal = null, $pola_spesimen_id = null, $klasifikasi_surat_id = null, $no_indeks = null, $no_sub_indeks = null, $id = null)
 {
     $retval = [
@@ -242,6 +278,10 @@ function generateNomorKeluar($tanggal = null, $pola_spesimen_id = null, $klasifi
         ]
     )->where('pola_spesimen_id', $pola_spesimen_id)->first();
     // dd($persuratan);
+
+    // $ref_pola_spesimen_id = $persuratan->polaSpesimen->parent_id ?? $pola_spesimen_id;
+    $ref_pola_spesimen_id = getRelasiPolaSpesimen($pola_spesimen_id);
+    // dd($ref_pola_spesimen_id);
     $dt_pola = $persuratan->polaSpesimen->PolaSurat;
     $dt_spesimen_jabatan = $persuratan->polaSpesimen->spesimenJabatan;
     $dt_klasifikasi_surat = KlasifikasiSurat::find($klasifikasi_surat_id);
@@ -273,29 +313,40 @@ function generateNomorKeluar($tanggal = null, $pola_spesimen_id = null, $klasifi
                         IF("' . $tanggal . '" BETWEEN MIN(tanggal) AND MAX(tanggal),1,0)) as mundur'
             ),
         ])
-            ->where('pola_spesimen_id', $pola_spesimen_id)
             ->whereYear('tanggal', $thn)
+            ->where('is_diterima', 1)
+            // ->where('pola_spesimen_id', $pola_spesimen_id)
+            ->whereIn('pola_spesimen_id', $ref_pola_spesimen_id)
             ->first();
         $is_mundur = $lastIndex->mundur;
         // dd($is_mundur);
         //jika mundur maka cari no_indeks dan sub_indeks terakhir pada tanggal tersebut
+
         if ($is_mundur) {
-            $lastIndex = SuratKeluar::where('pola_spesimen_id', $pola_spesimen_id)
+            // echo "MUNDUR SURAT";
+            // $query = SuratKeluar::where('pola_spesimen_id', 48)
+            $query = SuratKeluar::whereIn('pola_spesimen_id', $ref_pola_spesimen_id)
                 ->where('tanggal', '<=', $tanggal)
                 ->whereYear('tanggal', $thn)
                 // ->whereNotNull('no_surat')
+                ->where('is_diterima', 1)
                 ->orderBy('no_indeks', 'desc')
-                ->orderBy('no_sub_indeks', 'desc')
-                ->first();
+                ->orderBy('no_sub_indeks', 'desc');
+            // dd($query->toSql(), $query->getBindings());
+            $lastIndex = $query->first();
+            // dd($lastIndex);
             if (!$lastIndex->no_indeks) {
-                $lastIndex = SuratKeluar::where('pola_spesimen_id', $pola_spesimen_id)
+                // $lastIndex = SuratKeluar::where('pola_spesimen_id', $pola_spesimen_id)
+                $lastIndex = SuratKeluar::whereIn('pola_spesimen_id', $ref_pola_spesimen_id)
                     ->whereYear('tanggal', $thn)
                     ->where('tanggal', '>=', $tanggal)
                     ->whereNotNull('no_surat')
+                    ->where('is_diterima', 1)
                     ->orderBy('no_indeks', 'asc')
                     ->orderBy('no_sub_indeks', 'desc')
                     ->first();
             }
+            // dd($lastIndex);
             // dd($akses_pola_id, $tanggal, $thn, $lastIndex);
         }
 
@@ -308,8 +359,10 @@ function generateNomorKeluar($tanggal = null, $pola_spesimen_id = null, $klasifi
             $cariSub = SuratKeluar::select([
                 \DB::raw('MAX(no_sub_indeks) AS no_sub_indeks'),
             ])
-                ->where('pola_spesimen_id', $pola_spesimen_id)
+                // ->where('pola_spesimen_id', $pola_spesimen_id)
+                ->whereIn('pola_spesimen_id', $ref_pola_spesimen_id)
                 ->where('no_indeks', $indeks)
+                ->where('is_diterima', 1)
                 ->first();
             $subindeks = $cariSub->no_sub_indeks + 1;
         } else {
@@ -336,6 +389,8 @@ function generateNomorKeluar($tanggal = null, $pola_spesimen_id = null, $klasifi
         'no_sub_indeks' => $subindeks,
         'pola' => $dt_pola->pola,
     ];
+
+    // dd($retval);
     return $retval;
 }
 

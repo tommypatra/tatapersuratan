@@ -385,6 +385,7 @@ class SuratKeluarController extends Controller
         $pola_spesimen_id = $data->pola_spesimen_id;
 
         $generateValue = generateNomorKeluar($tanggal, $pola_spesimen_id, $klasifikasi_surat_id, $no_indeks, $no_sub_indeks, null);
+
         return $generateValue;
     }
 
