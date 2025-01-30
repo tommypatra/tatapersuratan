@@ -89,7 +89,25 @@
 	var base_url = "{{ url('/') }}";
 	var access_token=localStorage.getItem('access_token');
 	if(access_token){
-		window.location.replace(base_url+'/akun-dashboard');
+		$.ajax({
+			headers: {
+				'Authorization': 'Bearer ' + access_token
+			},
+			type: 'GET',
+			url: 'api/cek-akses/global',
+			success: function(response) {
+				window.location.replace(base_url+'/akun-dashboard');
+			},
+			error: function(xhr, status, error) {
+				localStorage.removeItem('access_token');
+				localStorage.removeItem('email');
+				localStorage.removeItem('hakakses');
+				localStorage.removeItem('akses');
+				localStorage.removeItem('foto');
+				localStorage.removeItem('nama');
+				localStorage.removeItem('id');
+			}
+		});
 	}
 
 	$(document).ready(function() {
