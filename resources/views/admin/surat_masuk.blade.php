@@ -829,28 +829,28 @@ function displayPagination(response) {
         myModalForm.toggle();
     }
 
-    function linkLampiran(upload_id,surat_masuk_id){
-        var formData = {upload_id:upload_id,surat_masuk_id:surat_masuk_id};
-        // console.log(formData);
-        $.ajax({
-            type: "POST",
-            dataType: 'json',
-            url: "/api/lampiran-surat-masuk",
-            data: formData,
-            success: function (response) {
-                if (response.success) {
-                    $('#modal-upload').modal('hide');
-                    refresh();
-                    appShowNotification(response.success, [response.message]);
-                } else {
-                    appShowNotification(false, ["Failed to upload attachment."]);
-                }
-            },
-            error: function (xhr, status, error) {
-                appShowNotification(false, ["Something went wrong. Please try again later."]);
-            },
-        });
-    }
+    // function linkLampiran(upload_id,surat_masuk_id){
+    //     var formData = {upload_id:upload_id,surat_masuk_id:surat_masuk_id};
+    //     // console.log(formData);
+    //     $.ajax({
+    //         type: "POST",
+    //         dataType: 'json',
+    //         url: "/api/lampiran-surat-masuk",
+    //         data: formData,
+    //         success: function (response) {
+    //             if (response.success) {
+    //                 $('#modal-upload').modal('hide');
+    //                 refresh();
+    //                 appShowNotification(response.success, [response.message]);
+    //             } else {
+    //                 appShowNotification(false, ["Failed to upload attachment."]);
+    //             }
+    //         },
+    //         error: function (xhr, status, error) {
+    //             appShowNotification(false, ["Something went wrong. Please try again later."]);
+    //         },
+    //     });
+    // }
 
     function hapusLampiranSuratMasuk(id,upload_id){
         if(confirm("apakah anda yakin?")){
@@ -879,7 +879,22 @@ function displayPagination(response) {
         fileInput.change(function () {
             var selectedFile = this.files[0];
             if (selectedFile) {
-                uploadFile(surat_masuk_id, selectedFile);
+                const formData = new FormData();
+                formData.append("surat_masuk_id", surat_masuk_id);
+                formData.append("file", selectedFile);
+                $.ajax({
+                    url: `api/lampiran-surat-masuk`,
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        refresh();
+                    },
+                    error: function (xhr, status, error) {
+                        alert('gagal terupload.');
+                    }
+                });
             }
         });
     });
@@ -894,30 +909,13 @@ function displayPagination(response) {
         });
         myModalUpload.toggle();
     });
-    
 
     function uploadFile(surat_masuk_id, file, fileName) {
         const formData = new FormData();
         formData.append("surat_masuk_id", surat_masuk_id);
         formData.append("file", file, fileName);
 
-        $.ajax({
-            url: "/api/upload",
-            type: "POST",
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                if (response.success) {
-                    linkLampiran(response.data.id, surat_masuk_id);
-                } else {
-                    appShowNotification(false, ["Failed to upload attachment."]);
-                }
-            },
-            error: function (xhr, status, error) {
-                appShowNotification(false, ["Something went wrong. Please try again later."]);
-            }
-        });
+        linkLampiran(upload_id,surat_masuk_id)
     }  
 
     function ajukan(id){

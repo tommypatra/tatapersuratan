@@ -77,11 +77,11 @@
 
         @media print {
             @page {
-                size: A4 portrait; /* Mengatur orientasi landscape */
+                size: Legal landscape; /* Mengatur orientasi landscape */
                 margin: 5mm; /* Margin sesuai kebutuhan */
             }
             body {
-                zoom: 100%;
+                zoom: 80%;
                 margin: 0;
                 padding: 0;
                 display: flex;
@@ -115,7 +115,28 @@
             <strong>DAFTAR SURAT MASUK</strong><br>
         </div>
         
+        <div class="table-responsive">
+            <table class="table mt-3">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th style="width:10%">Jenis (Nomor Agenda)</th>
+                        <th style="width:40%">Perihal/ Sifat</th>
+                        <th style="width:15%">Asal</th>
+                        <th style="width:10%">Nomor/ Tanggal</th>
+                        <th style="width:15%">Disposisi</th>
+                        <th style="text-align: center; width:20%">Lampiran</th>
+                        <th style="width:20%">Sumber</th>
+                    </tr>
+                </thead>
+                <tbody id="suratMasukTableBody">
+                </tbody>
+            </table>
+        
+            <a href="javascript:;" id="pagination-next" data-halaman="1" style="display:none;">Berikutnya</a>
 
+
+        </div>
         
     </div>
 </body>
@@ -124,6 +145,8 @@
 
 <script src="{{ asset('js/app.js') }}"></script>
 <script>
+    const base_url = "{{ url('/') }}";
+    const tableBody = $('#suratMasukTableBody');
     const authToken = localStorage.getItem('access_token');
     function getQueryParam(name) {
         const params = new URLSearchParams(window.location.search);
@@ -133,28 +156,113 @@
     const keyword = getQueryParam('keyword'); 
     const filter = getQueryParam('filter');
 
-
     $(document).ready(function () {        
-
-        // Atur header default untuk semua request AJAX
         $.ajaxSetup({
             headers: {
                 'Authorization': 'Bearer ' + authToken
             }
         });
 
-        // Kirim request AJAX
-        $.ajax({
-            url: `${vBaseUrl}/api/surat-masuk?page=all&keyword=${keyword}&filter=${filter}`,
-            type: "GET",
-            success: function(response) {
-                data=response.data;
-                console.log(response);
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                alert('terjadi kesalahan');
-            }
+        tableBody.empty();
+        loadData(1);
+
+        function loadData(page=1){
+            $.ajax({
+                url: `${vBaseUrl}/api/surat-masuk?per_page=75&page=${page}&keyword=${keyword}&filter=${filter}`,
+                type: "GET",
+                success: function(response) {
+                    displayData(response);
+                    console.log(response);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    alert('terjadi kesalahan');
+                }
+            });
+        }
+
+        $('#pagination-next').click(function(){
+            loadData($(this).data('halaman'));
         });
+
+
+        function displayData(response) {
+            var data = response.data;
+            var meta = response.meta;
+            var nomor = meta.from;
+
+            if(meta.current_page<meta.last_page){
+                $('#pagination-next').show();
+                $('#pagination-next').data("halaman",meta.current_page+1);
+            }else{
+                $('#pagination-next').hide();
+                alert('semua data telah ditampilkan');
+            }
+            if(data.length>0)
+                $.each(data, function(index, suratMasuk) {
+                    var lampiran=`Belum terupload`;
+                    var track_disposisi=``;
+                    var dt = suratMasuk;
+                    var labelApp=labelSetupVerifikasi(dt.is_diajukan,dt.is_diterima,dt.catatan,dt.verifikator);
+                    
+                    if(suratMasuk.jumlah_lampiran>0){
+                        lampiran =`<ul style="margin: 0;padding-left:20px;>`;
+                        $.each(suratMasuk.lampiran_surat_masuk, function(i, dt) {
+                            lampiran +=`<li>`;
+                            lampiran +=`<a href="${base_url}/${dt.upload.path}" target="_blank">${base_url}/${dt.upload.path}</a>`;
+                            lampiran +=`</li>`;
+
+                        });
+                        lampiran +=`</ul>`;
+
+                        if(suratMasuk.is_diterima){
+                            
+                            track_disposisi =`Belum terdisposisi`;
+                            if(suratMasuk.tujuan.length>0){
+                                track_disposisi =`<div>`;
+                                track_disposisi +=`<ul style="margin: 0;padding-left: 20px;" >`;
+                                $.each(suratMasuk.tujuan, function(i, dt) {
+                                    track_disposisi +=`
+                                        <li>
+                                            ${dt.user.name}
+                                        </li>`;
+                                });
+                                track_disposisi +=`</ul></div>`;
+                            }
+                        }
+                        
+                    }else{
+                        lampiran="belum terupload";
+                    }
+
+                    const vno_agenda=(suratMasuk.no_agenda>0)?`(${suratMasuk.no_agenda})`:"";
+
+                    var row = `
+                        <tr>
+                            <td>${nomor++}</td>
+                            <td>${suratMasuk.kategori_surat} ${vno_agenda}</td>
+                            <td>${suratMasuk.perihal} - ${suratMasuk.kategori_surat_masuk.kategori}</td>
+                            <td>${suratMasuk.asal} (${suratMasuk.tempat})</td>
+                            <td>No. ${suratMasuk.no_surat} /  ${suratMasuk.tanggal}</td>
+                            <td>
+                                ${track_disposisi}
+                            </td>
+                            <td>
+                                ${lampiran}                        
+                            </td>
+                            <td>${suratMasuk.user.name}<div style="text-align:center;font-size:10px;">${suratMasuk.created_at}</div></td>
+                        </tr>
+                    `;
+                    tableBody.append(row);
+                });
+            else{
+                var row = `
+                        <tr>
+                            <td colspan="9">Tidak ditemukan</td>
+                        </tr>
+                    `;
+                tableBody.append(row);            
+            }
+        }        
     });
 
 

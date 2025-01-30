@@ -842,9 +842,24 @@
         fileInput.change(function () {
             var selectedFile = this.files[0];
             if (selectedFile) {
-                uploadFile(surat_keluar_id, selectedFile);
+                const formData = new FormData();
+                formData.append("surat_keluar_id", surat_keluar_id);
+                formData.append("file", selectedFile);
+                $.ajax({
+                    url: `api/lampiran-surat-keluar`,
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        refresh();
+                    },
+                    error: function (xhr, status, error) {
+                        alert('gagal terupload.');
+                    }
+                });
             }
-        });
+        });        
     });  
     
     function ajukan(id){
