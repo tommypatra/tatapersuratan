@@ -15,6 +15,8 @@ class PolaSpesimenController extends Controller
     {
         $query = PolaSpesimen::with(
             [
+                'parent.spesimenJabatan',
+                'parent.polaSurat',
                 'PolaSurat' => function ($query) {
                     $query->orderBy('id', 'ASC');
                 },
@@ -163,6 +165,36 @@ class PolaSpesimenController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function hapusParent($id)
+    {
+
+        try {
+            $data = $this->findId($id);
+            $validatedData = [
+                'parent_id' => null,
+            ];
+            $data->update($validatedData);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'updated successfully',
+                'data' => new PolaSpesimenResource($data),
+            ], 200);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update',
                 'error' => $e->getMessage(),
             ], 500);
         }

@@ -33,4 +33,14 @@ class PolaSpesimen extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function parent()
+    {
+        return $this->belongsTo(PolaSpesimen::class, 'parent_id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(PolaSpesimen::class, 'parent_id');
+    }
 }

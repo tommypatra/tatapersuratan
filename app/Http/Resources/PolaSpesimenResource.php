@@ -19,9 +19,11 @@ class PolaSpesimenResource extends JsonResource
             'id' => $this->id,
             'user_id' => $this->user_id,
             'pola_surat_id' => $this->pola_surat_id,
+            'spesimen_jabatan_id' => $this->spesimen_jabatan_id,
             'user' => $this->user,
             'spesimen_jabatan' => $this->spesimenJabatan,
             'pola_surat' => $this->polaSurat,
+            'parent' => $this->parent,
             'created_at' => Carbon::parse($this->created_at)->format('Y-m-d H:i:s'),
             'updated_at' => Carbon::parse($this->updated_at)->format('Y-m-d H:i:s'),
         ];

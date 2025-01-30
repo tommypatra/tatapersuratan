@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class PolaSpesimenRequest extends FormRequest
@@ -21,11 +22,20 @@ class PolaSpesimenRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
+        // dd($this->route());
+        $id = $this->route('pola_spesiman');
         return [
-            'pola_surat_id' => 'required',
             'spesimen_jabatan_id' => 'required',
+            'parent_id' => 'nullable',
+            'pola_surat_id' => [
+                'required',
+                Rule::unique('pola_spesimens')
+                    ->where('spesimen_jabatan_id', $this->spesimen_jabatan_id)
+                    ->ignore($id),
+            ],
+
         ];
     }
 
@@ -33,7 +43,8 @@ class PolaSpesimenRequest extends FormRequest
     {
         return [
             'pola_surat_id' => 'pola surat',
-            'spesimen_jabatan_id' => 'spesiman jabatan',
+            'parent_id' => 'rujukan indeks',
+            'spesimen_jabatan_id' => 'spesimen jabatan',
         ];
     }
 }

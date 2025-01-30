@@ -38,8 +38,9 @@
                             <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th width="40%">Akses</th>
+                                    <th width="25%">Akses</th>
                                     <th width="40%">Pejabat Spesimen</th>
+                                    <th width="25%">Rujukan Indeks</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -84,6 +85,10 @@
                             <label class="form-label">Akses Spesimen Jabatan</label>
                             <select name="spesimen_jabatan_id" id="spesimen_jabatan_id" class="form-control" required multiple></select>
                         </div>
+						<div class="col-lg-8 mb-3">
+                            <label class="form-label">Rujukan Indeks</label>
+                            <select name="parent_id" id="parent_id" class="form-control"></select>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -109,8 +114,9 @@
     var vJudul='Pola Spesimen';
     var fieldInit={
         'id': { action: 'val' },
-        'pola_surat_id': { action: 'pola_surat_id' },
+        'pola_surat_id': { action: 'select2' },
         'spesimen_jabatan_id': { action: 'select2' },
+        'parent_id': { action: 'select2' },  
     };
 
     //refresh
@@ -135,11 +141,17 @@
         tableBody.empty();
         if(data.length>0)
             $.each(data, function(index, dt) {
+                var parent='';
+                if(dt.parent!=null){
+                    parent=`${dt.parent.pola_surat.kategori} ${dt.parent.spesimen_jabatan.jabatan}
+                    <a href="javascript:;" onclick="hapusParent(${dt.id})"><i class="fa-regular fa-trash-can" aria-hidden="true"></i></a>`;
+                }
                 var row = `
                     <tr>
                         <td>${nomor++}</td>
                         <td>${dt.pola_surat.kategori}</td>
                         <td>${dt.spesimen_jabatan.jabatan}</td>
+                        <td>${parent}</td>
                         <td>
                             <div class="btn-group" role="group">
                                 <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
@@ -232,10 +244,12 @@
         let id=$('#id').val();
         let pola_surat_id=$('#pola_surat_id').val();
         let spesimen_jabatan_id=$('#spesimen_jabatan_id').val();
+        let parent_id=$('#parent_id').val();
         $.each(spesimen_jabatan_id, function(index, spsDt) {
             let dataForm={
                 spesimen_jabatan_id:spsDt,
                 pola_surat_id:pola_surat_id,
+                parent_id:parent_id,
             }
             CrudModule.fSave(setup_ajax, dataForm, function(response) {
                 console.log(response);
@@ -255,11 +269,8 @@
         });
     }
 
-    //load init
-    initData();
     function initData(){
         sel2_tahun('#tahun','#myForm .modal-content');
-
         //load user
         $.ajax({
             url: '/api/user-app?page=all',
@@ -315,8 +326,45 @@
             error: function(xhr, status, error) {
                 console.error(error);
             }
-        });        
+        });    
+        
+        //load jabatan
+        $.ajax({
+            url: '/api/pola-spesimen?page=all',
+            method: 'GET',
+            dataType: 'json',
+            success: function (response){
+                let vdata=[];
+                vdata.push({id:'',text:`- PILIH -`});
+
+                if(response.data.length>0){
+                    $.each(response.data, function(index, dt) {
+                        vdata.push({id:dt.id,text:`${dt.pola_surat.kategori} ${dt.spesimen_jabatan.jabatan}`});
+                    });
+                }
+                sel2_datalokal('#parent_id',vdata,false,'#myForm .modal-content');
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+            }
+        });            
     }
+
+    function hapusParent(id){
+        if(confirm("apakah anda yakin?")){
+            $.ajax({
+                type: "GET",
+                url: "/api/hapus-parent-pola-spesimen/"+id,
+                dataType: 'json',
+                success: function (response) {
+                    refresh();
+                },
+                error: function (xhr, status, error) {
+                    appShowNotification(false, ["Something went wrong. Please try again later."]);
+                },
+            });
+        }
+    }    
 
     $(document).ready(function() {
         CrudModule.setApi(vApi);
@@ -326,6 +374,9 @@
             CrudModule.fRead(page, displayData);
         }
         InfoModule.updateNotifWeb();
+            //load init
+        initData();
+
     });
 </script>
 @endsection
