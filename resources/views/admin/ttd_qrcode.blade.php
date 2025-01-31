@@ -647,7 +647,7 @@
                     dataType: "json",
                     data: {
                         page: 1,
-                        filter: JSON.stringify({ kategori: 'diterima', tahun: year }),
+                        filter: JSON.stringify({ status: 'diterima', tahun: year }),
                         keyword: request.term                    
                     },
                     success: function(data) {
