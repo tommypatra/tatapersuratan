@@ -233,9 +233,9 @@
                             <td>${dataSurat.pola_surat.kategori} </td>
                             <td>${dataSurat.spesimen_jabatan.jabatan}</td>
                             <td>
-                                <div>${dataSurat.no_surat}</div> 
-                                <div>${dataSurat.perihal}</div> 
-                                <div>${dataSurat.tanggal}</div>
+                                <div>Nomor : ${dataSurat.no_surat}</div> 
+                                <div style="font-weight:bold;">${dataSurat.perihal}</div> 
+                                <div style="font-style:italic;font-size:12px;">Tanggal : ${dataSurat.tanggal}</div>
                             </td>
                             <td>${tujuan}</td>
                             <td>${ringkasan}</td>
