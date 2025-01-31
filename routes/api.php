@@ -68,7 +68,7 @@ Route::middleware(['auth.jwt'])->group(function () {
     Route::get('get-kategori-surat-masuk', [UtilityController::class, 'getKategoriSuratMasuk']);
     Route::get('get-users', [UtilityController::class, 'getUsers']);
     Route::get('get-pejabat', [SpesimenJabatanController::class, 'index']);
-    Route::post('kembalikan-surat-masuk/{id}', [SuratMasukController::class, 'kembalikanSuratMasuk']);
+    Route::PUT('kembalikan-surat-masuk/{id}', [SuratMasukController::class, 'kembalikanSuratMasuk']);
     // Route::resource('spesimen-jabatan', SpesimenJabatanController::class);
 
     Route::get('nomor-agenda-terakhir/{kategori}/{tahun}', [UtilityController::class, 'nomorAgendaTerakhir']);
