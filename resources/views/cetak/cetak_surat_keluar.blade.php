@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cetak Surat Keluar</title>
+    <title>Cetak Surat Masuk</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="shortcut icon" href="{{ asset('images/logo.png') }}" />
     <style>
@@ -77,11 +77,11 @@
 
         @media print {
             @page {
-                size: A4 portrait; /* Mengatur orientasi landscape */
+                size: Legal landscape; /* Mengatur orientasi landscape */
                 margin: 5mm; /* Margin sesuai kebutuhan */
             }
             body {
-                zoom: 100%;
+                zoom: 80%;
                 margin: 0;
                 padding: 0;
                 display: flex;
@@ -112,10 +112,34 @@
         <hr>
 
         <div style="text-align: center; padding-top:10px">
-            <strong>DAFTAR SURAT KELUAR</strong><br>
+            <strong>DAFTAR SURAT MASUK</strong><br>
+            <div id="loading" style="display:none;">
+                <img height="30" src="{{ url('images/loading2.gif') }}" alt="Loading..." > Loading...
+            </div>
         </div>
         
+        <div class="table-responsive">
+            <table class="table mt-3">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th style="width:10%">Kategori</th>
+                        <th style="width:10%">Pejabat Berwenang</th>
+                        <th style="width:30%">Nomor/ Perihal/ Tanggal Surat</th>
+                        <th style="width:10%">Tujuan</th>
+                        <th style="width:10%">Ringkasan</th>
+                        <th style="text-align: center; width:20%">Lampiran</th>
+                        <th style="width:20%">Sumber</th>
+                    </tr>
+                </thead>
+                <tbody id="suratTableBody">
+                </tbody>
+            </table>
+        
+            <a href="javascript:;" id="pagination-next" data-halaman="1" style="display:none;">Berikutnya</a>
 
+
+        </div>
         
     </div>
 </body>
@@ -124,6 +148,8 @@
 
 <script src="{{ asset('js/app.js') }}"></script>
 <script>
+    const base_url = "{{ url('/') }}";
+    const tableBody = $('#suratTableBody');
     const authToken = localStorage.getItem('access_token');
     function getQueryParam(name) {
         const params = new URLSearchParams(window.location.search);
@@ -133,28 +159,103 @@
     const keyword = getQueryParam('keyword'); 
     const filter = getQueryParam('filter');
 
-
     $(document).ready(function () {        
-
-        // Atur header default untuk semua request AJAX
         $.ajaxSetup({
             headers: {
                 'Authorization': 'Bearer ' + authToken
             }
         });
 
-        // Kirim request AJAX
-        $.ajax({
-            url: `${vBaseUrl}/api/surat-keluar?page=all&keyword=${keyword}&filter=${filter}`,
-            type: "GET",
-            success: function(response) {
-                data=response.data;
-                console.log(response);
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                alert('terjadi kesalahan');
-            }
+        $(document).ajaxStart(function() {
+			$('#loading').show();
+		}).ajaxStop(function() {
+			$('#loading').hide();
+		});
+
+
+        tableBody.empty();
+        loadData(1);
+
+        function loadData(page=1){
+            $.ajax({
+                url: `${vBaseUrl}/api/surat-keluar?per_page=75&page=${page}&keyword=${keyword}&filter=${filter}`,
+                type: "GET",
+                success: function(response) {
+                    displayData(response);
+                    console.log(response);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    alert('terjadi kesalahan');
+                }
+            });
+        }
+
+        $('#pagination-next').click(function(){
+            loadData($(this).data('halaman'));
         });
+
+
+        function displayData(response) {
+            var data = response.data;
+            var meta = response.meta;
+            var nomor = meta.from;
+
+            if(meta.current_page<meta.last_page){
+                $('#pagination-next').show();
+                $('#pagination-next').data("halaman",meta.current_page+1);
+            }else{
+                $('#pagination-next').hide();
+                alert('semua data telah ditampilkan');
+            }
+            if(data.length>0)
+                $.each(data, function(index, dataSurat) {
+                    var lampiran=`Belum terupload`;
+                    var dt = dataSurat;
+                    
+                    if(dataSurat.jumlah_lampiran>0){
+                        lampiran =`<ul style="margin: 0;padding-left:20px;">`;
+                        $.each(dataSurat.lampiran_surat_keluar, function(i, dt) {
+                            const dokumen=`${base_url}/${dt.upload.path}`;
+                            lampiran +=`<li>`;
+                            lampiran +=`<a href="${dokumen}" target="_blank">Lampiran Dokumen ${i+1}</a>`;
+                            lampiran +=`</li>`;
+                        });
+                        lampiran +=`</ul>`;
+
+                    }else{
+                        lampiran="belum terupload";
+                    }
+                    const tujuan=(dataSurat.tujuan!=null)?dataSurat.tujuan:"";
+                    const ringkasan=(dataSurat.ringkasan!=null)?dataSurat.ringkasan:"";
+                    var row = `
+                        <tr>
+                            <td>${nomor++}</td>
+                            <td>${dataSurat.pola_surat.kategori} </td>
+                            <td>${dataSurat.spesimen_jabatan.jabatan}</td>
+                            <td>
+                                <div>${dataSurat.no_surat}</div> 
+                                <div>${dataSurat.perihal}</div> 
+                                <div>${dataSurat.tanggal}</div>
+                            </td>
+                            <td>${tujuan}</td>
+                            <td>${ringkasan}</td>
+                            <td>
+                                ${lampiran}                        
+                            </td>
+                            <td>${dataSurat.user.name}<div style="text-align:center;font-size:10px;">${dataSurat.created_at}</div></td>
+                        </tr>
+                    `;
+                    tableBody.append(row);
+                });
+            else{
+                var row = `
+                        <tr>
+                            <td colspan="10">Tidak ditemukan</td>
+                        </tr>
+                    `;
+                tableBody.append(row);            
+            }
+        }        
     });
 
 

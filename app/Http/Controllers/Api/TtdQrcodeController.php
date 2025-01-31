@@ -127,6 +127,7 @@ class TtdQrcodeController extends Controller
             if ($request->hasFile('file')) {
                 $validatedData['file'] = uploadFile($request);
             }
+            $validatedData['is_diajukan'] = 1;
             $data = TtdQrcode::create($validatedData);
 
             // ini untuk update kode sesuai id

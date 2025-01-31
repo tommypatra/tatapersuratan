@@ -113,6 +113,9 @@
 
         <div style="text-align: center; padding-top:10px">
             <strong>DAFTAR SURAT MASUK</strong><br>
+            <div id="loading" style="display:none;">
+                <img height="30" src="{{ url('images/loading2.gif') }}" alt="Loading..." > Loading...
+            </div>
         </div>
         
         <div class="table-responsive">
@@ -129,7 +132,7 @@
                         <th style="width:20%">Sumber</th>
                     </tr>
                 </thead>
-                <tbody id="suratMasukTableBody">
+                <tbody id="suratTableBody">
                 </tbody>
             </table>
         
@@ -146,7 +149,7 @@
 <script src="{{ asset('js/app.js') }}"></script>
 <script>
     const base_url = "{{ url('/') }}";
-    const tableBody = $('#suratMasukTableBody');
+    const tableBody = $('#suratTableBody');
     const authToken = localStorage.getItem('access_token');
     function getQueryParam(name) {
         const params = new URLSearchParams(window.location.search);
@@ -162,6 +165,12 @@
                 'Authorization': 'Bearer ' + authToken
             }
         });
+
+        $(document).ajaxStart(function() {
+			$('#loading').show();
+		}).ajaxStop(function() {
+			$('#loading').hide();
+		});
 
         tableBody.empty();
         loadData(1);
@@ -198,29 +207,29 @@
                 alert('semua data telah ditampilkan');
             }
             if(data.length>0)
-                $.each(data, function(index, suratMasuk) {
+                $.each(data, function(index, dataSurat) {
                     var lampiran=`Belum terupload`;
                     var track_disposisi=``;
-                    var dt = suratMasuk;
+                    var dt = dataSurat;
                     var labelApp=labelSetupVerifikasi(dt.is_diajukan,dt.is_diterima,dt.catatan,dt.verifikator);
                     
-                    if(suratMasuk.jumlah_lampiran>0){
-                        lampiran =`<ul style="margin: 0;padding-left:20px;>`;
-                        $.each(suratMasuk.lampiran_surat_masuk, function(i, dt) {
+                    if(dataSurat.jumlah_lampiran>0){
+                        lampiran =`<ul style="margin: 0;padding-left:20px;">`;
+                        $.each(dataSurat.lampiran_surat_masuk, function(i, dt) {
+                            const dokumen=`${base_url}/${dt.upload.path}`;
                             lampiran +=`<li>`;
-                            lampiran +=`<a href="${base_url}/${dt.upload.path}" target="_blank">${base_url}/${dt.upload.path}</a>`;
+                            lampiran +=`<a href="${dokumen}" target="_blank">${dokumen}</a>`;
                             lampiran +=`</li>`;
-
                         });
                         lampiran +=`</ul>`;
 
-                        if(suratMasuk.is_diterima){
+                        if(dataSurat.is_diterima){
                             
                             track_disposisi =`Belum terdisposisi`;
-                            if(suratMasuk.tujuan.length>0){
+                            if(dataSurat.tujuan.length>0){
                                 track_disposisi =`<div>`;
                                 track_disposisi +=`<ul style="margin: 0;padding-left: 20px;" >`;
-                                $.each(suratMasuk.tujuan, function(i, dt) {
+                                $.each(dataSurat.tujuan, function(i, dt) {
                                     track_disposisi +=`
                                         <li>
                                             ${dt.user.name}
@@ -234,22 +243,22 @@
                         lampiran="belum terupload";
                     }
 
-                    const vno_agenda=(suratMasuk.no_agenda>0)?`(${suratMasuk.no_agenda})`:"";
+                    const vno_agenda=(dataSurat.no_agenda>0)?`(${dataSurat.no_agenda})`:"";
 
                     var row = `
                         <tr>
                             <td>${nomor++}</td>
-                            <td>${suratMasuk.kategori_surat} ${vno_agenda}</td>
-                            <td>${suratMasuk.perihal} - ${suratMasuk.kategori_surat_masuk.kategori}</td>
-                            <td>${suratMasuk.asal} (${suratMasuk.tempat})</td>
-                            <td>No. ${suratMasuk.no_surat} /  ${suratMasuk.tanggal}</td>
+                            <td>${dataSurat.kategori_surat} ${vno_agenda}</td>
+                            <td>${dataSurat.perihal} - ${dataSurat.kategori_surat_masuk.kategori}</td>
+                            <td>${dataSurat.asal} (${dataSurat.tempat})</td>
+                            <td>No. ${dataSurat.no_surat} /  ${dataSurat.tanggal}</td>
                             <td>
                                 ${track_disposisi}
                             </td>
                             <td>
                                 ${lampiran}                        
                             </td>
-                            <td>${suratMasuk.user.name}<div style="text-align:center;font-size:10px;">${suratMasuk.created_at}</div></td>
+                            <td>${dataSurat.user.name}<div style="text-align:center;font-size:10px;">${dataSurat.created_at}</div></td>
                         </tr>
                     `;
                     tableBody.append(row);
@@ -257,7 +266,7 @@
             else{
                 var row = `
                         <tr>
-                            <td colspan="9">Tidak ditemukan</td>
+                            <td colspan="8">Tidak ditemukan</td>
                         </tr>
                     `;
                 tableBody.append(row);            

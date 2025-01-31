@@ -40,10 +40,7 @@
 
                     <ul class="nav nav-tabs">
                         <li class="nav-item">
-                            <a class="nav-link active" href="javascript:;" id="tabKonsep" onclick="setActiveTab('tabKonsep')">Konsep</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="javascript:;" id="tabAjukan" onclick="setActiveTab('tabAjukan')">Diajukan</a>
+                            <a class="nav-link active" href="javascript:;" id="tabAjukan" onclick="setActiveTab('tabAjukan')">Diajukan</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="javascript:;" id="tabTerima" onclick="setActiveTab('tabTerima')">Diterima</a>
@@ -240,9 +237,9 @@
         $('#' + tabId).addClass('active');
         console.log(tabId);
         switch (tabId) {
-            case 'tabKonsep':
-                loadDataKonsep();
-                break;
+            // case 'tabKonsep':
+            //     loadDataKonsep();
+            //     break;
             case 'tabAjukan':
                 loadDataMasuk();
                 break;
@@ -292,9 +289,12 @@
                     }
                 }
                 if(dt.user_ttd_id==vUserId){
-                    if(dt.is_diajukan && dt.is_diterima==null){
-                        my_menu+=`  <li><a class="dropdown-item" href="javascript:;" onclick="validasi(1,${dt.id})"><i class="fa-solid fa-envelope-circle-check"></i> Terima</a></li>
-                                    <li><a class="dropdown-item" href="javascript:;" onclick="validasi(0,${dt.id})"><i class="fa-solid fa-rectangle-xmark"></i> Tolak</a></li>`;
+                    if(dt.is_diajukan){
+                        if(dt.is_diterima==null){
+                            my_menu+=`  <li><a class="dropdown-item" href="javascript:;" onclick="validasi(1,${dt.id})"><i class="fa-solid fa-envelope-circle-check"></i> Terima</a></li>
+                                        <li><a class="dropdown-item" href="javascript:;" onclick="validasi(0,${dt.id})"><i class="fa-solid fa-rectangle-xmark"></i> Tolak</a></li>`;
+                        }
+                        my_menu+=`<li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>`;
                     }
                 }
 
@@ -427,6 +427,7 @@
             } 
             appShowNotification(response.success,[response.message]);
         });
+        $('#modal-form').modal('hide');
     }		    
 
     // hapus
@@ -609,10 +610,10 @@
     }
 
 
-    function loadDataKonsep(page = 1) {
-        CrudModule.setFilter('{"kategori":"konsep","tahun":'+tahunFilter+'}');
-        CrudModule.fRead(page, displayData);
-    }
+    // function loadDataKonsep(page = 1) {
+    //     CrudModule.setFilter('{"kategori":"konsep","tahun":'+tahunFilter+'}');
+    //     CrudModule.fRead(page, displayData);
+    // }
 
     function loadDataMasuk(page = 1) {
         CrudModule.setFilter('{"kategori":"diajukan","tahun":'+tahunFilter+'}');
@@ -672,7 +673,7 @@
             }
         });
 
-        loadDataKonsep();
+        loadDataMasuk();
         InfoModule.updateNotifWeb();
 
         //load user
