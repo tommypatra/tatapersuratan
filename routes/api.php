@@ -47,8 +47,9 @@ use App\Http\Controllers\Api\LampiranSuratKeluarController;
 Route::post('auth-login', [AuthController::class, 'login'])->name('auth-login');
 Route::post('akun-baru-simpan', [AuthController::class, 'simpanPendaftaran'])->name('akun-baru-simpan');
 Route::get('tte/{kode}', [UtilityController::class, 'tte']);
+Route::post('refresh-token', [AuthController::class, 'refreshToken']);
 
-Route::middleware(['auth.jwt'])->group(function () {
+Route::middleware(['jwt.auth.refresh'])->group(function () {
     Route::get('cek-akses/{grup}', [UtilityController::class, 'cekAkses']);
 
     Route::get('get-menu/{id}', [MenuController::class, 'getMenu']);
@@ -84,7 +85,7 @@ Route::middleware(['auth.jwt'])->group(function () {
     Route::get('spesimen-jabatan', [SpesimenJabatanController::class, 'index']);
     Route::get('pola-surat-keluar', [PolaSuratController::class, 'index']);
 
-    Route::middleware(['auth:api', 'cek.akses:admin'])->group(function () {
+    Route::middleware(['cek.akses:admin'])->group(function () {
         Route::resource('spesimen-jabatan', SpesimenJabatanController::class)->except(['index']);
         Route::resource('pola-surat-keluar', PolaSuratController::class)->except(['index']);
         Route::resource('user-app', UserAppController::class);
@@ -101,7 +102,7 @@ Route::middleware(['auth.jwt'])->group(function () {
         Route::get('hapus-parent-pola-spesimen/{id}', [PolaSpesimenController::class, 'hapusParent']);
     });
 
-    Route::middleware(['auth:api', 'cek.akses:pengguna'])->group(function () {
+    Route::middleware(['cek.akses:pengguna'])->group(function () {
         //user login
         // Route::middleware(['auth:sanctum', 'ability:Admin,Pengguna'])->group(function () {
         Route::resource('ttd-elektronik', TtdQrcodeController::class);

@@ -215,6 +215,21 @@ class AuthController extends Controller
         }
     }
 
+    public function refreshToken()
+    {
+        try {
+            $newToken = auth()->refresh(); // Generate token baru
+            return response()->json([
+                'access_token' => $newToken,
+                'token_type' => 'bearer',
+                'expires_in' => auth()->factory()->getTTL() * 60
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Token tidak bisa diperbarui'], 401);
+        }
+    }
+
+
     public function redirectToGoogle()
     {
         return Socialite::driver('google')->redirect();

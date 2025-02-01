@@ -176,12 +176,24 @@
 	<script src="{{ asset('js/sweetalert2/dist/sweetalert2.min.js') }}"></script>
 	<script>
 		var dataNotif=[];
-    	var authToken=localStorage.getItem('access_token');
+    	var access_token=localStorage.getItem('access_token');
+
 		$.ajaxSetup({
-			headers: {
-				'Authorization': 'Bearer ' + authToken
-			}
-		});		
+			beforeSend: function(xhr) {
+				xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('access_token'));
+			},          
+			complete: function(xhr) {
+                let responHeader = xhr.getResponseHeader('Authorization');
+                if (responHeader) {
+					let newToken = responHeader.replace('Bearer ', '').trim();
+					access_token = newToken;
+					localStorage.setItem('access_token', newToken);
+                }
+                if (xhr.status === 401) {
+                    forceLogout();	
+                }
+            }
+        });
 
 		$(document).ajaxStart(function() {
 			$('#navbar-loading').show();
@@ -192,13 +204,7 @@
 		});
 
 		function forceLogout(){
-			localStorage.removeItem('access_token');
-			localStorage.removeItem('email');
-			localStorage.removeItem('hakakses');
-			localStorage.removeItem('akses');
-			localStorage.removeItem('foto');
-			localStorage.removeItem('nama');
-			localStorage.removeItem('id');
+			localStorage.clear();
 			window.location.replace(vBaseUrl+'/akun-keluar');
 		}
 
@@ -208,6 +214,8 @@
 	<script src="{{ asset('js/info.js') }}"></script>
 	
 	<script>
+		cekStatusToken();
+
 		$('#navbar-nama').html(vNama);
 		$('#navbar-foto').attr('src',vFoto);
 
@@ -244,9 +252,10 @@
 		loadMenu();		
 		function loadMenu(){
 			$('#menu-user').empty();
-			ajaxRequest(vBaseUrl+'/api/get-menu/'+vAksesId, 'GET', null, false,
-				function(response) {
-					console.log(response.data);
+			$.ajax({
+				url: vBaseUrl+'/api/get-menu/'+vAksesId,
+				type: 'GET',
+				success: function(response) {
 					if (response.data.length > 0) {
 						var menuHtml = '';
 						response.data.forEach(function(item) {
@@ -262,10 +271,12 @@
 						$('#menu-user').append(menuHtml);
 						feather.replace();
 					} 
+				},
+				error: function() {
+					console.log('Gagal memeriksa token');
 				}
-			);
+			});
 		}
-
 	</script>
 	@yield('scriptJs')
 </body>

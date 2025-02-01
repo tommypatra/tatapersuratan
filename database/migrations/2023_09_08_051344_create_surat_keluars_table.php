@@ -18,11 +18,11 @@ class CreateSuratKeluarsTable extends Migration
             $table->string('no_surat', 190)->nullable();
             $table->integer('no_indeks')->nullable();
             $table->integer('no_sub_indeks')->nullable();
-            $table->string('perihal', 190);
+            $table->text('perihal');
             $table->string('asal', 190);
             $table->string('pola', 190)->nullable();
-            $table->string('tujuan', 190)->nullable();
-            $table->string('ringkasan', 190)->nullable();
+            $table->text('tujuan')->nullable();
+            $table->text('ringkasan')->nullable();
             $table->date('tanggal');
             $table->timestamps();
 

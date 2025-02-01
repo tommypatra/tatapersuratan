@@ -17,10 +17,10 @@ class CreateSuratMasuksTable extends Migration
             $table->id();
             $table->string('no_agenda', 190);
             $table->string('no_surat', 190);
-            $table->string('perihal', 190);
+            $table->text('perihal');
             $table->string('asal', 190);
             $table->string('tempat', 190);
-            $table->string('ringkasan', 190)->nullable();
+            $table->text('ringkasan')->nullable();
             $table->date('tanggal');
             $table->timestamps();
 

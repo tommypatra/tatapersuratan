@@ -283,7 +283,7 @@
 <script src="{{ asset('js/app.js') }}"></script>
 <script>
     const id = {{ $id }};
-    const authToken = localStorage.getItem('access_token');
+    const access_token = localStorage.getItem('access_token');
     // console.log(authToken);
 
     function prosesPerihal(perihal) {
@@ -295,14 +295,27 @@
         }
     }    
 
+    $.ajaxSetup({
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('access_token'));
+        },          
+        complete: function(xhr) {
+            let responHeader = xhr.getResponseHeader('Authorization');
+            if (responHeader) {
+                let newToken = responHeader.replace('Bearer ', '').trim();
+                access_token = newToken;
+                localStorage.setItem('access_token', newToken);
+            }
+            if (xhr.status === 401) {
+                localStorage.clear();
+    			window.location.replace(vBaseUrl+'/akun-keluar');
+            }
+        }
+    });
+
     $(document).ready(function () {        
 
-        // Atur header default untuk semua request AJAX
-        $.ajaxSetup({
-            headers: {
-                'Authorization': 'Bearer ' + authToken
-            }
-        });
+        cekStatusToken();
         cekAkses('admin');
 
         // Kirim request AJAX

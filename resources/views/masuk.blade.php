@@ -86,8 +86,9 @@
 
 <script>
     var csrfToken = $('meta[name="csrf-token"]').attr('content');
-	var base_url = "{{ url('/') }}";
+	var vBaseUrl = "{{ url('/') }}";
 	var access_token=localStorage.getItem('access_token');
+
 	if(access_token){
 		$.ajax({
 			headers: {
@@ -95,17 +96,23 @@
 			},
 			type: 'GET',
 			url: 'api/cek-akses/global',
+			async: false,
 			success: function(response) {
-				window.location.replace(base_url+'/akun-dashboard');
+				window.location.replace(vBaseUrl+'/akun-dashboard');
+			},
+			complete: function(xhr) {
+				let responHeader = xhr.getResponseHeader('Authorization');
+				if (responHeader) {
+					let newToken = responHeader.replace('Bearer ', '').trim();
+					localStorage.setItem('access_token', newToken);
+					window.location.replace(vBaseUrl+'/akun-dashboard');
+				}
+				if (xhr.status === 401) {
+					localStorage.clear();
+				}
 			},
 			error: function(xhr, status, error) {
-				localStorage.removeItem('access_token');
-				localStorage.removeItem('email');
-				localStorage.removeItem('hakakses');
-				localStorage.removeItem('akses');
-				localStorage.removeItem('foto');
-				localStorage.removeItem('nama');
-				localStorage.removeItem('id');
+				localStorage.clear();
 			}
 		});
 	}
@@ -160,7 +167,7 @@
 				showAkses();
 				myModalAkses.show();
 			}else{
-				window.location.replace(base_url+'/akun-dashboard');
+				window.location.replace(vBaseUrl+'/akun-dashboard');
 			}
 		}	
 		

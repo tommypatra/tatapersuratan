@@ -239,7 +239,6 @@
 @section('scriptJs')
 
 <script type="text/javascript">
-    cekAkses('global');
 
     var tahun="{{ date('Y') }}"; 
     var bulan="{{ date('m') }}";

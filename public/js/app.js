@@ -197,9 +197,10 @@ function ajaxRequest(url, method, data=null, adaResponError=false, successCallba
                 return;
             }
 
-            if (jqXHR.status === 401) {
-                forceLogout();
-            } else if (jqXHR.status === 403) {
+            // if (jqXHR.status === 401) {
+            //     forceLogout();
+            // } else 
+            if (jqXHR.status === 403) {
                 window.location.replace(vBaseUrl+'/akun-dashboard');
             } else {
                 if (jqXHR.status === 422) {
@@ -250,3 +251,14 @@ $(document).on('click','.set-akses',function(){
     localStorage.setItem('akses', $(this).attr('data-grup_id'));
     window.location.replace(base_url+'/akun-dashboard');
 })
+
+function cekStatusToken(){
+    $.ajax({
+        type: 'GET',
+        url: `${vBaseUrl}/api/cek-akses/global`,
+        async: false, 
+        success: function(response) {
+            console.log(response);
+        }
+    });		
+}

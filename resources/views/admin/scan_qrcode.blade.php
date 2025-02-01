@@ -73,11 +73,6 @@
 <script src="{{ asset('js/app.js') }}"></script>
 <script>
     var vId=null;
-    $.ajaxSetup({
-        headers: {
-            'Authorization': 'Bearer ' + authToken
-        }
-    });
 
     function aksesDisposisi(tahun) {
         $.ajax({
@@ -101,7 +96,7 @@
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                console.error("Error:", textStatus, errorThrown);
+                console.error("Error:", textStaapitus, errorThrown);
             }
         });
     }
@@ -181,7 +176,6 @@
     }
 
     $(document).ready(function () {
-        cekAkses('pengguna');
         aksesDisposisi("{{ date('Y') }}");
 
 

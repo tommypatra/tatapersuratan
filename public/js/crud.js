@@ -24,9 +24,10 @@ var CrudModule = (function() {
             dataType: 'json',
             success: initDisplayData(displayDataFunc),
             error: function(jqXHR, textStatus, errorThrown) {
-                if (jqXHR.status === 401) {
-                    forceLogout('Mohon login kembali');
-                } else if (jqXHR.status === 403) {
+                // if (jqXHR.status === 401) {
+                //     forceLogout('Mohon login kembali');
+                // } else 
+                if (jqXHR.status === 403) {
                     window.location.replace(vBaseUrl+'/akun-dashboard');
                 } else{                
                     console.error(errorThrown);

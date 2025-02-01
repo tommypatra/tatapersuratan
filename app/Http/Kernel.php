@@ -65,7 +65,8 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'ability' => \App\Http\Middleware\CekAksesMiddleware::class,
 
-        'auth.jwt' => \Tymon\JWTAuth\Http\Middleware\Authenticate::class,
+        'jwt.auth' => \Tymon\JWTAuth\Http\Middleware\Authenticate::class,
         'cek.akses' => \App\Http\Middleware\CekAksesMiddleware::class,
+        'jwt.auth.refresh' => \App\Http\Middleware\JwtAuthenticateRefresh::class,
     ];
 }

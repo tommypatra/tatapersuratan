@@ -159,12 +159,26 @@
     const keyword = getQueryParam('keyword'); 
     const filter = getQueryParam('filter');
 
-    $(document).ready(function () {        
-        $.ajaxSetup({
-            headers: {
-                'Authorization': 'Bearer ' + authToken
+    $.ajaxSetup({
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('access_token'));
+        },          
+        complete: function(xhr) {
+            let responHeader = xhr.getResponseHeader('Authorization');
+            if (responHeader) {
+                let newToken = responHeader.replace('Bearer ', '').trim();
+                access_token = newToken;
+                localStorage.setItem('access_token', newToken);
             }
-        });
+            if (xhr.status === 401) {
+                localStorage.clear();
+    			window.location.replace(vBaseUrl+'/akun-keluar');
+            }
+        }
+    });
+
+    $(document).ready(function () {        
+        cekStatusToken();
 
         $(document).ajaxStart(function() {
 			$('#loading').show();
