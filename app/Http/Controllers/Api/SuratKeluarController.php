@@ -266,23 +266,20 @@ class SuratKeluarController extends Controller
         $result = [""];
         if ($tujuan) {
             $result = [];
-            // Ganti newline (\n) dengan koma untuk konsistensi pemrosesan
-            $tujuan = preg_replace('/\s*\n\s*/', ',', $tujuan);
-
-            // Pola untuk memisahkan berdasarkan angka dan titik, atau hanya koma
-            $pattern = '/\s*,\s*(?=\d+\.)|\s*,\s*/';
-
-            // Pisahkan data berdasarkan pola
-            $split = preg_split($pattern, trim($tujuan));
+            // Pisahkan berdasarkan newline (enter) dan mengabaikan koma atau karakter lainnya
+            $split = preg_split('/\r?\n/', $tujuan); // Memisahkan berdasarkan newline
 
             foreach ($split as $item) {
-                // Jika ada angka dan titik, hapus mereka; jika tidak, tetap gunakan
-                $cleaned = preg_replace('/^\d+\.\s*/', '', $item);
-                $result[] = trim($cleaned); // Hilangkan spasi
+                // Hapus karakter yang tidak diinginkan (misalnya spasi ekstra)
+                $cleaned = trim($item);
+                if (!empty($cleaned)) {
+                    $result[] = $cleaned; // Tambahkan item yang sudah dibersihkan
+                }
             }
         }
         return $result;
     }
+
 
 
     //OKE PUT application/x-www-form-urlencoded
