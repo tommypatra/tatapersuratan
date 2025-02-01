@@ -81,7 +81,7 @@
 	<script src="admin/adminkit-dev/static/js/app.js"></script>
     <script src="js/jquery-validation-1.19.5/dist/jquery.validate.min.js"></script>
 	<script src="js/sweetalert2/dist/sweetalert2.min.js"></script>
-	<script src="js/app.js"></script>
+	<script src="js/app.js?version=2"></script>
 	<script src="js/loading/loading.js"></script>
 
 <script>

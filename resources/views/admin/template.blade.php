@@ -209,7 +209,7 @@
 		}
 
 	</script>
-	<script src="{{ asset('js/app.js') }}?version=2"></script>
+	<script src="{{ asset('js/app.js?version=2') }}"></script>
 	<script src="{{ asset('js/loading/loading.js') }}"></script>
 	<script src="{{ asset('js/info.js') }}"></script>
 	
