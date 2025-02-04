@@ -1106,7 +1106,7 @@ function displayPagination(response) {
         });
 
         $('#btnCetak').click(function () {
-            var keyword = $(this).val();
+            var keyword = $("#search-data").val();
             var filter = filterData();
             var url = vBaseUrl+`/cetak-surat-masuk?keyword=${keyword}&filter=${filter}`;
             window.open(url, '_blank');
