@@ -230,8 +230,9 @@
                         lampiran =`<ul style="margin: 0;padding-left:20px;">`;
                         $.each(dataSurat.lampiran_surat_keluar, function(i, dt) {
                             const dokumen=`${base_url}/${dt.upload.path}`;
+                            const namadokumen= "dokumen upload "+(i+1);
                             lampiran +=`<li>`;
-                            lampiran +=`<a href="${dokumen}" target="_blank">Lampiran Dokumen ${i+1}</a>`;
+                            lampiran +=`<a href="${dokumen}" target="_blank">${namadokumen}</a>`;
                             lampiran +=`</li>`;
                         });
                         lampiran +=`</ul>`;
