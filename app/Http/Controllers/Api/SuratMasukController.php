@@ -125,11 +125,10 @@ class SuratMasukController extends Controller
                     ->orWhere('no_surat', 'LIKE', "%$keyword%")
                     ->orWhere('tempat', 'LIKE', "%$keyword%")
                     ->orWhere('ringkasan', 'LIKE', "%$keyword%")
-                    ->orWhere('asal', 'LIKE', "%$keyword%");
+                    ->orWhere('asal', 'LIKE', "%$keyword%")
                     ->orWhereHas('tujuan.user', function ($query) use ($keyword) {
                         $query->where('name', 'LIKE', "%$keyword%");
-                    });                    
-
+                    });
             });
         }
 
