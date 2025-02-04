@@ -618,10 +618,10 @@ function displayPagination(response) {
         }            
     }
 
-    $('.page-link').on('click', function(e) {
+    $(document).on('click','.page-link', function(e) {
         e.preventDefault();
         var page = $(this).data('page');
-        loadData(page);
+        CrudModule.fRead(page,displayData);
     });
 
     //tambah
