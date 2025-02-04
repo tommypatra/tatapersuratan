@@ -115,6 +115,9 @@ class SuratKeluarController extends Controller
                     ->orWhere('no_surat', 'LIKE', "%$keyword%")
                     ->orWhere('ringkasan', 'LIKE', "%$keyword%")
                     ->orWhere('asal', 'LIKE', "%$keyword%");
+                    ->orWhereHas('user', function ($query) use ($keyword) {
+                        $query->where('name', 'LIKE', "%$keyword%");
+                    });
             });
         }
 

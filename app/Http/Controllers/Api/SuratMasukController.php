@@ -127,7 +127,7 @@ class SuratMasukController extends Controller
                     ->orWhere('ringkasan', 'LIKE', "%$keyword%")
                     ->orWhere('asal', 'LIKE', "%$keyword%")
                     ->orWhereHas('tujuan.user', function ($query) use ($keyword) {
-                        $query->where('email', 'LIKE', "%$keyword%");
+                        $query->where('name', 'LIKE', "%$keyword%");
                     });
             });
         }
