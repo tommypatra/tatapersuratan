@@ -130,8 +130,8 @@ function getAksesDisposisi($user_id, $tahun)
     $data = [];
     foreach ($query as $i => $dp) {
         $data[$i]['jabatan'] = $dp['spesimenJabatan']->jabatan;
-        $data[$i]['user_pejabat_id'] = $dp['spesimenJabatan']->pejabat->id;
-        $data[$i]['nama_pejabat'] = $dp['spesimenJabatan']->pejabat->name;
+        $data[$i]['user_pejabat_id'] = ($dp['spesimenJabatan']->pejabat) ? $dp['spesimenJabatan']->pejabat->id : "";
+        $data[$i]['nama_pejabat'] = ($dp['spesimenJabatan']->pejabat) ? $dp['spesimenJabatan']->pejabat->name : "";
     }
 
     return $data;
