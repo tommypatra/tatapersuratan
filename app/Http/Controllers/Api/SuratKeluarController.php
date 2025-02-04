@@ -122,8 +122,8 @@ class SuratKeluarController extends Controller
         $bindings = $query->getBindings();
         // dd($sql);
 
-        $perPage = $request->input('per_page', env('DATA_PER_PAGE', 10));
-        $page = ($perPage == 'all') ? 'all' : $request->input('page', env('DATA_PER_PAGE', 10));
+        $perPage = $request->input('per_page', env('DATA_PER_PAGE', 30));
+        $page = ($perPage == 'all') ? 'all' : $request->input('page', env('DATA_PER_PAGE', 30));
 
 
         if ($page === 'all') {

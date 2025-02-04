@@ -615,13 +615,14 @@ function displayPagination(response) {
 
             paginationData.html(`<div>Data ke <span class="badge bg-secondary">${response.meta.from}</span> dari <span class="badge bg-secondary">${response.meta.total}</span> total data</div>`);
 
-            $('.page-link').on('click', function(e) {
-                e.preventDefault();
-                var page = $(this).data('page');
-                loadData(page);
-            });
         }            
     }
+
+    $('.page-link').on('click', function(e) {
+        e.preventDefault();
+        var page = $(this).data('page');
+        loadData(page);
+    });
 
     //tambah
     $("#btnTambah").click(function() {

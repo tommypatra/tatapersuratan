@@ -19,8 +19,12 @@ class JwtAuthenticateRefresh
             $payload = JWTAuth::getPayload();
             $exp = $payload->get('exp');
             $now = now()->timestamp;
-            //79.200 = 22 jam jika token masih 22 jam lagi maka refresh token
-            if (($exp - $now) < 79.200) {
+            //79200 = 22 jam jika token masih 22 jam lagi maka refresh token
+            //82800 = 23 jam
+            // 1 hari = 86400 detik
+            // 6 hari = 518400 detik
+            // 6 hari 23 jam = 518400 + 82800 = 601200 detik
+            if (($exp - $now) < 601200) {
                 $newToken = JWTAuth::refresh();
                 JWTAuth::setToken($newToken);
                 $user = JWTAuth::user();
