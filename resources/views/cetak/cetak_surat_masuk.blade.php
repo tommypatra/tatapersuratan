@@ -124,10 +124,10 @@
                     <tr>
                         <th>No</th>
                         <th style="width:10%">Jenis (Nomor Agenda)</th>
-                        <th style="width:40%">Perihal/ Sifat</th>
+                        <th style="width:25%">Perihal/ Sifat</th>
                         <th style="width:15%">Asal</th>
                         <th style="width:10%">Nomor/ Tanggal</th>
-                        <th style="width:15%">Disposisi</th>
+                        <th style="width:25%">Disposisi</th>
                         <th style="text-align: center; width:20%">Lampiran</th>
                         <th style="width:20%">Sumber</th>
                     </tr>
