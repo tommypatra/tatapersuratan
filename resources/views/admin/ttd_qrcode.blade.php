@@ -283,10 +283,10 @@
 
                 if(dt.user_id==vUserId){
                     if(!dt.is_diajukan){
-                        my_menu+=`  <li><a class="dropdown-item" href="javascript:;" onclick="ajukan(${dt.id})"><i class="fa-regular fa-share-from-square"></i> Ajukan</a></li>
-                                    <li><a class="dropdown-item" href="javascript:;" onclick="ganti(${dt.id})"><i class="fa-solid fa-pen-to-square"></i> Ganti</a></li>
-                                    <li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>`;
+                        my_menu+=`  <li><a class="dropdown-item" href="javascript:;" onclick="ajukan(${dt.id})"><i class="fa-regular fa-share-from-square"></i> Ajukan</a></li>`;
                     }
+                    my_menu+=`  <li><a class="dropdown-item" href="javascript:;" onclick="ganti(${dt.id})"><i class="fa-solid fa-pen-to-square"></i> Ganti</a></li>
+                                <li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>`;
                 }
                 if(dt.user_ttd_id==vUserId){
                     if(dt.is_diajukan){
@@ -294,7 +294,6 @@
                             my_menu+=`  <li><a class="dropdown-item" href="javascript:;" onclick="validasi(1,${dt.id})"><i class="fa-solid fa-envelope-circle-check"></i> Terima</a></li>
                                         <li><a class="dropdown-item" href="javascript:;" onclick="validasi(0,${dt.id})"><i class="fa-solid fa-rectangle-xmark"></i> Tolak</a></li>`;
                         }
-                        my_menu+=`<li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>`;
                     }
                 }
 
@@ -688,7 +687,7 @@
                         var vjabatan=dt.jabatan;
                         if(dt.pejabat)
                             // vdata.push({id:dt.pejabat.id,text:dt.pejabat.name+' ('+dt.pejabat.email+') '+vjabatan,jabatan:vjabatan,nama:dt.pejabat.name});
-                            vdata.push({id:dt.pejabat.id,text:vjabatan,jabatan:vjabatan,nama:''});
+                            vdata.push({id:dt.pejabat.id,text:vjabatan,jabatan:vjabatan,nama:dt.pejabat.name});
                     });
                 }
                 sel2_datalokal('#user_ttd_id',vdata,false,'#myForm .modal-content');

@@ -130,6 +130,15 @@ class TtdQrcodeController extends Controller
             $validatedData['is_diajukan'] = 1;
             $data = TtdQrcode::create($validatedData);
 
+            $akun = getInfoAkun($data->user_ttd_id);
+            if ($akun['data']) {
+                $pesanWA = "Hai " . $akun['data']->name . ", ada ajuan Tanda Tangan QrCode dari " . auth()->user()->name . " tentang " . $data->perihal . " tertanggal " . $data->tanggal . "\n\n";
+                $pesanWA .= "silahkan cek " . url($data->file);
+                if ($akun['data']->profil->hp) {
+                    kirimWA($akun['data']->profil->hp, $pesanWA);
+                }
+            }
+
             // ini untuk update kode sesuai id
             $id = $data->id;
             $cariData = $this->findId($id);
@@ -233,6 +242,17 @@ class TtdQrcodeController extends Controller
 
             $data->update(['is_diajukan' => 1]);
 
+            $akun = getInfoAkun($data->user_ttd_id);
+            if ($akun['data']) {
+                $pesanWA = "Hai " . $akun['data']->name . ", ada ajuan Tanda Tangan QrCode dari " . auth()->user()->name . " tentang " . $data->perihal . " tertanggal " . $data->tanggal . "\n\n";
+                $pesanWA .= "Ini konsep suratnya " . url($data->file) . "\n\n";
+                $pesanWA .= "silahkan cek dengan login laman https://surat.iainkendari.ac.id/";
+                if ($akun['data']->profil->hp) {
+                    kirimWA($akun['data']->profil->hp, $pesanWA);
+                }
+            }
+
+
             return response()->json([
                 'success' => true,
                 'message' => 'pengajuan successfully',
@@ -298,6 +318,26 @@ class TtdQrcodeController extends Controller
                 // }
             }
 
+            $akun = getInfoAkun($data->user_id);
+            if ($akun['data']) {
+                $pesanWA = "Hai " . $akun['data']->name . ", ajuan Tanda Tangan QrCode tentang " . $data->perihal . " tertanggal " . $data->tanggal . " ";
+                if ($request->input('is_diterima') == 1) {
+                    $pesanWA .= "diterima.\n\n";
+                } else {
+                    $pesanWA .= "ditolak ";
+                    if ($request->input('catatan'))
+                        $pesanWA .= " karena " . $request->input('catatan') . ".\n\n";
+                    else
+                        $pesanWA .= ".\n\n";
+                }
+                $pesanWA .= "silahkan cek dengan login laman https://surat.iainkendari.ac.id/";
+
+                if ($akun['data']->profil->hp) {
+                    kirimWA($akun['data']->profil->hp, $pesanWA);
+                }
+            }
+
+
             $data->update($dataUpdate);
 
             return response()->json([
@@ -324,7 +364,7 @@ class TtdQrcodeController extends Controller
         foreach ($phpWord->getSections() as $section) {
             $footer = $section->addFooter();
             $footer->addImage($pathqr, ['width' => 65, 'height' => 65]);
-            $footer->addText('test', ['left' => 70]);
+            // $footer->addText('test', ['left' => 70]);
         }
 
         $objWriter = IOFactory::createWriter($phpWord, 'Word2007');
@@ -374,7 +414,7 @@ class TtdQrcodeController extends Controller
             $left = $size['width'];
             $top = $size['height'];
 
-            $fpdi->Image($pathqr, 10, ($top - 25));
+            $fpdi->Image($pathqr, 10, ($top - 25), 18, 20);
             // $fpdi->SetFont("helvetica", "I", 10);
             $fpdi->SetTextColor(0, 0, 0);
             $fpdi->Text(30, ($top - 19), "dokumen ini sah dan ditandatangani secara elektronik oleh " . $data->pejabat);

@@ -16,12 +16,14 @@ use App\Models\PolaSpesimen;
 use App\Models\AksesDisposisi;
 use App\Models\SpesimenJabatan;
 use App\Models\KlasifikasiSurat;
+use App\Http\Resources\TujuanResource;
+use App\Http\Resources\DistribusiResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
-use App\Http\Resources\TujuanResource;
-use App\Http\Resources\DistribusiResource;
+use Intervention\Image\Facades\Image;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\Storage;
 
 function kirimWA($phone, $message = null, $jenis = 'text')
 {
@@ -532,6 +534,29 @@ function generateToken($length = 64)
     return $randomString;
 }
 
+// function generateQrCode($data)
+// {
+//     $pathqr = 'qrcodes/' . date('Y') . '/' . date('m') . '/' . date('d') . '/img-' . $data->id . '-' . time() . '-footer.png';
+//     $fullPath = public_path($pathqr); // Pastikan menggunakan public_path untuk path absolut
+
+//     if (!File::exists(dirname($fullPath))) {
+//         if (!File::makeDirectory(dirname($fullPath), 0755, true, true)) {
+//             return response()->json([
+//                 'success' => false,
+//                 'message' => 'Failed to create directory',
+//             ], 500);
+//         }
+//     }
+//     $link = url('/') . '/tte/' . $data->kode;
+//     $signedBy = strtoupper($data->pejabat);
+//     // $qrData = "$link | $signedBy";
+//     $qrData = $signedBy;
+
+//     // Generate QR code
+//     \QrCode::size(65)->format('png')->generate($qrData, $fullPath);
+//     return $pathqr; // Path relatif untuk digunakan di URL
+// }
+
 function generateQrCode($data)
 {
     $pathqr = 'qrcodes/' . date('Y') . '/' . date('m') . '/' . date('d') . '/img-' . $data->id . '-' . time() . '-footer.png';
@@ -546,12 +571,52 @@ function generateQrCode($data)
         }
     }
     $link = url('/') . '/tte/' . $data->kode;
+    $signedBy = strtoupper($data->pejabat);
+    // $qrData = "$link | $signedBy";
+    $qrData = $link;
 
-    // Generate QR code
-    \QrCode::size(65)->format('png')->generate($link, $fullPath);
-    return $pathqr; // Path relatif untuk digunakan di URL
+    // Simpan QR Code langsung sebagai file PNG
+    QrCode::format('png')->size(300)->margin(2)->errorCorrection('H')->generate($qrData, $fullPath);
+
+    // Cek apakah file QR berhasil dibuat
+    if (!File::exists($fullPath)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'QR Code image not found',
+        ], 500);
+    }
+
+    // Buka kembali QR Code dengan Intervention Image
+    $qrImage = Image::make($fullPath);
+
+    // Tambahkan logo jika ada
+    $logoPath = public_path('images/logo.png');
+    if (File::exists($logoPath)) {
+        $logo = Image::make($logoPath)->resize(80, 80);
+        $qrImage->insert($logo, 'center');
+        // echo "OKE $logoPath";
+    }
+
+    // // Buat canvas untuk menambahkan teks
+    $canvas = Image::canvas($qrImage->width(), $qrImage->height() + 40, [255, 255, 255, 0]);
+    $canvas->insert($qrImage, 'top-center');
+
+    $fontPath = public_path('fonts/arial.ttf'); // Pastikan font ada
+    if (File::exists($fontPath)) {
+        $canvas->text($signedBy, $qrImage->width() / 2, $qrImage->height() + 20, function ($font) use ($fontPath) {
+            $font->file($fontPath);
+            $font->size(20);
+            $font->color('#000000');
+            $font->align('center');
+            $font->valign('top');
+        });
+    }
+
+    // Simpan gambar
+    $canvas->save($fullPath, 100);
+
+    return $pathqr; // URL publik untuk digunakan di frontend
 }
-
 
 
 function cekAkses($id = null)

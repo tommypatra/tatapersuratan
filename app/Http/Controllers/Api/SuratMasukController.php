@@ -348,6 +348,8 @@ class SuratMasukController extends Controller
                     $pesanWA .= "ditolak dan tidak diproses disposisinya";
                     if ($request->input('catatan'))
                         $pesanWA .= " karena " . $request->input('catatan') . ".\n\n";
+                    else
+                        $pesanWA .= ".\n\n";
                 }
                 $pesanWA .= "silahkan cek dengan login laman https://surat.iainkendari.ac.id/";
 
