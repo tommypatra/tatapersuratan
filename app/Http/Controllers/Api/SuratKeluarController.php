@@ -191,6 +191,7 @@ class SuratKeluarController extends Controller
             $perihal = $validatedData['perihal'];
             $pesan = [];
             $responseData = [];
+            $surat_keluar_id = [];
             // dd($tujuan);
             $jumlah_tujuan = count($tujuan);
             foreach ($tujuan as $i => $dp) {
@@ -198,7 +199,7 @@ class SuratKeluarController extends Controller
                     $validatedData['perihal'] = $perihal . " " . $dp;
                 $validatedData['is_diajukan'] = 1;
                 $data = SuratKeluar::create($validatedData);
-
+                $surat_keluar_id[] = $data->id;
                 // jika ada akses maka generatekan nomor suratnya
                 $tmppesan = 'Pengajuan nomor surat <i>' . $data->perihal . '</i> tanggal ' . $data->tanggal;
                 if ($this->cekAksesPola($data->tanggal, $data->pola_spesimen_id)) {
@@ -228,11 +229,17 @@ class SuratKeluarController extends Controller
             foreach ($data_admin['data'] as $i => $row) {
                 // if ($row->user->profil->hp) {
                 if ($row->user->profil->hp && $row->user->id != auth()->user()->id) {
-                    $pesanWA = "Hai " . $row->user->name . ", beberapa saat lalu " . auth()->user()->name . " mengajukan pengambilan nomor, yaitu :\n";
+                    $pesanWA = "Hai " . $row->user->name . ", beberapa saat lalu " . auth()->user()->name . " mengajukan :\n";
                     foreach ($pesan as $i => $item) {
                         $pesanWA .= "\n" . $item . "\n";
                     }
-                    $pesanWA .= "\nsilahkan cek dengan login laman https://surat.iainkendari.ac.id/";
+                    $linkid = "/";
+                    foreach ($surat_keluar_id as $i => $item) {
+                        $linkid .= $item;
+                        if (($i + 1) < count($surat_keluar_id))
+                            $linkid .= "-";
+                    }
+                    $pesanWA .= "\nsilahkan cek dengan login laman https://surat.iainkendari.ac.id/setujui-pengambilan-nomor" . $linkid;
                     kirimWA($row->user->profil->hp, $pesanWA);
                 }
             }

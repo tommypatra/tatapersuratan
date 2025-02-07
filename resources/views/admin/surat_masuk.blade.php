@@ -3,6 +3,7 @@
 @section('scriptHead')
 <title>Surat Masuk</title>
 <link href="{{ asset('js/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css') }}" rel="stylesheet">
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/smoothness/jquery-ui.css" crossorigin="anonymous">
 <link href="{{ asset('js/select2/dist/css/select2.min.css') }}" rel="stylesheet">
 <link href="{{ asset('js/select2/dist/css/select2.custom.css') }}" rel="stylesheet">
 <link href="{{ asset('js/img-viewer/viewer.min.css') }}" rel="stylesheet">
@@ -311,6 +312,7 @@
 <script src="{{ asset('js/crud.js') }}"></script>
 <script src="{{ asset('js/img-viewer/viewer.min.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js" crossorigin="anonymous"></script>
 <script src="{{ url('js/foto-dokumen.js')}}"></script>
 
 <script type="text/javascript">
@@ -1049,6 +1051,50 @@ function displayPagination(response) {
         // Load data default
         loadDataTab();        
         InfoModule.updateNotifWeb();
+
+
+        $("#no_surat").autocomplete({
+            appendTo: "#modal-form",
+            source: function(request, response) {
+                var dateInput = $('#tanggal').val();
+                var year = new Date(dateInput).getFullYear();
+                year = (year)?year:"{{ date('Y') }}";
+                $.ajax({
+                    url: "api/surat-keluar",
+                    type: "GET",
+                    dataType: "json",
+                    data: {
+                        page: 1,
+                        filter: JSON.stringify({ status: 'diterima', tahun: year }),
+                        keyword: request.term                    
+                    },
+                    success: function(data) {
+                        var data_respon = data.data.map(function(item) {
+                            return {
+                                label: item.no_surat, // Teks yang akan ditampilkan dalam saran
+                                value: item.no_surat, // Nilai yang akan diisi ke input saat dipilih
+                                id: item.id,
+                                tanggal: item.tanggal,
+                                perihal: item.perihal,
+                                spesimen: item.spesimen_jabatan.jabatan,
+                            };
+                        });
+                        console.log(data_respon);
+                        response(data_respon);
+                    },
+                });
+            },
+            minLength: 2,
+            select: function(event, ui) {
+                $("#kategori_surat").val('INTERNAL');
+                // $("#kategori_surat_masuk_id").val('Biasa');
+                $("#kategori_surat_masuk_id").val("1").trigger("change"); 
+                $("#asal").val(ui.item.spesimen);
+                $("#tempat").val('IAIN Kendari');
+                $("#perihal").val(ui.item.perihal);
+                $("#tanggal").val(ui.item.tanggal);
+            }
+        });
 
         //start upload with crop
 

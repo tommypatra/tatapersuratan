@@ -245,8 +245,7 @@ class TtdQrcodeController extends Controller
             $akun = getInfoAkun($data->user_ttd_id);
             if ($akun['data']) {
                 $pesanWA = "Hai " . $akun['data']->name . ", ada ajuan Tanda Tangan QrCode dari " . auth()->user()->name . " tentang " . $data->perihal . " tertanggal " . $data->tanggal . "\n\n";
-                $pesanWA .= "Ini konsep suratnya " . url($data->file) . "\n\n";
-                $pesanWA .= "silahkan cek dengan login laman https://surat.iainkendari.ac.id/";
+                $pesanWA .= "silahkan cek " . url($data->file);
                 if ($akun['data']->profil->hp) {
                     kirimWA($akun['data']->profil->hp, $pesanWA);
                 }
@@ -323,6 +322,7 @@ class TtdQrcodeController extends Controller
                 $pesanWA = "Hai " . $akun['data']->name . ", ajuan Tanda Tangan QrCode tentang " . $data->perihal . " tertanggal " . $data->tanggal . " ";
                 if ($request->input('is_diterima') == 1) {
                     $pesanWA .= "diterima.\n\n";
+                    $pesanWA .= "ini dokumennya " . url($data->file)".\n\n";
                 } else {
                     $pesanWA .= "ditolak ";
                     if ($request->input('catatan'))
@@ -330,7 +330,7 @@ class TtdQrcodeController extends Controller
                     else
                         $pesanWA .= ".\n\n";
                 }
-                $pesanWA .= "silahkan cek dengan login laman https://surat.iainkendari.ac.id/";
+                $pesanWA .= "teria kasih";
 
                 if ($akun['data']->profil->hp) {
                     kirimWA($akun['data']->profil->hp, $pesanWA);
