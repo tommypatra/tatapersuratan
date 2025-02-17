@@ -322,7 +322,7 @@ class TtdQrcodeController extends Controller
                 $pesanWA = "Hai " . $akun['data']->name . ", ajuan Tanda Tangan QrCode tentang " . $data->perihal . " tertanggal " . $data->tanggal . " ";
                 if ($request->input('is_diterima') == 1) {
                     $pesanWA .= "diterima.\n\n";
-                    $pesanWA .= "ini dokumennya " . url($data->file)".\n\n";
+                    $pesanWA .= "ini dokumennya " . url($data->file) . ".\n\n";
                 } else {
                     $pesanWA .= "ditolak ";
                     if ($request->input('catatan'))
