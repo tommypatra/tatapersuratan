@@ -330,7 +330,7 @@ class TtdQrcodeController extends Controller
                     else
                         $pesanWA .= ".\n\n";
                 }
-                $pesanWA .= "teria kasih";
+                $pesanWA .= "terima kasih";
 
                 if ($akun['data']->profil->hp) {
                     kirimWA($akun['data']->profil->hp, $pesanWA);
