@@ -126,8 +126,8 @@
 		});
 
 		var myModalAkses = new bootstrap.Modal(document.getElementById('modal-pilih-akses'), {
-			backdrop: 'static', // nda bisa klik diluar modal
-			keyboard: false     // tombol esc tidak berfungsi untuk tutup modal  
+			backdrop: 'static',
+			keyboard: false       
 		});
 
 		$("#myForm").validate({
@@ -155,7 +155,6 @@
 			localStorage.setItem('nama', param.akun.name);
 			showModalAkses();
 		}	
-
 
 		function showModalAkses() {
 			$('#daftar-akses').html('');
