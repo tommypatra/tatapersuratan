@@ -304,73 +304,69 @@ function generateNomorKeluar($tanggal = null, $pola_spesimen_id = null, $klasifi
     $bln = $tanggalObj->format('m');
     $thn = $tanggalObj->format('Y');
 
-    if (!$no_indeks && !$id) {
-        // Cari data surat terbaru untuk menentukan indeks berikutnya
-        $lastIndex = SuratKeluar::select([
-            \DB::raw('MAX(no_indeks) AS no_indeks'),
-            \DB::raw('MIN(tanggal) AS tanggal_awal'),
-            \DB::raw('MAX(tanggal) AS tanggal_terakhir'),
-            \DB::raw(
-                'IF("' . $tanggal . '">=MAX(tanggal),0,
-                        IF("' . $tanggal . '" BETWEEN MIN(tanggal) AND MAX(tanggal),1,0)) as mundur'
-            ),
-        ])
-            ->whereYear('tanggal', $thn)
-            ->where('is_diterima', 1)
-            // ->where('pola_spesimen_id', $pola_spesimen_id)
-            ->whereIn('pola_spesimen_id', $ref_pola_spesimen_id)
-            ->first();
-        $is_mundur = $lastIndex->mundur;
-        // dd($is_mundur);
-        //jika mundur maka cari no_indeks dan sub_indeks terakhir pada tanggal tersebut
+    $indeks = 1;
+    $subindeks = null;
 
-        if ($is_mundur) {
-            // echo "MUNDUR SURAT";
-            // $query = SuratKeluar::where('pola_spesimen_id', 48)
-            $query = SuratKeluar::whereIn('pola_spesimen_id', $ref_pola_spesimen_id)
-                ->where('tanggal', '<=', $tanggal)
-                ->whereYear('tanggal', $thn)
-                // ->whereNotNull('no_surat')
-                ->where('is_diterima', 1)
-                ->orderBy('no_indeks', 'desc')
-                ->orderBy('no_sub_indeks', 'desc');
-            // dd($query->toSql(), $query->getBindings());
-            $lastIndex = $query->first();
-            // dd($lastIndex);
-            if (!$lastIndex->no_indeks) {
-                // $lastIndex = SuratKeluar::where('pola_spesimen_id', $pola_spesimen_id)
-                $lastIndex = SuratKeluar::whereIn('pola_spesimen_id', $ref_pola_spesimen_id)
-                    ->whereYear('tanggal', $thn)
-                    ->where('tanggal', '>=', $tanggal)
-                    ->whereNotNull('no_surat')
+    if (!$no_indeks && !$id) {
+
+        $surat_mundur = SuratKeluar::where('is_diterima', 1)
+            ->whereIn('pola_spesimen_id', $ref_pola_spesimen_id)
+            ->where(function ($query) use ($thn) {
+                $query->whereYear('tanggal', $thn);
+            })
+            ->where(function ($query) use ($tanggal) {
+                $query->where('tanggal', '>', $tanggal);
+            })
+            ->exists();
+
+        $nomor_sebelumnya = SuratKeluar::select('no_indeks', 'no_sub_indeks')
+            ->where('is_diterima', 1)
+            ->whereIn('pola_spesimen_id', $ref_pola_spesimen_id)
+            ->where(function ($query) use ($thn) {
+                $query->whereYear('tanggal', $thn);
+            })
+            ->where(function ($query) use ($tanggal) {
+                $query->where('tanggal', '<=', $tanggal);
+            })
+            ->orderBy('tanggal', 'desc')
+            ->orderBy('no_indeks', 'desc')
+            ->orderBy('no_sub_indeks', 'desc')
+            ->first();
+
+        if ($surat_mundur) {
+            if ($nomor_sebelumnya) {
+                $indeks = $nomor_sebelumnya->no_indeks;
+                $subindeks = $nomor_sebelumnya->no_sub_indeks;
+            } else {
+                $nomor_setelahnya = SuratKeluar::select('no_indeks', 'no_sub_indeks')
                     ->where('is_diterima', 1)
-                    ->orderBy('no_indeks', 'asc')
+                    ->whereIn('pola_spesimen_id', $ref_pola_spesimen_id)
+                    ->where(function ($query) use ($thn) {
+                        $query->whereYear('tanggal', $thn);
+                    })
+                    ->where(function ($query) use ($tanggal) {
+                        $query->where('tanggal', '>', $tanggal);
+                    })
+                    ->orderBy('tanggal', 'asc')
+                    ->orderBy('no_indeks', 'desc')
                     ->orderBy('no_sub_indeks', 'desc')
                     ->first();
+                $indeks = $nomor_setelahnya->no_indeks;
+                $subindeks = $nomor_setelahnya->no_sub_indeks;
             }
-            // dd($lastIndex);
-            // dd($akses_pola_id, $tanggal, $thn, $lastIndex);
-        }
-
-        $indeks = 1;
-        $subindeks = null;
-        //jika mundur maka indeks tetap dan sub_indeks tambah 1
-        if ($is_mundur) {
-            $indeks = $lastIndex->no_indeks;
-            //cari maks subindeks berdasarkan indeks
-            $cariSub = SuratKeluar::select([
-                \DB::raw('MAX(no_sub_indeks) AS no_sub_indeks'),
-            ])
-                // ->where('pola_spesimen_id', $pola_spesimen_id)
-                ->whereIn('pola_spesimen_id', $ref_pola_spesimen_id)
-                ->where('no_indeks', $indeks)
-                ->where('is_diterima', 1)
-                ->first();
-            $subindeks = $cariSub->no_sub_indeks + 1;
+            // cek dulu indeks dan subindeks
+            do {
+                $subindeks++;
+                $exists = SuratKeluar::where('is_diterima', 1)
+                    ->whereIn('pola_spesimen_id', $ref_pola_spesimen_id)
+                    ->whereYear('tanggal', $thn)
+                    ->where('no_indeks', $indeks)
+                    ->where('no_sub_indeks', $subindeks)
+                    ->exists();
+            } while ($exists);
         } else {
-            if ($lastIndex) {
-                $indeks = $lastIndex->no_indeks + 1;
-            }
+            $indeks = $nomor_sebelumnya->no_indeks + 1;
+            $subindeks = null;
         }
     } else {
         $indeks = $no_indeks;
@@ -392,7 +388,7 @@ function generateNomorKeluar($tanggal = null, $pola_spesimen_id = null, $klasifi
         'pola' => $dt_pola->pola,
     ];
 
-    // dd($retval);
+    dd($retval);
     return $retval;
 }
 
