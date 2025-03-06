@@ -348,7 +348,7 @@ function generateNomorKeluar($tanggal = null, $pola_spesimen_id = null, $klasifi
                         $query->where('tanggal', '>', $tanggal);
                     })
                     ->orderBy('tanggal', 'asc')
-                    ->orderBy('no_indeks', 'desc')
+                    ->orderBy('no_indeks', 'asc')
                     ->orderBy('no_sub_indeks', 'desc')
                     ->first();
                 $indeks = $nomor_setelahnya->no_indeks;
