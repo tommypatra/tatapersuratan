@@ -388,7 +388,7 @@ function generateNomorKeluar($tanggal = null, $pola_spesimen_id = null, $klasifi
         'pola' => $dt_pola->pola,
     ];
 
-    dd($retval);
+    // dd($retval);
     return $retval;
 }
 
