@@ -365,7 +365,9 @@ function generateNomorKeluar($tanggal = null, $pola_spesimen_id = null, $klasifi
                     ->exists();
             } while ($exists);
         } else {
-            $indeks = $nomor_sebelumnya->no_indeks + 1;
+            $indeks = 1;
+            if ($nomor_sebelumnya)
+                $indeks = $nomor_sebelumnya->no_indeks + 1;
             $subindeks = null;
         }
     } else {
