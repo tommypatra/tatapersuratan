@@ -63,8 +63,8 @@ Route::get('/ujicoba', function () {
     return view('admin.test');
 });
 
-Route::get('/kirim-wa/{nomor}/{pesan}/{jenis}', function ($nomor, $pesan, $jenis) {
-    $pesan = "https://iainkendari.ac.id/upload/lampiran/IDUP18180454270911793.pdf";
+Route::get('/kirim-wa/{nomor}/{pesan}', function ($nomor, $pesan) {
+    $pesan = "Bismillah, coba kirim pesan";
     kirimWA($nomor, $pesan);
 });
 

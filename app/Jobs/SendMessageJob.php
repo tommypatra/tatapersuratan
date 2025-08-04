@@ -41,21 +41,22 @@ class SendMessageJob implements ShouldQueue
     {
         $token = env('WA_BLAS_TOKEN');
         $secretKey = env('WA_BLAS_SECRET');
+        $url = env('WA_BLAS_URL');
         if ($this->jenis == "text") {
-            $this->sendTextMessage($token, $secretKey);
+            $this->sendTextMessage($token, $secretKey, $url);
         } elseif ($this->jenis == "document") {
-            $this->sendDocumentMessage($token, $secretKey);
+            $this->sendDocumentMessage($token, $secretKey, $url);
         }
     }
 
     /**
      * Mengirim pesan teks ke WhatsApp API.
      */
-    private function sendTextMessage($token, $secretKey)
+    private function sendTextMessage($token, $secretKey, $url)
     {
         $response = Http::withHeaders([
             'Authorization' => "$token.$secretKey",
-        ])->post('https://kudus.wablas.com/api/send-message', [
+        ])->post($url . 'api/send-message', [
             'phone' => $this->phone,
             'message'  => $this->message,
         ]);
@@ -65,14 +66,14 @@ class SendMessageJob implements ShouldQueue
     /**
      * Mengirim pesan dokumen jika ada link dalam pesan.
      */
-    private function sendDocumentMessage($token, $secretKey)
+    private function sendDocumentMessage($token, $secretKey, $url)
     {
         $dokumen = $this->extractLinkDetails($this->message);
         // dd($dokumen);
         if ($dokumen && isset($dokumen['document'])) {
             $response = Http::withHeaders([
                 'Authorization' => "$token.$secretKey",
-            ])->post('https://kudus.wablas.com/api/send-document', [
+            ])->post($url . 'api/send-document', [
                 'phone' => $this->phone,
                 'document' => $dokumen['document'],
                 'caption' => $dokumen['caption'],
