@@ -64,7 +64,6 @@ Route::get('/ujicoba', function () {
 });
 
 Route::get('/kirim-wa/{nomor}/{pesan}', function ($nomor, $pesan) {
-    $pesan = "Bismillah, coba kirim pesan";
     kirimWA($nomor, $pesan);
 });
 
@@ -100,7 +99,7 @@ Route::get('/kirim-wa2', function () {
     curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($payload));
-    curl_setopt($curl, CURLOPT_URL,  "https://kudus.wablas.com/api/v2/send-link");
+    curl_setopt($curl, CURLOPT_URL,  "https://sby.wablas.com/api/v2/send-link");
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
 
