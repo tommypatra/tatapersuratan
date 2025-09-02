@@ -134,7 +134,7 @@ class SuratKeluarController extends Controller
         } else {
             $perPage = ($perPage == 'all') ? 20 : $perPage;
 
-            $data = $query->paginate($perPage);
+            $data = $query->paginate($perPage)->onEachSide(1);
         }
 
         return SuratKeluarResource::collection($data);
