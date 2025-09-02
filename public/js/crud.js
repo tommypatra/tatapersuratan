@@ -139,7 +139,7 @@ var CrudModule = (function() {
         pagination.empty();
         paginationInfo.empty();
         if (response.meta.total > 0) {
-            for (let i = 1; i <= lastPage; i++) {
+            for (let i = 1; i <= lastPage; i++) {   // 👈 ini bikin SEMUA halaman keluar
                 var liClass = (i === currentPage) ? 'page-item active' : 'page-item';
                 var linkClass = 'page-link';
                 var link = `<li class="${liClass}"><a href="javascript:;" class="${linkClass}" data-page="${i}">${i}</a></li>`;
