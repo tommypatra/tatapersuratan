@@ -132,22 +132,31 @@ var CrudModule = (function() {
     }
 
     function displayPagination(response) {
-        var currentPage = response.meta.current_page;
-        var lastPage = response.meta.last_page;
         var pagination = $('#pagination');
         var paginationInfo = $('#pagination-info');
         pagination.empty();
         paginationInfo.empty();
+
         if (response.meta.total > 0) {
-            for (let i = 1; i <= lastPage; i++) {   // 👈 ini bikin SEMUA halaman keluar
-                var liClass = (i === currentPage) ? 'page-item active' : 'page-item';
-                var linkClass = 'page-link';
-                var link = `<li class="${liClass}"><a href="javascript:;" class="${linkClass}" data-page="${i}">${i}</a></li>`;
-                pagination.append(link);
-            }
-            paginationInfo.append(`<div>Data ke <span class="badge bg-secondary">${response.meta.from}</span> dari <span class="badge bg-secondary">${response.meta.total}</span> total data</div>`);
+            response.meta.links.forEach(link => {
+                let liClass = link.active ? 'page-item active' : 'page-item';
+                let disabled = link.url === null ? ' disabled' : '';
+                let html = `<li class="${liClass}${disabled}">
+                            <a href="javascript:;" class="page-link" 
+                                data-page="${link.url ? new URL(link.url).searchParams.get('page') : ''}">
+                                ${link.label}
+                            </a>
+                            </li>`;
+                pagination.append(html);
+            });
+
+            paginationInfo.append(
+                `<div>Data ke <span class="badge bg-secondary">${response.meta.from}</span> 
+                dari <span class="badge bg-secondary">${response.meta.total}</span> total data</div>`
+            );
         }
     }
+
 
     function resetForm(formFieldMapping, formElmt = '#myForm') {
         $.each(formFieldMapping, function(key, value) {
