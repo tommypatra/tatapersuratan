@@ -51,7 +51,7 @@ class DistribusiController extends Controller
             $data = $query->get();
         } else {
             $perPage = ($perPage == 'all') ? 20 : 20;
-            $data = $query->paginate($perPage);
+            $data = $query->paginate($perPage)->onEachSide(1);
         }
 
         return DistribusiResource::collection($data);

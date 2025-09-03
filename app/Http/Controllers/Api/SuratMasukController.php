@@ -144,7 +144,7 @@ class SuratMasukController extends Controller
             $data = $query->get();
         } else {
             $perPage = ($perPage == 'all') ? 20 : $perPage;
-            $data = $query->paginate($perPage);
+            $data = $query->paginate($perPage)->onEachSide(1);
         }
         return SuratMasukResource::collection($data);
     }

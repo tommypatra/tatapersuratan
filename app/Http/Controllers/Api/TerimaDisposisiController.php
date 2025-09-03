@@ -28,7 +28,7 @@ class TerimaDisposisiController extends Controller
         } else {
             $perPage = ($perPage == 'all') ? 20 : 20;
 
-            $data = $query->paginate($perPage);
+            $data = $query->paginate($perPage)->onEachSide(1);
         }
 
         return TerimaDisposisiResource::collection($data);

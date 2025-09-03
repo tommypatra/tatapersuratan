@@ -309,7 +309,7 @@
 <script src="{{ asset('js/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.js') }}"></script>
 <script src="{{ asset('js/select2/dist/js/select2.min.js') }}"></script>
 <script src="{{ asset('js/select2lib.js') }}"></script>
-<script src="{{ asset('js/crud.js') }}"></script>
+<script src="{{ asset('js/crud.js?v=3') }}"></script>
 <script src="{{ asset('js/img-viewer/viewer.min.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js" crossorigin="anonymous"></script>

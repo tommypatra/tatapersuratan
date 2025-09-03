@@ -66,7 +66,7 @@ class AksesDisposisiController extends Controller
         } else {
             $perPage = ($perPage == 'all') ? 20 : 20;
 
-            $data = $query->paginate($perPage);
+            $data = $query->paginate($perPage)->onEachSide(1);
         }
 
         return AksesDisposisiResource::collection($data);

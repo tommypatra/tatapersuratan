@@ -337,7 +337,6 @@
                 $('#asal').text(`${data.asal} (${data.tempat})`);
                 $('#perihal').text(`${perihal}`);
 
-
                 const qr_text = JSON.stringify({
                     id: data.id, 
                     api: "disposisi", 

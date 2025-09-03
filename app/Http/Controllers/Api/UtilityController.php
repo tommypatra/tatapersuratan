@@ -404,7 +404,7 @@ class UtilityController extends Controller
         if ($perPage === 'all') {
             $data = $query->get();
         } else {
-            $data = $query->paginate($perPage);
+            $data = $query->paginate($perPage)->onEachSide(1);
         }
 
         return PolaSpesimenResource::collection($data);

@@ -20,23 +20,23 @@
                     <header class="p-2 border-bottom">
                         <div class="container">
                             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-                        
+
                                 <ul class="nav col-12 col-sm-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                                     <li><a href="javascript:;" id="btnRefresh" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="refresh-cw"></i> Refresh</a></li>
                                     <li><a href="javascript:;" id="btnTambah" class="nav-link px-2 link-dark"><i class="align-middle" data-feather="plus-circle"></i> Tambah</a></li>
                                     <li><a href="javascript:;" id="btnFilter" class="nav-link px-2 link-dark" onclick="setfilter()"><i class="align-middle" data-feather="filter"></i> Filter</a></li>
-                                </ul>                    
+                                </ul>
 
-                                <form class="col-12 col-sm-auto mb-3 mb-lg-0 me-lg-3">                                        
+                                <form class="col-12 col-sm-auto mb-3 mb-lg-0 me-lg-3">
                                     <input type="search" id="search-data" class="form-control" placeholder="Search..." aria-label="Search">
-                                </form>                        
+                                </form>
                             </div>
                         </div>
                     </header>
 
                 </div>
                 <div class="card-body">
-                    
+
                     <ul class="nav nav-tabs">
                         <li class="nav-item">
                             <a class="nav-link active" href="javascript:;" id="tabKonsep" onclick="setActiveTab('tabKonsep')">Arsip</a>
@@ -52,16 +52,16 @@
                         </li>
                     </ul>
 
-                    <select class="form-control mt-2" id="filter_kategori_surat" >
+                    <select class="form-control mt-2" id="filter_kategori_surat">
                         <option value="SEMUA">- SEMUA -</option>
                         @php
-                            $kategori = explode(',', env('KATEGORI_SURAT_MASUK'));
+                        $kategori = explode(',', env('KATEGORI_SURAT_MASUK'));
                         @endphp
                         @foreach ($kategori as $item)
-                            <option value="{{ trim($item) }}">{{ trim($item) }}</option>
+                        <option value="{{ trim($item) }}">{{ trim($item) }}</option>
                         @endforeach
                     </select>
-                    
+
                     <div class="table-responsive">
                         <table class="table mt-1">
                             <thead>
@@ -78,7 +78,7 @@
                                 <!-- Data will be dynamically populated here -->
                             </tbody>
                         </table>
-                    
+
                         <nav aria-label="Page navigation">
                             <ul class="pagination" id="pagination">
                                 <!-- Pagination links will be dynamically populated here -->
@@ -99,7 +99,7 @@
 <div class="modal fade modal-lg" id="modal-form" role="dialog">
     <div class="modal-dialog">
         <form id="myForm">
-            <input type="hidden" name="id" id="id" >
+            <input type="hidden" name="id" id="id">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modal-label">Form Surat Masuk</h5>
@@ -107,19 +107,19 @@
                 </div>
                 <div class="modal-body ">
                     <div class="row">
-						<div class="col-sm-4 mb-3">
+                        <div class="col-sm-4 mb-3">
                             <label class="form-label">Kategori</label>
                             <select class="form-control" id="kategori_surat" name="kategori_surat" required>
                                 <option value="">- Pilih -</option>
                                 @php
-                                    $kategori = explode(',', env('KATEGORI_SURAT_MASUK'));
+                                $kategori = explode(',', env('KATEGORI_SURAT_MASUK'));
                                 @endphp
                                 @foreach ($kategori as $item)
-                                    <option value="{{ trim($item) }}">{{ trim($item) }}</option>
+                                <option value="{{ trim($item) }}">{{ trim($item) }}</option>
                                 @endforeach
                             </select>
                         </div>
-						<div class="col-sm-4 mb-3">
+                        <div class="col-sm-4 mb-3">
                             <label class="form-label">Tanggal Surat</label>
                             <input name="tanggal" id="tanggal" type="text" class="form-control datepicker" value="{{ date("Y-m-d") }}" placeholder="" required>
                         </div>
@@ -128,29 +128,29 @@
                             <label class="form-label">Nomor Agenda</label>
                             <input name="no_agenda" id="no_agenda" type="text" class="form-control" placeholder="" required>
                         </div>
-						<div class="col-sm-8 mb-3">
+                        <div class="col-sm-8 mb-3">
                             <label class="form-label">Nomor Surat</label>
                             <input name="no_surat" id="no_surat" type="text" class="form-control" placeholder="" required>
                         </div>
-						<div class="col-sm-4 mb-3">
+                        <div class="col-sm-4 mb-3">
                             <label class="form-label">Sifat Surat</label>
                             <select class="form-control" id="kategori_surat_masuk_id" name="kategori_surat_masuk_id" required></select>
                         </div>
-						<div class="col-sm-6 mb-3">
+                        <div class="col-sm-6 mb-3">
                             <label class="form-label">Daerah Asal Surat</label>
                             <input name="asal" id="asal" type="text" class="form-control" placeholder="ex : kendari atau jakarta, dst" required>
                         </div>
-						<div class="col-sm-6 mb-3">
+                        <div class="col-sm-6 mb-3">
                             <label class="form-label">Nama Institusi</label>
                             <input name="tempat" id="tempat" type="text" class="form-control" placeholder="ex : Kemenag RI, Dirjen Pendis, Gubernur Sultra" required>
                         </div>
-						<div class="col-sm-12 mb-3">
+                        <div class="col-sm-12 mb-3">
                             <label class="form-label">Perihal</label>
                             <textarea name="perihal" id="perihal" class="form-control" rows="4" required></textarea>
                         </div>
-						<div class="col-sm-12 mb-3">
+                        <div class="col-sm-12 mb-3">
                             <label class="form-label">Ringkasan</label>
-                            <textarea name="ringkasan" id="ringkasan" class="form-control" rows="4" ></textarea>
+                            <textarea name="ringkasan" id="ringkasan" class="form-control" rows="4"></textarea>
                         </div>
 
                     </div>
@@ -177,12 +177,12 @@
                     <div class="col-sm-8">
                         <button id="switch-camera" class="btn btn-primary">Switch Camera</button>
                         <video id="camera" autoplay width="100%"></video>
-                    </div>                
+                    </div>
                     <div class="col-sm-4">
                         <button type="button" class="btn btn-success" id="take-photo">Ambil Gambar</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                    </div>                
-                </div>                
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -225,24 +225,24 @@
 <script src="{{ asset('js/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.js') }}"></script>
 <script src="{{ asset('js/select2/dist/js/select2.min.js') }}"></script>
 <script src="{{ asset('js/select2lib.js') }}"></script>
-<script src="{{ asset('js/crud.js') }}"></script>
+<script src="{{ asset('js/crud.js?v=3') }}"></script>
 <script src="{{ asset('js/img-viewer/viewer.min.js') }}"></script>
 
 <script type="text/javascript">
     cekAkses('pengguna');
-    var vApi='/api/surat-masuk';
-    var vJudul='Surat Masuk';
+    var vApi = '/api/surat-masuk';
+    var vJudul = 'Surat Masuk';
     var vPage = 1;
     var vsurat_masuk_id;
 
     var hakAkses = vAksesId;
     var tahunFilter = '{{ date("Y") }}';
 
-    function setfilter(){
+    function setfilter() {
         tahunFilter = prompt('Masukkan tahun:');
         if (!isValidTahun(tahunFilter)) {
-            appShowNotification(false,['Tahun yang dimasukkan tidak valid. Mohon masukkan tahun yang benar.']);
-        }else{
+            appShowNotification(false, ['Tahun yang dimasukkan tidak valid. Mohon masukkan tahun yang benar.']);
+        } else {
             refresh();
         }
     }
@@ -250,12 +250,12 @@
     function isValidTahun(input) {
         const regex = /^\d{4}$/;
         return regex.test(input);
-    }   
+    }
 
 
     // Fungsi untuk mengatur kelas active
     function setActiveTab(tabId) {
-        $('.nav-link').removeClass('active'); 
+        $('.nav-link').removeClass('active');
         $('#' + tabId).addClass('active');
         console.log(tabId);
         switch (tabId) {
@@ -274,7 +274,7 @@
             default:
                 loadDataMasuk();
                 break;
-        }    
+        }
     }
 
     $('.datepicker').bootstrapMaterialDatePicker({
@@ -283,6 +283,7 @@
         time: false,
     });
     loadKategorSurat();
+
     function loadKategorSurat() {
         $('#kategori_surat_masuk_id').empty().trigger("change");
         $.ajax({
@@ -290,11 +291,17 @@
             method: 'GET',
             dataType: 'json',
             success: function(response) {
-                let dataparent = [{ id: "", text: "" }];
-                jQuery.each(response.data, function (i, val) {
-                    dataparent.push({ id: val['id'], text: val['kategori'] });
+                let dataparent = [{
+                    id: "",
+                    text: ""
+                }];
+                jQuery.each(response.data, function(i, val) {
+                    dataparent.push({
+                        id: val['id'],
+                        text: val['kategori']
+                    });
                 });
-                sel2_datalokal("#kategori_surat_masuk_id", dataparent, null,'#modal-form .modal-content');
+                sel2_datalokal("#kategori_surat_masuk_id", dataparent, null, '#modal-form .modal-content');
             },
             error: function(xhr, status, error) {
                 console.error(error);
@@ -303,7 +310,7 @@
     }
 
 
-    $(document).on('click','.imgprev',function() {
+    $(document).on('click', '.imgprev', function() {
         var image = new Image();
         image.src = $(this).data('url');
         var viewer = new Viewer(image, {
@@ -322,16 +329,16 @@
                 rotateRight: 4,
                 flipHorizontal: 4,
                 flipVertical: 4,
-            },            
+            },
             hidden: function() {
                 viewer.destroy();
             },
-        });        
+        });
         viewer.show();
-    });    
+    });
 
     function loadData(page = 1) {
-        let filter='';
+        let filter = '';
         // if(hakAkses>1)
         //     filter=`{"user_id":"${vUserId}"}`;
 
@@ -354,9 +361,9 @@
     //pencarian data
     $('#search-data').on('input', function() {
         var keyword = $(this).val();
-        var filter='';
-        if(hakAkses>1)
-            filter=`{"user_id":"${vUserId}"}`;
+        var filter = '';
+        if (hakAkses > 1)
+            filter = `{"user_id":"${vUserId}"}`;
 
         if (keyword.length == 0 || keyword.length >= 3) {
             $.ajax({
@@ -372,9 +379,9 @@
                 }
             });
         }
-    });    
+    });
 
-    function refreshData(){
+    function refreshData() {
         $('#search-data').val("");
         CrudModule.refresh(displayData);
     }
@@ -389,114 +396,114 @@
         var tableBody = $('#suratMasukTableBody');
         var nomor = response.meta.from;
         tableBody.empty();
-        if(data.length>0)
+        if (data.length > 0)
             $.each(data, function(index, suratMasuk) {
-                var lampiran=`<span class="badge bg-danger">Belum terupload</span>`;
-                var status_disposisi=lampiran;
-                var track_disposisi=``;
-                var menu_detail=``;
+                var lampiran = `<span class="badge bg-danger">Belum terupload</span>`;
+                var status_disposisi = lampiran;
+                var track_disposisi = ``;
+                var menu_detail = ``;
                 var dt = suratMasuk;
-                var pembuat_surat=false;
-                var labelApp=labelSetupVerifikasi(dt.is_diajukan,dt.is_diterima,dt.catatan,dt.verifikator);
-                var menu_edit=``;
+                var pembuat_surat = false;
+                var labelApp = labelSetupVerifikasi(dt.is_diajukan, dt.is_diterima, dt.catatan, dt.verifikator);
+                var menu_edit = ``;
 
-                var btnUpload=` <div class="btn-group-sm mt-1">
+                var btnUpload = ` <div class="btn-group-sm mt-1">
                                     <a href="javascript:;" class="btn btn-primary uploadLampiran" data-surat_masuk_id="${suratMasuk.id}"><i class="fa-solid fa-upload"></i></a>
                                     <a href="javascript:;" class="btn btn-primary fotoLampiran" onclick="upload(${suratMasuk.id})"><i class="fa-solid fa-camera"></i></a>
                                 </div>`;
-                
-                if(dt.user_id==vUserId){
-                    pembuat_surat=true;
-                    if(dt.is_diajukan!=1){                    
-                        menu_edit+=`<li><a class="dropdown-item" href="javascript:;" onclick="ganti(${dt.id})"><i class="fa-solid fa-pen-to-square"></i> Ganti</a></li>
+
+                if (dt.user_id == vUserId) {
+                    pembuat_surat = true;
+                    if (dt.is_diajukan != 1) {
+                        menu_edit += `<li><a class="dropdown-item" href="javascript:;" onclick="ganti(${dt.id})"><i class="fa-solid fa-pen-to-square"></i> Ganti</a></li>
                                     <li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>`;
-                        if(suratMasuk.jumlah_lampiran>0){
-                            menu_edit+=` <li><a class="dropdown-item" href="javascript:;" onclick="ajukan(${dt.id})"><i class="fa-regular fa-share-from-square"></i> Ajukan</a></li>`;
+                        if (suratMasuk.jumlah_lampiran > 0) {
+                            menu_edit += ` <li><a class="dropdown-item" href="javascript:;" onclick="ajukan(${dt.id})"><i class="fa-regular fa-share-from-square"></i> Ajukan</a></li>`;
                         }
                     }
                 }
-                
-                if(dt.is_diajukan){
-                    menu_edit=``;
 
-                    if(dt.is_diterima==null && (hakAkses==1)){
-                        menu_edit=` <li><a class="dropdown-item" href="javascript:;" onclick="validasi(1,${dt.id})"><i class="fa-solid fa-envelope-circle-check"></i> Terima</a></li>
+                if (dt.is_diajukan) {
+                    menu_edit = ``;
+
+                    if (dt.is_diterima == null && (hakAkses == 1)) {
+                        menu_edit = ` <li><a class="dropdown-item" href="javascript:;" onclick="validasi(1,${dt.id})"><i class="fa-solid fa-envelope-circle-check"></i> Terima</a></li>
                                     <li><a class="dropdown-item" href="javascript:;" onclick="validasi(0,${dt.id})"><i class="fa-solid fa-rectangle-xmark"></i> Tolak</a></li>
                                     <li><a class="dropdown-item" href="javascript:;" onclick="kembalikan(${dt.id})"><i class="fas fa-arrow-left"></i> Kembalikan Ke Arsip</a></li>`;
 
                     }
-                    if(dt.is_diterima==null)
-                        menu_edit+=`<li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>`;
+                    if (dt.is_diterima == null)
+                        menu_edit += `<li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>`;
                 }
 
-                if(suratMasuk.is_diterima && hakAkses!=1){
-                    btnUpload=``;
+                if (suratMasuk.is_diterima && hakAkses != 1) {
+                    btnUpload = ``;
                 }
 
-                if(suratMasuk.jumlah_lampiran>0){
-                    status_disposisi='<span class="badge bg-danger">Belum diterima</span>';
-                    lampiran =`<ul style="list-style: none;margin: 0;padding: 0; font-size:11px;" class="fa-ul images">`;
+                if (suratMasuk.jumlah_lampiran > 0) {
+                    status_disposisi = '<span class="badge bg-danger">Belum diterima</span>';
+                    lampiran = `<ul style="list-style: none;margin: 0;padding: 0; font-size:11px;" class="fa-ul images">`;
                     $.each(suratMasuk.lampiran_surat_masuk, function(i, dt) {
-                        lampiran +=`<li><span class="fa-li"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>`;
-                        if(is_image(dt.upload.type))
-                            lampiran +=`<a href="javascript:;" data-url="${dt.upload.path}" class="imgprev" target="_self">${dt.upload.name}</a>`;
+                        lampiran += `<li><span class="fa-li"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>`;
+                        if (is_image(dt.upload.type))
+                            lampiran += `<a href="javascript:;" data-url="${dt.upload.path}" class="imgprev" target="_self">${dt.upload.name}</a>`;
                         else
-                            lampiran +=`<a href="${dt.upload.path}" target="_blank">${dt.upload.name}</a>`;
+                            lampiran += `<a href="${dt.upload.path}" target="_blank">${dt.upload.name}</a>`;
 
-                        if(!suratMasuk.is_diterima)
-                            lampiran +=` <a href="javascript:;" onclick="hapusLampiranSuratMasuk(${dt.id},${dt.upload.id})"><i class="fa-regular fa-trash-can"></i></a>`;
+                        if (!suratMasuk.is_diterima)
+                            lampiran += ` <a href="javascript:;" onclick="hapusLampiranSuratMasuk(${dt.id},${dt.upload.id})"><i class="fa-regular fa-trash-can"></i></a>`;
 
-                        lampiran +=` </li>`;
+                        lampiran += ` </li>`;
 
                     });
-                    lampiran +=`</ul>`;
-                    if(suratMasuk.is_diterima){
-                        
-                        if(hakAkses==1){
-                            status_disposisi=`<span class="btn btn-primary btn-sm" onclick="prosesDisposisi(${suratMasuk.id})"><i class="fa-solid fa-envelopes-bulk"></i> Proses Disposisi</span>`;
-                        }else{
-                            status_disposisi=`<span class="badge bg-warning"> Dalam proses</span>`;
+                    lampiran += `</ul>`;
+                    if (suratMasuk.is_diterima) {
+
+                        if (hakAkses == 1) {
+                            status_disposisi = `<span class="btn btn-primary btn-sm" onclick="prosesDisposisi(${suratMasuk.id})"><i class="fa-solid fa-envelopes-bulk"></i> Proses Disposisi</span>`;
+                        } else {
+                            status_disposisi = `<span class="badge bg-warning"> Dalam proses</span>`;
                         }
-                        track_disposisi =`<span class="badge bg-warning">Belum terdisposisi</span>`;
-                        if(suratMasuk.tujuan.length>0){
-                            status_disposisi="";
+                        track_disposisi = `<span class="badge bg-warning">Belum terdisposisi</span>`;
+                        if (suratMasuk.tujuan.length > 0) {
+                            status_disposisi = "";
                             // menu_detail=`<li><a class="dropdown-item" href="/disposisi-detail/${suratMasuk.id}"><i class="fa-brands fa-readme"></i> Detail Disposisi</a></li>`;
-                            track_disposisi =`<div style="font-size:11px;">`;
+                            track_disposisi = `<div style="font-size:11px;">`;
                             let conv;
                             let badge_clr;
-                            track_disposisi +=`<ul style="list-style: none;margin: 0;padding: 0;" class="fa-ul">`;
+                            track_disposisi += `<ul style="list-style: none;margin: 0;padding: 0;" class="fa-ul">`;
                             $.each(suratMasuk.tujuan, function(i, dt) {
-                                conv=waktuLalu(dt.created_at);
-                                badge_clr='danger'; 
-                                badge_icon='check'; 
-                                let hapusDispo=`<a href="javascript:;" onclick="hapus(${dt.id},'/api/tujuan/')"><i class="fa-regular fa-trash-can"></i></a>`;
-                                if(dt.waktu_akses!==null){
-                                    badge_clr='success'; 
-                                    badge_icon='check-double'; 
-                                    hapusDispo='';
+                                conv = waktuLalu(dt.created_at);
+                                badge_clr = 'danger';
+                                badge_icon = 'check';
+                                let hapusDispo = `<a href="javascript:;" onclick="hapus(${dt.id},'/api/tujuan/')"><i class="fa-regular fa-trash-can"></i></a>`;
+                                if (dt.waktu_akses !== null) {
+                                    badge_clr = 'success';
+                                    badge_icon = 'check-double';
+                                    hapusDispo = '';
                                 }
-                                track_disposisi +=`
+                                track_disposisi += `
                                     <li>
                                         <span class="fa-li"><i class="fa-solid fa-${badge_icon}"></i></span>
                                         <i class="fa-regular fa-clock"></i> ${conv} - ${dt.user.name} ${hapusDispo}
                                     </li>`;
                             });
-                            track_disposisi +=`</ul></div>`;
+                            track_disposisi += `</ul></div>`;
                         }
                     }
-                    
-                }else{
-                    lampiran="wajib upload dokumen sebelum diajukan";
+
+                } else {
+                    lampiran = "wajib upload dokumen sebelum diajukan";
                 }
 
-                if(suratMasuk.is_diterima && hakAkses==1)
-                    menu_edit=`<li><a class="dropdown-item" href="javascript:;" onclick="ganti(${dt.id})"><i class="fa-solid fa-pen-to-square"></i> Ganti</a></li>
+                if (suratMasuk.is_diterima && hakAkses == 1)
+                    menu_edit = `<li><a class="dropdown-item" href="javascript:;" onclick="ganti(${dt.id})"><i class="fa-solid fa-pen-to-square"></i> Ganti</a></li>
                                <li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>
                                <li><a class="dropdown-item" href="${vBaseUrl}/cetak-lembar-disposisi/${suratMasuk.id}" target="_blank"><i class="fa-solid fa-print"></i> Cetak Lembar Disposisi</a></li>`;
-                else if(suratMasuk.is_diterima==0 && hakAkses==1)
-                    menu_edit=`<li><a class="dropdown-item" href="javascript:;" onclick="kembalikan(${dt.id})"><i class="fas fa-arrow-left"></i> Kembalikan Ke Arsip</a></li>
+                else if (suratMasuk.is_diterima == 0 && hakAkses == 1)
+                    menu_edit = `<li><a class="dropdown-item" href="javascript:;" onclick="kembalikan(${dt.id})"><i class="fas fa-arrow-left"></i> Kembalikan Ke Arsip</a></li>
                                <li><a class="dropdown-item" href="javascript:;" onclick="hapus(${dt.id})"><i class="fa-solid fa-trash"></i> Hapus</a></li>`;
-                const vno_agenda=(suratMasuk.no_agenda>0)?`(${suratMasuk.no_agenda})`:"";
+                const vno_agenda = (suratMasuk.no_agenda > 0) ? `(${suratMasuk.no_agenda})` : "";
                 var row = `
                     <tr>
                         <td>${nomor++}</td>
@@ -533,18 +540,18 @@
                 `;
                 tableBody.append(row);
             });
-        else{
+        else {
             var row = `
                     <tr>
                         <td colspan="5">Tidak ditemukan</td>
                     </tr>
                 `;
-            tableBody.append(row);            
+            tableBody.append(row);
         }
     }
 
-//pagination
-function displayPagination(response) {
+    //pagination
+    function displayPagination(response) {
         // console.log(response);
         var currentPage = response.meta.current_page;
         var lastPage = response.meta.last_page;
@@ -552,7 +559,7 @@ function displayPagination(response) {
         var paginationData = $('#pagination-jumlah-data');
         pagination.empty();
         paginationData.empty();
-        if(response.meta.total>0){
+        if (response.meta.total > 0) {
             for (let i = 1; i <= lastPage; i++) {
                 var liClass = (i === currentPage) ? 'page-item active' : 'page-item';
                 var linkClass = 'page-link';
@@ -567,7 +574,7 @@ function displayPagination(response) {
                 var page = $(this).data('page');
                 loadData(page);
             });
-        }            
+        }
     }
 
     //tambah
@@ -575,12 +582,12 @@ function displayPagination(response) {
         showModalForm();
         $("#no_agenda").val("0");
         $("#div_no_agenda").hide();
-    });    
+    });
 
     //untuk showModal untuk tambah
-    function showModalForm(){
+    function showModalForm() {
         $('#myForm')[0].reset();
-        $("#kategori_surat_masuk_id").val("").trigger("change"); 
+        $("#kategori_surat_masuk_id").val("").trigger("change");
         $("#id").val("");
         let myModalForm = new bootstrap.Modal(document.getElementById('modal-form'), {
             backdrop: 'static',
@@ -590,9 +597,9 @@ function displayPagination(response) {
     }
 
     function hapus(id) {
-        if(confirm("apakah anda yakin?")){
+        if (confirm("apakah anda yakin?")) {
             $.ajax({
-                url: 'api/surat-masuk/'+id,
+                url: 'api/surat-masuk/' + id,
                 method: 'DELETE',
                 dataType: 'json',
                 success: function(response) {
@@ -600,52 +607,52 @@ function displayPagination(response) {
                     InfoModule.updateNotifWeb();
                 },
                 error: function(xhr, status, error) {
-                    appShowNotification(false,[error]);
+                    appShowNotification(false, [error]);
                 }
             });
         }
     }
 
     function kembalikan(id) {
-        if(confirm("apakah anda yakin kembalikan surat ini ?")){
+        if (confirm("apakah anda yakin kembalikan surat ini ?")) {
             catatan = prompt("Tuliskan alasan sederhana mengapa dikembalikan?");
-            if(catatan){
+            if (catatan) {
                 $.ajax({
                     url: `/api/kembalikan-surat-masuk/${id}`,
                     type: "PUT",
                     data: {
-                        'catatan':catatan,
+                        'catatan': catatan,
                     },
                     dataType: 'json',
-                    success: function (response) {
-                        if(response.success){
+                    success: function(response) {
+                        if (response.success) {
                             appShowNotification(true, [response.message]);
                             refresh();
                             InfoModule.updateNotifWeb();
                         }
                     },
-                    error: function (xhr, status, error) {
+                    error: function(xhr, status, error) {
                         appShowNotification(false, ["Something went wrong. Please try again later."]);
                     }
-                });                
-            }else 
+                });
+            } else
                 alert('wajib ada catatan');
         }
     }
 
-    function populateEditForm(data){
+    function populateEditForm(data) {
         // console.log(data);
         $("#id").val(data.id);
         $("#asal").val(data.asal);
-        $("#no_agenda").val(data.no_agenda);        
-        $("#no_surat").val(data.no_surat);        
-        $("#perihal").val(data.perihal);        
-        $("#ringkasan").val(data.ringkasan);        
-        $("#tanggal").val(data.tanggal);        
+        $("#no_agenda").val(data.no_agenda);
+        $("#no_surat").val(data.no_surat);
+        $("#perihal").val(data.perihal);
+        $("#ringkasan").val(data.ringkasan);
+        $("#tanggal").val(data.tanggal);
         $("#tempat").val(data.tempat);
         $("#kategori_surat").val(data.kategori_surat);
-        
-        $("#kategori_surat_masuk_id").val(data.kategori_surat_masuk_id).trigger("change"); 
+
+        $("#kategori_surat_masuk_id").val(data.kategori_surat_masuk_id).trigger("change");
     }
 
     $("#myForm").validate({
@@ -657,17 +664,23 @@ function displayPagination(response) {
             tempat: "tempat surat tidak boleh kosong",
             kategori_surat_masuk: "sifat surat tidak boleh kosong",
             kategori_surat: "kategori surat tidak boleh kosong",
-            
+
         },
         submitHandler: function(form) {
-            let setup_ajax={type:'POST',url:'/api/surat-masuk'};
-            let id=$("#id").val();
+            let setup_ajax = {
+                type: 'POST',
+                url: '/api/surat-masuk'
+            };
+            let id = $("#id").val();
             if (id !== "")
-                setup_ajax={type:'PUT',url:'/api/surat-masuk/'+id};
-            simpan(setup_ajax,form)
+                setup_ajax = {
+                    type: 'PUT',
+                    url: '/api/surat-masuk/' + id
+                };
+            simpan(setup_ajax, form)
         }
-    });  
-    
+    });
+
     $("#form-disposisi").validate({
         messages: {
             user_id: "pilih user dulu",
@@ -675,11 +688,11 @@ function displayPagination(response) {
         submitHandler: function(form) {
             simpanTujuan()
         }
-    });  
-    
+    });
+
     function simpanTujuan(form) {
         var select_user_id = $('#select_user_id').val();
-        var surat_masuk_id = $('#surat_masuk_id').val(); 
+        var surat_masuk_id = $('#surat_masuk_id').val();
 
         $.ajax({
             url: '/api/tujuan',
@@ -690,18 +703,18 @@ function displayPagination(response) {
                 user_id: select_user_id,
                 // created_by: vUserId,
             },
-            success: function (response) {
-                if(response.success){
+            success: function(response) {
+                if (response.success) {
                     refresh();
                     InfoModule.updateNotifWeb();
                     $('#modal-disposisi').modal('hide');
-                }   
-                appShowNotification(response.success,[response.message]);
+                }
+                appShowNotification(response.success, [response.message]);
             },
-            error: function (xhr, status, error) {
-                appShowNotification(false,['Terjadi kesalahan, '+error]);
+            error: function(xhr, status, error) {
+                appShowNotification(false, ['Terjadi kesalahan, ' + error]);
             }
-        });    
+        });
         // multiple user
         // jQuery.each(select_user_id, function (i, val) {
         //     $.ajax({
@@ -723,9 +736,9 @@ function displayPagination(response) {
         //         }
         //     });    
         // });
-    }		    
+    }
 
-    function simpan(setup_ajax,form) {
+    function simpan(setup_ajax, form) {
         $.ajax({
             type: setup_ajax.type,
             url: setup_ajax.url,
@@ -736,19 +749,19 @@ function displayPagination(response) {
                     refreshData();
                     InfoModule.updateNotifWeb();
                     $('#modal-form').modal('hide');
-                } 
-                appShowNotification(response.success,[response.message]);
+                }
+                appShowNotification(response.success, [response.message]);
             },
             error: function(xhr, status, error) {
-                appShowNotification(false,['Something went wrong. Please try again later.']);
+                appShowNotification(false, ['Something went wrong. Please try again later.']);
             }
         });
-    }		    
+    }
 
     function ganti(id) {
         $.ajax({
             type: 'GET',
-            url: '/api/surat-masuk/'+id,
+            url: '/api/surat-masuk/' + id,
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
@@ -756,16 +769,16 @@ function displayPagination(response) {
                     showModalForm();
                     InfoModule.updateNotifWeb();
                     populateEditForm(response.data);
-                }else 
-                    appShowNotification(response.success,[response.message]);
+                } else
+                    appShowNotification(response.success, [response.message]);
             },
             error: function(xhr, status, error) {
-                appShowNotification(false,['Something went wrong. Please try again later.']);
+                appShowNotification(false, ['Something went wrong. Please try again later.']);
             }
         });
     }
-    
-    function prosesDisposisi(surat_masuk_id){
+
+    function prosesDisposisi(surat_masuk_id) {
         $('#form-disposisi')[0].reset();
         $("#surat_masuk_id").val(surat_masuk_id);
         $('#select_user_id').val("").trigger("change");
@@ -776,15 +789,18 @@ function displayPagination(response) {
         myModalForm.toggle();
     }
 
-    function linkLampiran(upload_id,surat_masuk_id){
-        var formData = {upload_id:upload_id,surat_masuk_id:surat_masuk_id};
+    function linkLampiran(upload_id, surat_masuk_id) {
+        var formData = {
+            upload_id: upload_id,
+            surat_masuk_id: surat_masuk_id
+        };
         // console.log(formData);
         $.ajax({
             type: "POST",
             dataType: 'json',
             url: "/api/lampiran-surat-masuk",
             data: formData,
-            success: function (response) {
+            success: function(response) {
                 if (response.success) {
                     $('#modal-upload').modal('hide');
                     refresh();
@@ -793,37 +809,37 @@ function displayPagination(response) {
                     appShowNotification(false, ["Failed to upload attachment."]);
                 }
             },
-            error: function (xhr, status, error) {
+            error: function(xhr, status, error) {
                 appShowNotification(false, ["Something went wrong. Please try again later."]);
             },
         });
     }
 
-    function hapusLampiranSuratMasuk(id,upload_id){
-        if(confirm("apakah anda yakin?")){
+    function hapusLampiranSuratMasuk(id, upload_id) {
+        if (confirm("apakah anda yakin?")) {
             $.ajax({
                 type: "DELETE",
-                url: "/api/lampiran-surat-masuk/"+id,
+                url: "/api/lampiran-surat-masuk/" + id,
                 dataType: 'json',
-                success: function (response) {
+                success: function(response) {
                     refresh();
                 },
-                error: function (xhr, status, error) {
+                error: function(xhr, status, error) {
                     appShowNotification(false, ["Something went wrong. Please try again later."]);
                 },
             });
         }
     }
 
-   
 
-    $(document).on("click", ".uploadLampiran", function () {
+
+    $(document).on("click", ".uploadLampiran", function() {
         var surat_masuk_id = $(this).data("surat_masuk_id");
         var fileInput = $('<input type="file" id="lampiran" name="lampiran" accept=".jpg, .jpeg, .png, .pdf, .doc, .docx, .ppt, .pptx, .xls, .xlsx" style="display: none;">');
         $("body").append(fileInput);
         fileInput.click();
 
-        fileInput.change(function () {
+        fileInput.change(function() {
             var selectedFile = this.files[0];
             if (selectedFile) {
                 uploadFile(surat_masuk_id, selectedFile);
@@ -842,81 +858,83 @@ function displayPagination(response) {
             data: formData,
             processData: false,
             contentType: false,
-            success: function (response) {
+            success: function(response) {
                 if (response.success) {
                     linkLampiran(response.data.id, surat_masuk_id);
                 } else {
                     appShowNotification(false, ["Failed to upload attachment."]);
                 }
             },
-            error: function (xhr, status, error) {
+            error: function(xhr, status, error) {
                 appShowNotification(false, ["Something went wrong. Please try again later."]);
             }
         });
-    }  
+    }
 
-    function ajukan(id){
-        if(confirm("apakah anda yakin?")){
+    function ajukan(id) {
+        if (confirm("apakah anda yakin?")) {
             $.ajax({
                 url: "/api/ajukan-surat-masuk",
                 type: "POST",
-                data: {'id':id},
+                data: {
+                    'id': id
+                },
                 dataType: 'json',
-                success: function (response) {
-                    if(response.success){
+                success: function(response) {
+                    if (response.success) {
                         refresh();
                         InfoModule.updateNotifWeb();
                     }
                     appShowNotification(response.success, response.msg);
                 },
-                error: function (xhr, status, error) {
+                error: function(xhr, status, error) {
                     appShowNotification(false, ["Something went wrong. Please try again later."]);
                 }
             });
         }
-    }    
+    }
 
-    function validasi(is_diterima,id){
-        var label='tolak';
-        var catatan='';
-        if(is_diterima){
-            label='terima';
+    function validasi(is_diterima, id) {
+        var label = 'tolak';
+        var catatan = '';
+        if (is_diterima) {
+            label = 'terima';
         }
 
-        if(confirm('apakah anda yakin '+label+' usulan ini?')){
-            if(!is_diterima)
+        if (confirm('apakah anda yakin ' + label + ' usulan ini?')) {
+            if (!is_diterima)
                 catatan = prompt("Tuliskan alasan sederhana mengapa ditolak?");
 
             $.ajax({
                 url: "/api/proses-ajuan-surat-masuk",
                 type: "POST",
                 data: {
-                    'id':id,
-                    'is_diterima':is_diterima,
-                    'catatan':catatan,
+                    'id': id,
+                    'is_diterima': is_diterima,
+                    'catatan': catatan,
                 },
                 dataType: 'json',
-                success: function (response) {
-                    if(response.success){
+                success: function(response) {
+                    if (response.success) {
                         appShowNotification(true, [response.message]);
                         refresh();
                         InfoModule.updateNotifWeb();
                     }
                 },
-                error: function (xhr, status, error) {
+                error: function(xhr, status, error) {
                     appShowNotification(false, ["Something went wrong. Please try again later."]);
                 }
-            });                
+            });
         }
-    }    
+    }
 
-    sel2_cariUser(3,'#select_user_id','#form-disposisi .modal-content');
+    sel2_cariUser(3, '#select_user_id', '#form-disposisi .modal-content');
 
     //modal untuk ambil dari kamera
-    function upload(id){
+    function upload(id) {
         // $("#uploadForm")[0].reset();
         // $("#surat_masuk_id").val(id);
-        vsurat_masuk_id=id;
+        vsurat_masuk_id = id;
         let myModalUpload = new bootstrap.Modal(document.getElementById('modal-upload'), {
             backdrop: 'static',
             keyboard: false,
@@ -947,12 +965,12 @@ function displayPagination(response) {
     //     });
     // });
     //refresh
-    function refresh(){
+    function refresh() {
         CrudModule.refresh(displayData);
     }
 
 
-    function loadDataKonsep(page = 1) {        
+    function loadDataKonsep(page = 1) {
         CrudModule.setFilter(`{"status":"konsep","tahun":"${tahunFilter}","kategori":"${$('#filter_kategori_surat').val()}"}`);
         CrudModule.fRead(page, displayData);
     }
@@ -975,7 +993,7 @@ function displayPagination(response) {
     $(document).ready(function() {
         CrudModule.setApi(vApi);
         // Load data default
-        loadDataKonsep();        
+        loadDataKonsep();
         InfoModule.updateNotifWeb();
         // Ambil referensi elemen
         const cameraElement = document.getElementById("camera");
@@ -1065,7 +1083,7 @@ function displayPagination(response) {
             stopCamera();
         });
 
-        function cariNoAgenda(){
+        function cariNoAgenda() {
             var kategori_surat = $("#kategori_surat").val();
             var tahun = $("#tanggal").val();
             var tanggal = $("#tanggal").val();
@@ -1097,21 +1115,20 @@ function displayPagination(response) {
         $('#filter_kategori_surat').on('change', function() {
             var activeTabId = $('.nav-tabs .nav-link.active').attr('id');
             var kategori = $(this).val();
-            console.log(activeTabId,kategori)
-            
-            if(activeTabId=='tabKonsep')        
+            console.log(activeTabId, kategori)
+
+            if (activeTabId == 'tabKonsep')
                 CrudModule.setFilter(`{"status":"konsep","tahun":"${tahunFilter}","kategori":"${kategori}"}`);
-            else if(activeTabId=='tabAjukan')         
+            else if (activeTabId == 'tabAjukan')
                 CrudModule.setFilter(`{"status":"diajukan","tahun":"${tahunFilter}","kategori":"${kategori}"}`);
-            else if(activeTabId=='tabTerima')         
+            else if (activeTabId == 'tabTerima')
                 CrudModule.setFilter(`{"status":"diterima","tahun":"${tahunFilter}","kategori":"${kategori}"}`);
-            else if(activeTabId=='tabTolak')         
+            else if (activeTabId == 'tabTolak')
                 CrudModule.setFilter(`{"status":"ditolak","tahun":"${tahunFilter}","kategori":"${kategori}"}`);
-                                                    
+
             CrudModule.refresh(displayData);
         });
-        
-    });
 
+    });
 </script>
 @endsection

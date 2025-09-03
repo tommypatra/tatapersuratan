@@ -94,7 +94,7 @@
 @section('scriptJs')
 <script src="{{ asset('js/select2/dist/js/select2.min.js') }}"></script>
 <script src="{{ asset('js/select2lib.js') }}"></script>
-<script src="{{ asset('js/crud.js') }}"></script>
+<script src="{{ asset('js/crud.js?v=3') }}"></script>
 <script src="{{ asset('js/img-viewer/viewer.min.js') }}"></script>
 
 <script type="text/javascript">
