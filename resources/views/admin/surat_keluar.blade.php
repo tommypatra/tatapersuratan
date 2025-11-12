@@ -242,7 +242,7 @@
                         <select class="form-control" id="filter_bulan" name="filter_bulan">
                             <option value="SEMUA">SEMUA</option>
                             @php
-                                $bulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','November','Desember'];
+                                $bulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','oktober', 'November','Desember'];
                             @endphp
                             @foreach ($bulan as $i => $item)
                                 <option value="{{ $i+1 }}">{{ $item }}</option>
