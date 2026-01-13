@@ -53,9 +53,9 @@
 									</div>
 								</div>
 							</div>
-							<div class="text-center mb-3">
+							{{-- <div class="text-center mb-3">
 								Tidak punya akun? <a href="{{ route('akun-daftar') }}">Mendaftar</a>
-							</div>
+							</div> --}}
 						</form>
 					</div>
 				</div>

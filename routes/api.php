@@ -45,7 +45,7 @@ use App\Http\Controllers\Api\LampiranSuratKeluarController;
 
 
 Route::post('auth-login', [AuthController::class, 'login'])->name('auth-login');
-Route::post('akun-baru-simpan', [AuthController::class, 'simpanPendaftaran'])->name('akun-baru-simpan');
+// Route::post('akun-baru-simpan', [AuthController::class, 'simpanPendaftaran'])->name('akun-baru-simpan');
 Route::get('tte/{kode}', [UtilityController::class, 'tte']);
 Route::post('refresh-token', [AuthController::class, 'refreshToken']);
 
