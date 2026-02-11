@@ -186,13 +186,16 @@ class SuratKeluarController extends Controller
 
             $validatedData = $request->validated();
             $validatedData['user_id'] = auth()->user()->id;
+            $validatedData['tahun'] = substr($validatedData['tanggal'], 0, 4);
+
             $gabungkan = isset($request['gabungkan']) ? true : false;
             $tujuan = $this->parseTujuan($validatedData['tujuan']);
             $perihal = $validatedData['perihal'];
+
             $pesan = [];
             $responseData = [];
             $surat_keluar_id = [];
-            // dd($tujuan);
+            // dd($validatedData);
             $jumlah_tujuan = count($tujuan);
             foreach ($tujuan as $i => $dp) {
                 if ($gabungkan)
@@ -299,6 +302,7 @@ class SuratKeluarController extends Controller
         try {
             $validatedData = $request->validated();
             $validatedData['user_id'] = auth()->user()->id;
+            $validatedData['tahun'] = substr($validatedData['tanggal'], 0, 4);
 
             $data = $this->findId($id);
             $data->update($validatedData);
