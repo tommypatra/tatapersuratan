@@ -75,36 +75,94 @@ class UploadController extends Controller
         ], 200);
     }
 
-    //OKE PUT application/x-www-form-urlencoded
     public function store(UploadRequest $request)
     {
         try {
-            $validatedData = $request->validated();
-            $validatedData['user_id'] = auth()->user()->id;
+
+            if (!$request->hasFile('file')) {
+                throw new \Exception('File tidak ditemukan');
+            }
+
             $uploadedFile = $request->file('file');
 
-            $originalFileName = $uploadedFile->getClientOriginalName();
-            $ukuranFile = $uploadedFile->getSize();
-            $tipeFile = $uploadedFile->getMimeType();
+            // pastikan upload valid
+            if (!$uploadedFile->isValid()) {
+                throw new \Exception('Upload file gagal');
+            }
 
-            $storagePath = 'uploads/' . date('Y') . '/' . date('m') . '/' . date('d');
+            // informasi file
+            $originalName = $uploadedFile->getClientOriginalName();
+            $size = $uploadedFile->getSize();
+            $mime = $uploadedFile->getMimeType();
+            $ext  = strtolower($uploadedFile->extension());
+
+            // whitelist extension
+            $allowedExt = [
+                'pdf',
+                'doc',
+                'docx',
+                'xls',
+                'xlsx',
+                'jpg',
+                'jpeg',
+                'png'
+            ];
+
+            if (!in_array($ext, $allowedExt)) {
+                throw new \Exception('Tipe file tidak diizinkan');
+            }
+
+            // blacklist tambahan
+            $blocked = [
+                'php',
+                'phtml',
+                'php3',
+                'php4',
+                'php5',
+                'phar',
+                'shtml',
+                'cgi',
+                'pl',
+                'exe',
+                'sh'
+            ];
+
+            if (in_array($ext, $blocked)) {
+                throw new \Exception('File berbahaya terdeteksi');
+            }
+
+            // batasi ukuran (5MB)
+            $maxSize = 5 * 1024 * 1024;
+            if ($size > $maxSize) {
+                throw new \Exception('Ukuran file terlalu besar');
+            }
+
+            // path penyimpanan
+            $storagePath = 'uploads/' . date('Y/m/d');
 
             if (!File::isDirectory(public_path($storagePath))) {
                 File::makeDirectory(public_path($storagePath), 0755, true);
             }
 
-            $fileName = generateUniqueFileName($originalFileName);
-            // $fileName = time() . '_' . $uploadedFile->getClientOriginalName();
+            // nama file random (tidak pakai nama user)
+            $fileName = Str::random(40) . '.' . $ext;
+
+            // pastikan tidak ada collision
+            while (File::exists(public_path($storagePath . '/' . $fileName))) {
+                $fileName = Str::random(40) . '.' . $ext;
+            }
+
+            // simpan file
             $uploadedFile->move(public_path($storagePath), $fileName);
 
-            $data = new Upload([
+            // simpan database
+            $data = Upload::create([
                 'path' => $storagePath . '/' . $fileName,
-                'name' => $originalFileName,
-                'size' => $ukuranFile,
-                'type' => $tipeFile,
-                'user_id' => auth()->user()->id,
+                'name' => basename($originalName),
+                'size' => $size,
+                'type' => $mime,
+                'user_id' => auth()->id()
             ]);
-            $data->save();
 
             return response()->json([
                 'success' => true,
@@ -112,15 +170,17 @@ class UploadController extends Controller
                 'data' => new UploadResource($data),
             ], 201);
         } catch (ValidationException $e) {
+
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed',
                 'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
+
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to create',
+                'message' => 'Upload gagal',
                 'error' => $e->getMessage(),
             ], 500);
         }

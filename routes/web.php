@@ -67,6 +67,14 @@ Route::get('/kirim-wa/{nomor}/{pesan}', function ($nomor, $pesan) {
     kirimWA($nomor, $pesan);
 });
 
+Route::get('/test-ip', function (Request $request) {
+    return [
+        'ip' => $request->ip(),
+        'forwarded' => $request->header('X-Forwarded-For'),
+        'real_ip' => $request->header('X-Real-IP')
+    ];
+});
+
 // });
 
 Route::get('/kirim-wa2', function () {
