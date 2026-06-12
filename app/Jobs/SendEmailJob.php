@@ -3,60 +3,40 @@
 namespace App\Jobs;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
-
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class SendEmailJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    public $data;
-    public $subject;
-    public $template;
-    /**
-     * Create a new message instance.
-     */
-    public function __construct($subject, $data, $template)
+
+    protected $email;
+    protected $subject;
+    protected $message;
+
+    public function __construct($email, $subject, $message)
     {
+        $this->email = $email;
         $this->subject = $subject;
-        $this->data = $data;
-        $this->template = $template;
+        $this->message = $message;
     }
 
-    /**
-     * Get the message envelope.
-     */
-    public function envelope(): Envelope
+    public function handle()
     {
-        return new Envelope(
-            subject: $this->subject,
-        );
-    }
-
-    /**
-     * Get the message content definition.
-     */
-    public function content(): Content
-    {
-        return new Content(
-            view: $this->template,
-            with: $this->data,
-        );
-    }
-
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
-    public function attachments(): array
-    {
-        return [];
+        try {
+            Mail::raw($this->message, function ($mail) {
+                $mail->to($this->email)
+                     ->subject($this->subject);
+            });
+        } catch (\Exception $e) {
+            Log::error('Gagal mengirim email', [
+                'email' => $this->email,
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 }

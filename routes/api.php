@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Http\Request;
+// use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\GrupController;
@@ -20,13 +20,14 @@ use App\Http\Controllers\Api\SuratMasukController;
 use App\Http\Controllers\Api\SuratKeluarController;
 use App\Http\Controllers\Api\PolaSpesimenController;
 use App\Http\Controllers\Api\AksesDisposisiController;
-use App\Http\Controllers\Api\AksesSuratMasukController;
+// use App\Http\Controllers\Api\AksesSuratMasukController;
 use App\Http\Controllers\Api\SpesimenJabatanController;
 use App\Http\Controllers\Api\TerimaDisposisiController;
 use App\Http\Controllers\Api\KlasifikasiSuratController;
 use App\Http\Controllers\Api\KategoriSuratMasukController;
 use App\Http\Controllers\Api\LampiranSuratMasukController;
 use App\Http\Controllers\Api\LampiranSuratKeluarController;
+use App\Http\Controllers\Api\NotifikasiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +49,9 @@ Route::post('auth-login', [AuthController::class, 'login'])->name('auth-login');
 // Route::post('akun-baru-simpan', [AuthController::class, 'simpanPendaftaran'])->name('akun-baru-simpan');
 Route::get('tte/{kode}', [UtilityController::class, 'tte']);
 Route::post('refresh-token', [AuthController::class, 'refreshToken']);
+
+Route::post('kirim-notifikasi', [NotifikasiController::class, 'kirim']);
+
 
 Route::middleware(['jwt.auth.refresh'])->group(function () {
     Route::get('cek-akses/{grup}', [UtilityController::class, 'cekAkses']);
@@ -92,7 +96,7 @@ Route::middleware(['jwt.auth.refresh'])->group(function () {
         Route::resource('grup-user', GrupUserController::class);
         Route::resource('grup', GrupController::class);
         Route::resource('akses-pola', AksesPolaController::class);
-        Route::resource('akses-surat-masuk', AksesSuratMasukController::class);
+        // Route::resource('akses-surat-masuk', AksesSuratMasukController::class);
         Route::resource('akses-disposisi', AksesDisposisiController::class);
         Route::resource('kategori-surat-masuk', KategoriSuratMasukController::class);
         Route::resource('pola-spesimen', PolaSpesimenController::class);
