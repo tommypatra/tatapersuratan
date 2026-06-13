@@ -12,6 +12,15 @@ class NotifikasiController extends Controller
 
     public function kirim(Request $request)
     {
+        $apiKey = $request->header('X-API-KEY');
+
+        if ($apiKey !== env('NOTIF_API_KEY')) {
+            return response()->json([
+                'status' => false,
+                'pesan'  => 'Unauthorized'
+            ], 401);
+        }
+
         $request->validate([
             'pesan' => 'required|string',
             'judul' => 'nullable|string',
