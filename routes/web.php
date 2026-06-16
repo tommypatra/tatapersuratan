@@ -65,7 +65,29 @@ Route::get('/ujicoba', function () {
 });
 
 Route::get('/kirim-wa/{nomor}/{pesan}', function ($nomor, $pesan) {
-    kirimWA($nomor, $pesan);
+    $curl = curl_init();
+    $token = env('WA_BLAS_TOKEN');
+    $secret_key = env('WA_BLAS_SECRET');
+    $data = [
+    'phone' => $nomor,
+    'message' => $pesan,
+    'flag' => 'instant',
+    ];
+    curl_setopt($curl, CURLOPT_HTTPHEADER,
+        array(
+            "Authorization: $token.$secret_key",
+        )
+    );
+    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));
+    curl_setopt($curl, CURLOPT_URL,  env('WA_BLAS_URL')."api/send-message");
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+    $result = curl_exec($curl);
+    curl_close($curl);
+    echo "<pre>";
+    print_r($result);
 });
 
 Route::get('/test-ip', function (Request $request) {
@@ -82,7 +104,7 @@ Route::get('/kirim-wa2', function () {
     $curl = curl_init();
 
     $token = "uvQOIWdPSfeMZKZediZyTGMOGqK0Zn0IhcKlCRcBS5fvWwOZlD14f4MDIiOqdoDs";
-    $secret_key = "spz2bNUJ";
+    $secret_key = "wn0D3Qn7";
 
     $payload = [
         "data" => [
