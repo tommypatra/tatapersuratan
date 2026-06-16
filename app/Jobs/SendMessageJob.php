@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Log;
 class SendMessageJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    protected $jenis;
     protected $phone;
     protected $message;
 
@@ -24,11 +23,13 @@ class SendMessageJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($phone, $message = null, $jenis = "text")
+
+    public function __construct($phone, $message = null)
     {
-        $this->jenis = $jenis ?? 'text';
+    
         $this->phone = $phone;
         $this->message = $message ?? '';
+    
     }
 
     /**
@@ -42,80 +43,55 @@ class SendMessageJob implements ShouldQueue
         $token = env('WA_BLAS_TOKEN');
         $secretKey = env('WA_BLAS_SECRET');
         $url = env('WA_BLAS_URL');
-        if ($this->jenis == "text") {
-            $this->sendTextMessage($token, $secretKey, $url);
-        } elseif ($this->jenis == "document") {
-            $this->sendDocumentMessage($token, $secretKey, $url);
-        }
+
+        $this->sendTextMessage(
+            $token,
+            $secretKey,
+            $url
+        );
     }
 
-    /**
-     * Mengirim pesan teks ke WhatsApp API.
-     */
     private function sendTextMessage($token, $secretKey, $url)
     {
-        $response = Http::withHeaders([
-            'Authorization' => "$token.$secretKey",
-        ])->post($url . 'api/send-message', [
-            'phone' => $this->phone,
-            'message'  => $this->message,
+        $curl = curl_init();
+
+        $data = [
+            'phone'   => $this->phone,
+            'message' => $this->message,
+            'flag'    => 'instant',
+        ];
+
+        curl_setopt($curl, CURLOPT_HTTPHEADER, [
+            "Authorization: {$token}.{$secretKey}",
         ]);
-        $this->handleResponse($response);
-    }
 
-    /**
-     * Mengirim pesan dokumen jika ada link dalam pesan.
-     */
-    private function sendDocumentMessage($token, $secretKey, $url)
-    {
-        $dokumen = $this->extractLinkDetails($this->message);
-        // dd($dokumen);
-        if ($dokumen && isset($dokumen['document'])) {
-            $response = Http::withHeaders([
-                'Authorization' => "$token.$secretKey",
-            ])->post($url . 'api/send-document', [
-                'phone' => $this->phone,
-                'document' => $dokumen['document'],
-                'caption' => $dokumen['caption'],
-            ]);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));
 
-            $this->handleResponse($response);
-        } else {
-            Log::warning('Pesan dokumen tidak valid.', [
+        curl_setopt(
+            $curl,
+            CURLOPT_URL,
+            rtrim($url, '/') . '/api/send-message'
+        );
+
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+
+        $result = curl_exec($curl);
+
+        if (curl_errno($curl)) {
+            Log::error('WABLAS CURL ERROR', [
                 'phone' => $this->phone,
-                'message' => $this->message,
+                'error' => curl_error($curl),
             ]);
         }
-    }
 
-    /**
-     * Mengekstrak link dan caption dari pesan HTML.
-     */
-    private function extractLinkDetails($htmlString)
-    {
-        $pattern = '/<a\s+[^>]*href=["\']([^"\']+)["\'][^>]*>(.*?)<\/a>/i';
-        if (preg_match($pattern, $htmlString, $matches)) {
-            return [
-                'document' => $matches[1] ?? null,
-                'caption' => trim(strip_tags($matches[2])) ?? null
-            ];
-        }
-        return null;
-    }
+        Log::info('WABLAS RESPONSE', [
+            'phone' => $this->phone,
+            'result' => $result,
+        ]);
 
-    /**
-     * Menangani respons dari API dan logging jika gagal.
-     */
-    private function handleResponse($response)
-    {
-        if (!$response->successful()) {
-            Log::error('Gagal mengirim pesan.', [
-                'phone' => $this->phone,
-                'jenis' => $this->jenis,
-                'message' => $this->message,
-                'status' => $response->status(),
-                'body' => $response->body(),
-            ]);
-        }
+        curl_close($curl);
     }
 }
