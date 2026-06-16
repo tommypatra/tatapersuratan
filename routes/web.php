@@ -1,9 +1,10 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\WebController;
+use App\Jobs\SendMessageJob;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\WebController;
-use App\Http\Controllers\Api\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,6 +63,20 @@ Route::get('/scan-qrcode', [WebController::class, 'scanQrCode'])->name('scan-qrc
 
 Route::get('/ujicoba', function () {
     return view('admin.test');
+});
+
+
+Route::get('/test-job-wa/{nomor}/{pesan}', function ($nomor, $pesan) {
+
+    SendMessageJob::dispatch(
+        $nomor,
+        $pesan
+    );
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Job masuk antrian'
+    ]);
 });
 
 Route::get('/kirim-wa/{nomor}/{pesan}', function ($nomor, $pesan) {
