@@ -110,13 +110,13 @@
         <div class="header">
             <!-- Logo -->
             <img src="{{ asset('images/logo.png') }}" alt="Logo">
-            
+
             <!-- Teks Judul -->
             <div class="header-text">
                 <strong>KEMENTERIAN AGAMA REPUBLIK INDONESIA</strong><br>
-                INSTITUT AGAMA ISLAM NEGERI IAIN KENDARI<br>
+                UNIVERSITAS ISLAM NEGERI (UIN) KENDARI<br>
                 Jln Sultan Qaimuddin, no 17 Baruga, Kota Kendari, Sulawesi Tenggara<br>
-                Email: iainkendari@yahoo.co.id | Website: iainkendari.ac.id<br>
+                Website: https://uinkendari.ac.id<br>
             </div>
         </div>
 
@@ -124,7 +124,7 @@
             <strong>LEMBAR DISPOSISI</strong><br>
             <strong>PERHATIAN:</strong> Dilarang memisahkan sehelai surat pun yang digabung dalam surat ini
         </div>
-        
+
         <table class="table">
             <tr>
                 <td>Nomor Surat</td>
@@ -274,7 +274,7 @@
                 <td></td>
             </tr>
         </table>
-        
+
     </div>
 </body>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -287,18 +287,18 @@
     // console.log(authToken);
 
     function prosesPerihal(perihal) {
-        const words = perihal.split(" ");   
+        const words = perihal.split(" ");
         if (words.length > 4) {
             return words.slice(0, 4).join(" ") + " ...";
         } else {
             return perihal;
         }
-    }    
+    }
 
     $.ajaxSetup({
         beforeSend: function(xhr) {
             xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('access_token'));
-        },          
+        },
         complete: function(xhr) {
             let responHeader = xhr.getResponseHeader('Authorization');
             if (responHeader) {
@@ -313,7 +313,7 @@
         }
     });
 
-    $(document).ready(function () {        
+    $(document).ready(function () {
 
         cekStatusToken();
         cekAkses('admin');
@@ -331,22 +331,22 @@
 
                 $('#no_surat').text(data.no_surat);
                 $('#tanggal').text(data.tanggal);
-                $('#tanggal_diterima').text(formattedDate);                
+                $('#tanggal_diterima').text(formattedDate);
                 $('#no_agenda').text(data.no_agenda);
                 $('#token').text(data.token);
                 $('#asal').text(`${data.asal} (${data.tempat})`);
                 $('#perihal').text(`${perihal}`);
 
                 const qr_text = JSON.stringify({
-                    id: data.id, 
-                    api: "disposisi", 
-                });     
+                    id: data.id,
+                    api: "disposisi",
+                });
                 // const qr_ttd = `${data.no_surat} ${data.perihal} ${qr_link}`;
                 new QRCode(document.getElementById('qrcode_label'), {
                     text: qr_text,
                     width: 100,
                     height: 100
-                });                
+                });
 
             },
             error: function(jqXHR, textStatus, errorThrown) {
